@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<!-- publicado via Claude em 09/10/2026 -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Rota: do edital à aprovação</title>
@@ -9,48 +8,50 @@
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;500;600;700;800;900&family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    /* Paleta "Vinho e Papel": papel quente, tinta de vinho e três apoios com personalidade.
+    /* Paleta "Água e Bordô Editorial": papel quente, verde água de ação, bordô para marca e prazos.
        Os nomes antigos (blue, mint, peach...) continuam existindo para não reescrever regras:
-       blue = VINHO (marca), mint = VERDE PETRÓLEO (ok), peach = TERRACOTA (atenção),
+       blue = VERDE ÁGUA (ação), mint = VERDE (ok), peach = BORDÔ (atenção e prazos),
        lav = AZUL ARDÓSIA (info), rose = ÂMBAR (favoritos). */
-    --bg: #FAF5EE;
-    --ink: #2B1E22;
-    --ink-soft: #7C6B70;
-    --line: #E9DDD3;
+    --bg: #FAF7F2;
+    --ink: #241E20;
+    --ink-soft: #6B6063;
+    --line: #E6DED6;
+    --vinho: #6E1F3A; --vinho-bg: #F1DEE3;
 
-    --blue: #D9A2AE; --blue-deep:#7C2D3E; --blue-bg:#F6E4E7;      /* vinho */
-    --mint: #8CCBC3; --mint-deep:#1B6B67; --mint-bg:#DDF0ED;      /* verde petróleo */
-    --peach:#EBA48E; --peach-deep:#B4472B; --peach-bg:#FAE4DC;    /* terracota */
+    --blue: #A9D3CB; --blue-deep:#17695F; --blue-bg:#D3E9E3;      /* verde água (marca) */
+    --mint: #8CC7BD; --mint-deep:#1F7A6E; --mint-bg:#DDF0EC;      /* verde ok */
+    --peach:#D9A0B0; --peach-deep:#6E1F3A; --peach-bg:#F1DEE3;    /* bordô (atenção e prazos) */
     --warn-bg:#FFF1CC; --warn-line:#E3C26B; --warn-ink:#5E4300;
     --cr-rose:var(--blue-deep); --cr-rose-bg:var(--blue-bg); --serif:'Fraunces',Georgia,'Times New Roman',serif;
     --lav:  #9DB6D1; --lav-deep:#2F5577; --lav-bg:#E0E9F3;        /* azul ardósia */
-    --sand: #E9DDD3; --sand-deep:#7C6B70;
+    --sand: #E6DED6; --sand-deep:#6B6063;
     --rose: #E8C27A; --rose-deep:#9A6410; --rose-bg:#FAEBC9;      /* âmbar */
 
-    --card: #FFFFFF;
-    --btn-primary-bg: #7C2D3E;
+    --card: #FFFEFC;
+    --btn-primary-bg: #17695F;
     --btn-primary-fg: #FFFFFF;
-    --nav-bg: rgba(250,245,238,.93);
+    --nav-bg: rgba(250,247,242,.93);
   }
   html[data-theme="dark"]{
-    --bg: #1E1719;
-    --ink: #F5ECEE;
-    --ink-soft: #B3A0A6;
-    --line: #3D3236;
+    --bg: #121A19;
+    --ink: #EAF2EF;
+    --ink-soft: #9DB0AB;
+    --line: #2B3B38;
+    --vinho: #E9A0B6; --vinho-bg: #3A1D28;
 
-    --blue: #7C2D3E; --blue-deep:#F0A4B4; --blue-bg:#3A1F27;
-    --mint: #1B6B67; --mint-deep:#62C4BA; --mint-bg:#17302E;
-    --peach:#B4472B; --peach-deep:#F0957A; --peach-bg:#3B221B;
+    --blue: #17695F; --blue-deep:#7FD0C0; --blue-bg:#173532;
+    --mint: #1F7A6E; --mint-deep:#86D3B5; --mint-bg:#15302A;
+    --peach:#8E3050; --peach-deep:#E9A0B6; --peach-bg:#3A1D28;
     --warn-bg:#3A2F12; --warn-line:#8A7228; --warn-ink:#F2DC96;
     --cr-rose:var(--blue-deep); --cr-rose-bg:var(--blue-bg); --serif:'Fraunces',Georgia,'Times New Roman',serif;
     --lav:  #2F5577; --lav-deep:#8FB4DC; --lav-bg:#1D2A3A;
-    --sand: #3D3236; --sand-deep:#B3A0A6;
+    --sand: #2B3B38; --sand-deep:#9DB0AB;
     --rose: #9A6410; --rose-deep:#E7B766; --rose-bg:#3A2D14;
 
-    --card: #2A2124;
-    --btn-primary-bg: #F0A4B4;
-    --btn-primary-fg: #2B1E22;
-    --nav-bg: rgba(30,23,25,.93);
+    --card: #1B2625;
+    --btn-primary-bg: #7FD0C0;
+    --btn-primary-fg: #0F211E;
+    --nav-bg: rgba(18,26,25,.93);
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
@@ -1170,8 +1171,8 @@
   html[data-theme="dark"] nav.tabs button.active{ color:#1E1719; }
   nav.tabs button.active.t-inicio, nav.tabs button.active.t-concursos, nav.tabs button.active.t-estudos, nav.tabs button.active.t-favoritos, nav.tabs button.active.t-perfil{ background:var(--blue-deep); color:#fff; }
   html[data-theme="dark"] nav.tabs button.active.t-inicio, html[data-theme="dark"] nav.tabs button.active.t-concursos, html[data-theme="dark"] nav.tabs button.active.t-estudos, html[data-theme="dark"] nav.tabs button.active.t-favoritos, html[data-theme="dark"] nav.tabs button.active.t-perfil{ color:#1E1719; }
-  .seg-bar button.active, .cr-tabs button.active, .sort-chip.active{ background:var(--blue-deep); color:#fff; border-color:var(--blue-deep); box-shadow:0 4px 12px rgba(124,45,62,.25); }
-  html[data-theme="dark"] .seg-bar button.active, html[data-theme="dark"] .cr-tabs button.active, html[data-theme="dark"] .sort-chip.active{ color:#2B1E22; }
+  .seg-bar button.active, .cr-tabs button.active, .sort-chip.active{ background:var(--blue-deep); color:#fff; border-color:var(--blue-deep); box-shadow:0 4px 12px rgba(23,105,95,.25); }
+  html[data-theme="dark"] .seg-bar button.active, html[data-theme="dark"] .cr-tabs button.active, html[data-theme="dark"] .sort-chip.active{ color:#241E20; }
   .quick-tile.accent{ background:var(--blue-deep); border-color:transparent; }
   .quick-tile.ok{ background:var(--mint-deep); border-color:transparent; }
   .quick-tile.warn{ background:var(--peach-deep); border-color:transparent; }
@@ -1185,14 +1186,14 @@
   .cr-hero .cr-stats div{ border-color:rgba(255,255,255,.22); }
   .cr-hero .cr-meter{ background:rgba(255,255,255,.22); }
   .cr-hero .cr-meter i{ background:#F2C879; }
-  .cr-f0{ background:#7C2D3E; color:#fff; } .cr-f1{ background:#2F5577; color:#fff; } .cr-f2{ background:#1B6B67; color:#fff; } .cr-f3{ background:#B7791F; color:#fff; }
+  .cr-f0{ background:#17695F; color:#fff; } .cr-f1{ background:#2F5577; color:#fff; } .cr-f2{ background:#1F7A6E; color:#fff; } .cr-f3{ background:#B7791F; color:#fff; }
   .cr-m header em{ background:rgba(255,255,255,.22); color:#fff; }
-  .cr-banner{ background:linear-gradient(140deg,#4A1926,#2B1E22); color:#fff; border:none; }
+  .cr-banner{ background:linear-gradient(140deg,#0B3F38,#241E20); color:#fff; border:none; }
   .cr-banner b{ color:#F2C879; } .cr-banner span{ color:rgba(255,255,255,.82); }
   .cr-btn.dark{ background:var(--blue-deep); color:#fff; border-color:var(--blue-deep); }
-  html[data-theme="dark"] .cr-btn.dark{ color:#2B1E22; }
+  html[data-theme="dark"] .cr-btn.dark{ color:#241E20; }
   .cr-hoje{ background:var(--blue-deep); color:#fff; }
-  html[data-theme="dark"] .cr-hoje{ color:#2B1E22; }
+  html[data-theme="dark"] .cr-hoje{ color:#241E20; }
   .cr-day.hoje .cr-card{ border-color:var(--blue-deep); border-width:1.6px; }
   .cr-tag.t-aula{ color:var(--lav-deep); } .cr-tag.t-q{ color:var(--mint-deep); } .cr-tag.t-rev{ color:var(--peach-deep); }
   .mast-title .accent{ color:var(--blue-deep); }
@@ -1247,7 +1248,7 @@
   .pf-chips span{ font-size:11.5px; font-weight:800; padding:5px 10px; border-radius:999px; background:var(--blue-bg); color:var(--blue-deep); }
   .pf-chips span.g{ background:var(--mint-bg); color:var(--mint-deep); }
   .pf-plan{ margin-top:12px; border-radius:24px; padding:18px 16px; }
-  .pf-plan.cta{ background:linear-gradient(145deg,#7C2D3E,#4A1926); color:#fff; box-shadow:0 10px 26px rgba(74,25,38,.25); }
+  .pf-plan.cta{ background:linear-gradient(145deg,#17695F,#0B3F38); color:#fff; box-shadow:0 10px 26px rgba(11,63,56,.25); }
   .pf-plan.done{ background:var(--card); border:1px solid var(--line); box-shadow:var(--shadow-sm); }
   .pf-plan .eyebrow{ font-size:10.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:#E8C27A; }
   .pf-plan.done .eyebrow{ color:var(--blue-deep); }
@@ -1255,7 +1256,7 @@
   .pf-plan p{ font-size:12.5px; line-height:1.5; margin:0 0 12px; opacity:.92; }
   .pf-plan.done p{ color:var(--ink-soft); opacity:1; margin:8px 0 0; }
   .pf-plan .btn{ text-align:center; }
-  .pf-plan.cta .btn{ background:#fff; color:#7C2D3E; border:none; width:100%; }
+  .pf-plan.cta .btn{ background:#fff; color:#17695F; border:none; width:100%; }
   .pf-plan .row{ display:flex; gap:8px; margin-top:14px; }
   .pf-plan .row .btn{ flex:1; }
   .pf-label{ font-family:var(--serif); font-size:18px; font-weight:800; margin:24px 2px 10px; }
@@ -1292,7 +1293,7 @@
   .frase-f button{ font-family:inherit; font-size:12px; font-weight:800; color:inherit; background:rgba(0,0,0,.06); border:none; border-radius:999px; padding:6px 12px; cursor:pointer; }
   html[data-theme="dark"] .frase-f button{ background:rgba(255,255,255,.1); }
   /* ---------- Estudos > Hoje ---------- */
-  .hj-hero{ background:linear-gradient(145deg,#7C2D3E,#4A1926); color:#fff; border-radius:24px; padding:18px 18px 16px; margin:0 0 12px; box-shadow:0 10px 26px rgba(74,25,38,.28); }
+  .hj-hero{ background:linear-gradient(145deg,#17695F,#0B3F38); color:#fff; border-radius:24px; padding:18px 18px 16px; margin:0 0 12px; box-shadow:0 10px 26px rgba(11,63,56,.28); }
   .hj-eyebrow{ font-size:11px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:#E8C27A; }
   .hj-big{ font-family:var(--serif); font-size:38px; font-weight:800; line-height:1.1; margin:6px 0 10px; }
   .hj-big small{ font-family:inherit; font-size:13px; font-weight:700; opacity:.8; }
@@ -1394,6 +1395,44 @@
   .wz-fases div{ border-left:4px solid var(--blue-deep); background:var(--bg); border-radius:0 12px 12px 0; padding:8px 12px; }
   .wz-fases b{ display:block; font-family:var(--serif); font-size:14px; }
   .wz-fases span{ font-size:12px; color:var(--ink-soft); line-height:1.45; }
+
+  /* ====== Leveza (09/10): mesmo vinho, menos blocos sólidos. Fundos suaves, vinho só em texto, ícones e detalhes ====== */
+  .quick-tile.accent, .quick-tile.ok, .quick-tile.warn{ background:var(--card); border:1px solid var(--line); }
+  .quick-tile .qt-value, .quick-tile.accent .qt-value, .quick-tile.ok .qt-value, .quick-tile.warn .qt-value{ color:var(--ink); }
+  .quick-tile.accent .qt-label{ color:var(--blue-deep); } .quick-tile.ok .qt-label{ color:var(--mint-deep); } .quick-tile.warn .qt-label{ color:var(--peach-deep); }
+  .quick-tile.accent .qt-ico{ background:var(--blue-bg); color:var(--blue-deep); box-shadow:none; }
+  .quick-tile.ok .qt-ico{ background:var(--mint-bg); color:var(--mint-deep); box-shadow:none; }
+  .quick-tile.warn .qt-ico{ background:var(--peach-bg); color:var(--peach-deep); box-shadow:none; }
+  html[data-theme="dark"] .quick-tile .qt-value{ color:var(--ink); }
+  html[data-theme="dark"] .quick-tile.accent .qt-label{ color:var(--blue-deep); }
+  html[data-theme="dark"] .quick-tile.ok .qt-label{ color:var(--mint-deep); }
+  html[data-theme="dark"] .quick-tile.warn .qt-label{ color:var(--peach-deep); }
+
+  nav.tabs button.active.t-inicio, nav.tabs button.active.t-concursos, nav.tabs button.active.t-estudos, nav.tabs button.active.t-favoritos, nav.tabs button.active.t-perfil{ background:var(--blue-bg); color:var(--blue-deep); box-shadow:none; }
+  html[data-theme="dark"] nav.tabs button.active.t-inicio, html[data-theme="dark"] nav.tabs button.active.t-concursos, html[data-theme="dark"] nav.tabs button.active.t-estudos, html[data-theme="dark"] nav.tabs button.active.t-favoritos, html[data-theme="dark"] nav.tabs button.active.t-perfil{ background:var(--blue-bg); color:var(--blue-deep); }
+  .seg-bar button.active, .cr-tabs button.active, .sort-chip.active{ background:var(--blue-bg); color:var(--blue-deep); border-color:var(--blue-deep); box-shadow:none; }
+  html[data-theme="dark"] .seg-bar button.active, html[data-theme="dark"] .cr-tabs button.active, html[data-theme="dark"] .sort-chip.active{ color:var(--blue-deep); }
+
+  .hj-hero{ background:linear-gradient(160deg,var(--blue-bg),var(--card)); color:var(--ink); border:1px solid var(--line); box-shadow:var(--shadow-sm); }
+  .hj-eyebrow{ color:var(--blue-deep); }
+  .hj-meter{ background:var(--line); } .hj-meter i{ background:var(--blue-deep); }
+  .hj-chips span{ background:var(--card); border:1px solid var(--line); }
+  .pf-plan.cta{ background:linear-gradient(160deg,var(--blue-bg),var(--card)); color:var(--ink); border:1px solid var(--line); box-shadow:var(--shadow-sm); }
+  .pf-plan.cta .eyebrow{ color:var(--blue-deep); }
+  .pf-plan.cta .btn{ background:var(--blue-deep); color:#fff; }
+  html[data-theme="dark"] .pf-plan.cta .btn{ color:#241E20; }
+  .cr-banner{ background:linear-gradient(160deg,var(--blue-bg),var(--card)); color:var(--ink); border:1px solid var(--line); }
+  .cr-banner b{ color:var(--blue-deep); } .cr-banner span{ color:var(--ink-soft); }
+
+  /* ====== Editorial (09/10): Água e Bordô. Marca em bordô, linhas finas, cantos mais discretos ====== */
+  :root{ --radius:12px; }
+  .mast-title .accent{ color:var(--vinho); }
+  .card,.alert-box,.nav-list{ border-radius:12px; }
+  .stat,.quick-tile,.stat-tile{ border-radius:10px; }
+  .quick-tile.warn .qt-ico{ background:var(--peach-bg); color:var(--peach-deep); }
+  .hj-hero{ background:transparent; border:0; border-top:2px solid var(--blue-deep); border-bottom:1px solid var(--line); border-radius:0; box-shadow:none; padding-left:2px; padding-right:2px; }
+  .pf-plan.cta,.cr-banner{ border-radius:12px; }
+  .alert-bar{ background:var(--peach-deep); }
 </style>
 </head>
 <body data-tab="inicio">
