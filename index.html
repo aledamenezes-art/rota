@@ -1433,6 +1433,30 @@
   .hj-hero{ background:transparent; border:0; border-top:2px solid var(--blue-deep); border-bottom:1px solid var(--line); border-radius:0; box-shadow:none; padding-left:2px; padding-right:2px; }
   .pf-plan.cta,.cr-banner{ border-radius:12px; }
   .alert-bar{ background:var(--peach-deep); }
+
+  /* ====== Degradê (09/10): bordô encontra água. Destaques e botões em degradê, base clara e limpa ====== */
+  :root{ --grad-hero:linear-gradient(135deg,#6E1F3A 0%,#4C3A5E 45%,#17695F 100%); --grad-ag:linear-gradient(90deg,#17695F,#2FA394); --grad-vi:linear-gradient(145deg,#6E1F3A,#A8426A); --grad-go:linear-gradient(145deg,#B8821F,#C9972F); }
+  html[data-theme="dark"]{ --grad-hero:linear-gradient(135deg,#8E3050 0%,#4C3A5E 45%,#1F7A6E 100%); --grad-ag:linear-gradient(90deg,#7FD0C0,#5BB8A8); --grad-vi:linear-gradient(145deg,#8E3050,#C0587C); }
+  .hj-hero, .pf-plan.cta, .cr-banner{ background:var(--grad-hero); color:#fff; border:0; border-radius:22px; box-shadow:0 10px 24px rgba(110,31,58,.26); }
+  .hj-hero{ padding:18px 18px 16px; }
+  .hj-hero .hj-eyebrow, .pf-plan.cta .eyebrow{ color:rgba(255,255,255,.85); }
+  .hj-meter{ background:rgba(255,255,255,.25); } .hj-meter i{ background:#fff; }
+  .hj-chips span{ background:rgba(255,255,255,.16); border:0; color:#fff; }
+  .pf-plan.cta .btn{ background:#fff; color:#6E1F3A; }
+  html[data-theme="dark"] .pf-plan.cta .btn{ color:#4C1A2B; }
+  .cr-banner b{ color:#FFE3A8; } .cr-banner span{ color:rgba(255,255,255,.88); }
+  .btn.primary{ background:var(--grad-ag); color:#fff; }
+  html[data-theme="dark"] .btn.primary{ color:#0F211E; }
+  .hj-bar i{ background:var(--grad-ag); }
+  nav.tabs button.active.t-inicio, nav.tabs button.active.t-concursos, nav.tabs button.active.t-estudos, nav.tabs button.active.t-favoritos, nav.tabs button.active.t-perfil{ background:linear-gradient(135deg,#6E1F3A,#17695F); color:#fff; }
+  html[data-theme="dark"] nav.tabs button.active.t-inicio, html[data-theme="dark"] nav.tabs button.active.t-concursos, html[data-theme="dark"] nav.tabs button.active.t-estudos, html[data-theme="dark"] nav.tabs button.active.t-favoritos, html[data-theme="dark"] nav.tabs button.active.t-perfil{ background:linear-gradient(135deg,#8E3050,#1F7A6E); color:#fff; }
+  .mast-title .accent{ background:linear-gradient(90deg,#6E1F3A,#A8426A); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  html[data-theme="dark"] .mast-title .accent{ background:linear-gradient(90deg,#E9A0B6,#F3C0CF); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .quick-tile.accent .qt-ico{ background:var(--grad-ag); color:#fff; }
+  .quick-tile.ok .qt-ico{ background:var(--grad-vi); color:#fff; }
+  .quick-tile.warn .qt-ico{ background:var(--grad-go); color:#fff; }
+  .quick-tile.ok .qt-label, html[data-theme="dark"] .quick-tile.ok .qt-label{ color:var(--vinho); }
+  .quick-tile.warn .qt-label{ color:#9A6F14; } html[data-theme="dark"] .quick-tile.warn .qt-label{ color:#E7B766; }
 </style>
 </head>
 <body data-tab="inicio">
