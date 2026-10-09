@@ -22,7 +22,7 @@
     --vinho: #6E1F3A; --vinho-bg: #F1DEE3;
 
     --blue: #A9D3CB; --blue-deep:#17695F; --blue-bg:#D3E9E3;      /* verde água (marca) */
-    --mint: #8CC7BD; --mint-deep:#1F7A6E; --mint-bg:#DDF0EC;      /* verde ok */
+    --mint: #8CC7BD; --mint-deep:#1A6A5F; --mint-bg:#DDF0EC;      /* verde ok */
     --peach:#D9A0B0; --peach-deep:#6E1F3A; --peach-bg:#F1DEE3;    /* bordô (atenção e prazos) */
     --warn-bg:#FFF1CC; --warn-line:#E3C26B; --warn-ink:#5E4300;
     --cr-rose:var(--blue-deep); --cr-rose-bg:var(--blue-bg); --serif:'Fraunces',Georgia,'Times New Roman',serif;
@@ -1438,7 +1438,7 @@
   .alert-bar{ background:var(--peach-deep); }
 
   /* ====== Degradê (09/10): bordô encontra água. Destaques e botões em degradê, base clara e limpa ====== */
-  :root{ --grad-hero:linear-gradient(135deg,#6E1F3A 0%,#4C3A5E 45%,#17695F 100%); --grad-ag:linear-gradient(90deg,#17695F,#2FA394); --grad-vi:linear-gradient(145deg,#6E1F3A,#A8426A); --grad-go:linear-gradient(145deg,#B8821F,#C9972F); }
+  :root{ --grad-hero:linear-gradient(135deg,#6E1F3A 0%,#4C3A5E 45%,#17695F 100%); --grad-ag:linear-gradient(90deg,#17695F,#228476); --grad-vi:linear-gradient(145deg,#6E1F3A,#A8426A); --grad-go:linear-gradient(145deg,#B8821F,#C9972F); }
   html[data-theme="dark"]{ --grad-hero:linear-gradient(135deg,#8E3050 0%,#4C3A5E 45%,#1F7A6E 100%); --grad-ag:linear-gradient(90deg,#7FD0C0,#5BB8A8); --grad-vi:linear-gradient(145deg,#8E3050,#C0587C); }
   .hj-hero, .pf-plan.cta, .cr-banner{ background:var(--grad-hero); color:#fff; border:0; border-radius:22px; box-shadow:0 10px 24px rgba(110,31,58,.26); }
   .hj-hero{ padding:18px 18px 16px; }
@@ -1459,7 +1459,7 @@
   .quick-tile.ok .qt-ico{ background:var(--grad-vi); color:#fff; }
   .quick-tile.warn .qt-ico{ background:var(--grad-go); color:#fff; }
   .quick-tile.ok .qt-label, html[data-theme="dark"] .quick-tile.ok .qt-label{ color:var(--vinho); }
-  .quick-tile.warn .qt-label{ color:#9A6F14; } html[data-theme="dark"] .quick-tile.warn .qt-label{ color:#E7B766; }
+  .quick-tile.warn .qt-label{ color:#8A6210; } html[data-theme="dark"] .quick-tile.warn .qt-label{ color:#E7B766; }
 
   /* ====== Logo (09/10): estrela de bússola ====== */
   .mast-brand{ display:inline-flex; align-items:center; gap:8px; }
@@ -1475,6 +1475,17 @@
   .mast-title{ font-size:clamp(34px,10vw,46px); line-height:1.05; letter-spacing:-.015em; margin:0 0 14px; }
   .mast-title::after{ content:""; display:block; width:56px; height:4px; border-radius:4px; margin-top:16px; background:var(--grad-hero); }
   .mast-sub{ font-size:14px; line-height:1.55; max-width:34ch; color:var(--ink-soft); margin-bottom:6px; }
+
+  /* ====== Legibilidade (09/10): nada abaixo de 10px, rótulos mais firmes, contraste revisado ====== */
+  .nav-label, .quick-tile .qt-label, .src-note, footer.foot, .field-label{ font-size:11px; }
+  .stat span, .chart-val{ font-size:10px; }
+  .cal-dow, .mcal-dow, .constancia-dow, .chart-dow, .ph-grid .h, .hj-week .v{ font-size:10.5px; }
+  .cycle-item-tag, .flash-item-materia, .flash-review-materia, .error-item-badge, .prazo-label, .fact-label, .mat-table th, .subject-concurso, .badge-desc, .tag-crit, .tag-imp, .cr-hoje, .cr-tag, .cr-m header em, .cr-m .ml, .conc-badge, .mat-table .peso-tag, .mini-chip{ font-size:10.5px; }
+  .badge{ font-size:10.5px; } .badge.mini{ font-size:10px; }
+  .badge-desc{ line-height:1.35; }
+  .field-label{ letter-spacing:.03em; }
+  html[data-theme="dark"] .quick-tile.warn .qt-label{ color:#E7B766; }
+  .cr-hero{ background:var(--grad-hero); box-shadow:0 10px 24px rgba(110,31,58,.26); }
 </style>
 </head>
 <body data-tab="inicio">
