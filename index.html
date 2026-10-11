@@ -6363,6 +6363,7 @@ function dayTimelineBlocks(dow){
 // mais confiáveis, e copia o pedido pronto pra colar no Claude, que confere e devolve
 // o painel atualizado. ----------
 const DATA_CHECKED = "10/10/2026";
+const DATA_CHECKED_HORA = "21:56";
 const UPDATE_SOURCES = [
   { name:"JC Concursos: abertos no RJ", url:"https://jcconcursos.com.br/concursos/inscricoes-abertas/rj" },
   { name:"PCI Concursos: Rio de Janeiro", url:"https://www.pciconcursos.com.br/concursos/rj/rio-de-janeiro" },
@@ -7286,7 +7287,7 @@ searchClear.addEventListener("click", ()=>{ searchInput.value=""; applySearch();
 
 const today = new Date();
 const opts = { day:'2-digit', month:'2-digit', year:'numeric' };
-document.getElementById("today-stamp").textContent = "Atualizado em " + today.toLocaleDateString('pt-BR', opts);
+document.getElementById("today-stamp").textContent = "Atualizado em " + DATA_CHECKED + " às " + DATA_CHECKED_HORA;
 </script>
 </body>
 </html>
