@@ -1556,6 +1556,51 @@
   @media (min-width:1024px){
     .stats, .stats-hint, .search-wrap{ max-width:1120px; }
   }
+
+  /* ===== Roteiro de preparação ===== */
+  .rt-card{ margin:14px 0 4px; padding:16px 18px; background:var(--card); border:1.5px solid var(--line); border-radius:20px; cursor:pointer; box-shadow:0 8px 22px rgba(36,30,32,.06); }
+  .rt-card:active{ transform:scale(.99); }
+  .rt-card-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+  .rt-card-tag{ font-size:10.5px; font-weight:800; letter-spacing:.08em; color:var(--vinho); }
+  .rt-card-c{ font-size:12px; font-weight:800; color:var(--mint-deep); }
+  .rt-card-t{ font-family:var(--serif); font-size:18px; font-weight:700; line-height:1.25; margin-bottom:10px; color:var(--ink); }
+  .rt-card-go{ margin-top:10px; font-size:13px; font-weight:800; color:var(--blue-deep); }
+  .rt-hero{ padding:6px 0 16px; }
+  .rt-hero-n{ font-family:var(--serif); font-size:44px; font-weight:800; line-height:1; color:var(--ink); }
+  .rt-hero-n small{ font-size:18px; font-weight:700; color:var(--ink-soft); }
+  .rt-hero-t{ font-size:13px; color:var(--ink-soft); margin:4px 0 10px; font-weight:600; }
+  .rt-fase{ background:var(--card); border:1.5px solid var(--line); border-radius:20px; padding:6px 16px 8px; margin-bottom:14px; }
+  .rt-fase-h{ display:flex; align-items:center; gap:10px; padding:12px 0 8px; }
+  .rt-fase-h b{ font-family:var(--serif); font-size:17px; flex:1; }
+  .rt-fase-n{ width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; background:var(--mint-bg); color:var(--mint-deep); }
+  .rt-blue .rt-fase-n{ background:var(--blue-bg); color:var(--blue-deep); }
+  .rt-peach .rt-fase-n{ background:var(--peach-bg); color:var(--peach-deep); }
+  .rt-vinho .rt-fase-n{ background:var(--vinho-bg); color:var(--vinho); }
+  .rt-fase-c{ font-size:12px; font-weight:700; color:var(--ink-soft); }
+  .rt-step{ display:flex; gap:12px; padding:13px 0; border-top:1px solid var(--line); }
+  .rt-check{ flex-shrink:0; width:28px; height:28px; border-radius:50%; border:2px solid var(--line); background:var(--card); cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; margin-top:1px; }
+  .rt-check svg{ width:16px; height:16px; }
+  .rt-step.is-done .rt-check{ background:var(--grad-ag); border-color:transparent; }
+  .rt-body{ flex:1; min-width:0; }
+  .rt-title{ font-size:15px; font-weight:800; color:var(--ink); line-height:1.3; }
+  .rt-n{ display:inline-block; min-width:22px; color:var(--ink-soft); font-weight:700; font-size:13px; }
+  .rt-step.is-done .rt-title{ color:var(--ink-soft); text-decoration:line-through; text-decoration-thickness:1px; }
+  .rt-desc{ font-size:13px; color:var(--ink-soft); line-height:1.45; margin-top:2px; }
+  .rt-go{ margin-top:8px; border:0; background:var(--blue-bg); color:var(--blue-deep); font-family:inherit; font-size:12.5px; font-weight:800; padding:7px 13px; border-radius:999px; cursor:pointer; }
+  .rt-go:active{ transform:scale(.96); }
+  .rt-calc{ margin-top:10px; padding:12px; border-radius:14px; background:var(--bg); border:1.5px solid var(--line); }
+  .rt-calc-row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .rt-calc label{ display:block; font-size:11.5px; font-weight:700; color:var(--ink-soft); }
+  .rt-calc input{ display:block; width:100%; box-sizing:border-box; margin-top:5px; padding:10px 12px; border-radius:12px; border:1.5px solid var(--line); background:var(--card); color:var(--ink); font-family:inherit; font-size:16px; font-weight:700; }
+  .rt-out{ font-size:13px; color:var(--ink); margin:10px 0; }
+  .rt-calc .btn{ width:100%; }
+
+  .rt-alvo{ margin-top:6px; font-size:12px; color:var(--ink-soft); }
+  .rt-alvo b{ color:var(--blue-deep); }
+  .rt-retro{ padding:4px 2px 24px; }
+  .rt-retro-l{ display:flex; justify-content:space-between; gap:14px; align-items:baseline; padding:12px 0; border-bottom:1px solid var(--line); font-size:13.5px; }
+  .rt-retro-l span{ color:var(--ink-soft); }
+  .rt-retro-l b{ text-align:right; color:var(--ink); }
 </style>
 </head>
 <body data-tab="inicio">
@@ -1604,6 +1649,8 @@
     <div class="resumo-row" id="resumo-row"></div>
 
     <div id="inicio-hoje"></div>
+
+    <div id="inicio-roteiro"></div>
 
     <div class="section-label">Calendário</div>
     <div id="cal-head"></div>
@@ -2873,6 +2920,7 @@ function renderStudyStats(){
   renderStudyDesempenho();
   if(typeof renderEstudoHoje === "function") renderEstudoHoje();
   if(typeof renderInicioHoje === "function") renderInicioHoje();
+  if(typeof renderRoteiroCard === "function") renderRoteiroCard();
 }
 
 // Seções da aba Estudos (Hoje, Plano, Revisar, Evolução): mostra uma por vez pra tela não ficar enorme
@@ -4299,6 +4347,7 @@ async function loadFavorites(){
   await loadState('concursos-rj-exam-checklist', (v)=>{ examChecklist = (v && typeof v === "object" && !Array.isArray(v)) ? v : {}; });
   await loadState('concursos-rj-prep', (v)=>{ prep = (v && typeof v === "object" && !Array.isArray(v)) ? v : {}; });
   await loadState('concursos-rj-wizard', (v)=>{ if(v && typeof v === "object") wiz = (v.v === 2) ? Object.assign(wizVazio(), v) : wizVazio(v.done); });
+  await loadState('concursos-rj-roteiro', (v)=>{ roteiro = (v && typeof v === "object" && !Array.isArray(v)) ? v : {}; if(!roteiro.done) roteiro.done = {}; });
   await loadState('concursos-rj-meu-cargo', (v)=>{ meuCargo = (v && typeof v === "object" && !Array.isArray(v)) ? v : {}; });
   refreshFavoriteUI();
   refreshInscritoUI();
@@ -4785,6 +4834,7 @@ function renderWeekStrip(){
   if(holder) holder.innerHTML = `<details class="cal-leg"><summary>Legenda</summary>${legend}</details>` + detail;
   if(label) label.style.display = "none";
   renderInicioHoje(gg, hojeEv);
+  if(typeof renderRoteiroCard === "function") renderRoteiroCard();
 }
 
 // ---------- Rotina fixa (versão simples, sem login no Google Calendar): a própria
@@ -5144,6 +5194,8 @@ function importCicloFromEdital(itemId, sugerido){
   if(sugerido) planoSugestao(itemId).forEach(x=>{ sugestaoMap[x.nome] = x.minutos; });
   const jaNoCiclo = new Set(study.cycle.map(c => c.materia));
   let addedCount = 0;
+  const ehEspec = m => /espec[ií]fic/i.test(m.nome) ? 1 : 0;
+  materiasParaImportar = materiasParaImportar.slice().sort((a,b) => ehEspec(a) - ehEspec(b));
   materiasParaImportar.forEach(m=>{
     if(jaNoCiclo.has(m.nome)) return;
     study.cycle.push({ id: Date.now() + "-" + Math.random().toString(36).slice(2,7) + "-" + addedCount, materia: m.nome, targetMinutes: sugestaoMap[m.nome] || 60, doneMinutes: 0 });
@@ -5876,6 +5928,180 @@ function renderInicioHoje(g, ev){
     <div class="hj-actions"><button class="btn primary" onmousedown="event.preventDefault()" onclick="irEstudosHoje()">Abrir meu dia</button></div>
   </div>`;
 }
+
+// ---------- Roteiro de preparação: os 20 passos de quem começa a estudar pra concurso,
+// ligados ao que o app já tem. Alguns passos se marcam sozinhos quando há dado real
+// (flashcards, ciclo, questões, revisões); os outros ela marca na mão. ----------
+let roteiro = { done:{}, horas:0, perda:20 };
+function saveRoteiro(){ saveState('concursos-rj-roteiro', roteiro); }
+function roteiroAlvo(){ return [].concat(inscritoIds, favIds).find(i => allItemsById[i]) || null; }
+function roteiroAbrir(tipo){
+  const id = roteiroAlvo();
+  if(!id){ roteiroIr("concursos"); return; }
+  const it = allItemsById[id].item;
+  if(tipo === "edital"){ if(it.editalUrl) window.open(it.editalUrl, "_blank", "noopener"); else openSubScreen(id, "geral"); return; }
+  if(tipo === "requisitos"){ openSubScreen(id, "geral"); return; }
+  if(tipo === "banca"){ openSubScreen(id, "historico"); return; }
+  if(tipo === "materias"){
+    if(it.materias && it.materias.length) openSubScreen(id, "verticalizado");
+    else if(typeof prepDisponivel === "function" && prepDisponivel(it)){ prepTab = "mat"; prepRender(id, "mat"); }
+    else openDetail(id);
+  }
+}
+const ROTEIRO_FASES = [
+  { nome:"Escolher o concurso", cor:"mint", passos:[
+    { k:"area", t:"Escolher a área", d:"Defina o tipo de carreira que combina com você.", auto:()=>wiz && wiz.areas && wiz.areas.length>0, acao:["Abrir passo a passo","abrirWizard()"] },
+    { k:"concurso", t:"Definir o concurso", d:"Favorite os concursos que você quer prestar.", auto:()=>favIds.length>0 || inscritoIds.length>0, acao:["Ver concursos","roteiroIr('concursos')"] },
+    { k:"requisitos", t:"Verificar os requisitos", d:"Confira escolaridade, registro e exigências do cargo.", alvo:1, acao:["Ver requisitos","roteiroAbrir('requisitos')"] },
+    { k:"edital", t:"Baixar o último edital", d:"Abra o edital mais recente e salve no celular.", alvo:1, acao:["Abrir edital","roteiroAbrir('edital')"] }
+  ]},
+  { nome:"Entender a prova", cor:"blue", passos:[
+    { k:"discip", t:"Analisar as disciplinas", d:"Veja quais matérias caem e quantas questões cada uma tem.", alvo:1, auto:()=>study.subjects.length>0 || study.cycle.length>0, acao:["Ver matérias","roteiroAbrir('materias')"] },
+    { k:"peso", t:"Conferir o peso de cada matéria", d:"Comece pelas que valem mais pontos.", alvo:1, acao:["Ver pesos","roteiroAbrir('materias')"] },
+    { k:"banca", t:"Conhecer a banca do último concurso", d:"Veja o estilo das questões e o histórico da edição anterior.", alvo:1, acao:["Ver banca e histórico","roteiroAbrir('banca')"] }
+  ]},
+  { nome:"Montar a rotina", cor:"peach", passos:[
+    { k:"teoria", t:"Assinar um curso de teoria", d:"Escolha uma fonte de aulas e fique com ela." },
+    { k:"plataforma", t:"Assinar uma plataforma de questões", d:"Questões em volume são o que mais treina a prova." },
+    { k:"flash", t:"Criar flashcards", d:"Cartões de revisão rápida das matérias.", auto:()=>study.flashcards.length>0, acao:["Abrir Estudos","roteiroIr('estudos')"] },
+    { k:"notas", t:"Organizar suas anotações", d:"Use o bloco de notas de cada matéria em Estudos.", auto:()=>study.subjects.some(x=>x.notas && x.notas.trim()), acao:["Abrir Estudos","roteiroIr('estudos')"] },
+    { k:"horas", t:"Definir as horas líquidas", d:"Quanto tempo de estudo de verdade cabe no seu dia.", auto:()=>roteiro.horas>0 },
+    { k:"ciclo", t:"Criar um ciclo de estudo", d:"Monte a ordem das matérias com meta de tempo.", auto:()=>study.cycle.length>0, acao:["Montar ciclo","goToEstudosSubjects()"] },
+    { k:"blocos", t:"Estudar em blocos de 30 a 45 minutos", d:"Use o Pomodoro com foco de 40 minutos e pausa curta.", acao:["Iniciar bloco","openTimerPicker()"] },
+    { k:"base", t:"Formar a base primeiro", d:"Português, raciocínio e legislação antes das específicas.", auto:()=>study.cycle.length>0 && !/espec[ií]fic/i.test(study.cycle[0].materia), acao:["Ver ciclo","goToEstudosSubjects()"] }
+  ]},
+  { nome:"Estudar e revisar", cor:"vinho", passos:[
+    { k:"pdf", t:"Leitura de PDF", d:"Registre as páginas lidas ao fechar cada sessão.", auto:()=>study.logs.some(l=>l.paginas>0), acao:["Abrir Estudos","roteiroIr('estudos')"] },
+    { k:"questoes", t:"Resolução de questões", d:"Anote acertos e erros no caderno de erros.", auto:()=>study.errors.length>0, acao:["Abrir Estudos","roteiroIr('estudos')"] },
+    { k:"revisao", t:"Revisão por progresso e desempenho", d:"Agende revisões e refaça o que errou.", auto:()=>study.reviews.length>0, acao:["Ver revisões","goToEstudosReviews()"] },
+    { k:"simulado", t:"Fazer mini simulados", d:"Teste curto, sem consulta, para medir onde está.", acao:["Fazer simulado","roteiroSimulado()"] },
+    { k:"retro", t:"Retroalimentação", d:"Olhe seus pontos fracos e volte neles no próximo ciclo.", auto:()=>!!(roteiro.retro && roteiro.retro[roteiroSemana()]), acao:["Fazer a revisão da semana","roteiroRetro()"] }
+  ]}
+];
+function roteiroPassos(){ return ROTEIRO_FASES.flatMap(f=>f.passos); }
+function roteiroFeito(p){ let a = false; try{ a = p.auto ? !!p.auto() : false; }catch(e){} return a || !!roteiro.done[p.k]; }
+function roteiroProgresso(){ const ps = roteiroPassos(); return { feitos: ps.filter(roteiroFeito).length, total: ps.length, prox: ps.find(p=>!roteiroFeito(p)) }; }
+function roteiroIr(tab){ closeSubScreen(); document.querySelector('.tab-btn[data-tab="'+tab+'"]').click(); setTimeout(()=>window.scrollTo(0,0), 120); }
+function roteiroSimulado(){ closeSubScreen(); document.querySelector('.tab-btn[data-tab="estudos"]').click(); setTimeout(()=>{ if(typeof openSimuladosMenu === "function") openSimuladosMenu(); }, 160); }
+function roteiroToggle(k){ if(roteiro.done[k]) delete roteiro.done[k]; else roteiro.done[k] = true; saveRoteiro(); abrirRoteiro(true); renderRoteiroCard(); }
+function roteiroCalc(){
+  const h = parseFloat(document.getElementById("rt-horas").value) || 0;
+  const perda = Math.min(60, Math.max(0, parseFloat(document.getElementById("rt-perda").value) || 0));
+  const liq = Math.round(h * (1 - perda/100) * 10) / 10;
+  const blocos = Math.floor((liq * 60) / 45);
+  const out = document.getElementById("rt-out");
+  if(out) out.innerHTML = h > 0 ? `<b>${liq.toString().replace(".",",")} h líquidas por dia</b> · cerca de ${blocos} ${blocos === 1 ? "bloco" : "blocos"} de 45 minutos` : "Digite as horas livres do seu dia.";
+}
+function roteiroSalvarHoras(){
+  const h = parseFloat(document.getElementById("rt-horas").value) || 0;
+  const perda = Math.min(60, Math.max(0, parseFloat(document.getElementById("rt-perda").value) || 0));
+  if(h <= 0){ roteiroCalc(); return; }
+  const liq = Math.round(h * (1 - perda/100) * 2) / 2 || 0.5;
+  roteiro.horas = h; roteiro.perda = perda; saveRoteiro();
+  study.dailyHours = liq; study.goalHours = liq * (study.diasSemana || 5);
+  saveState("concursos-rj-estudos", study);
+  if(typeof toast === "function") toast("Horas líquidas salvas");
+  abrirRoteiro(true); renderRoteiroCard();
+  if(typeof renderInicioHoje === "function") renderInicioHoje();
+}
+function abrirRoteiro(manter){
+  const pr = roteiroProgresso();
+  const pct = Math.round(pr.feitos / pr.total * 100);
+  const fases = ROTEIRO_FASES.map((f, fi)=>{
+    const feitosF = f.passos.filter(roteiroFeito).length;
+    const rows = f.passos.map(p=>{
+      const ok = roteiroFeito(p);
+      const n = roteiroPassos().indexOf(p) + 1;
+      const calc = p.k === "horas" ? `
+        <div class="rt-calc">
+          <div class="rt-calc-row">
+            <label>Horas livres por dia<input id="rt-horas" type="number" inputmode="decimal" min="0" max="16" step="0.5" value="${roteiro.horas || ""}" oninput="roteiroCalc()" placeholder="Ex: 3"></label>
+            <label>Perda com pausas e distração (%)<input id="rt-perda" type="number" inputmode="numeric" min="0" max="60" step="5" value="${roteiro.perda == null ? 20 : roteiro.perda}" oninput="roteiroCalc()"></label>
+          </div>
+          <div class="rt-out" id="rt-out"></div>
+          <button class="btn primary" onmousedown="event.preventDefault()" onclick="roteiroSalvarHoras()">Usar no meu plano</button>
+        </div>` : "";
+      return `<div class="rt-step${ok ? " is-done" : ""}">
+        <button class="rt-check" aria-label="${ok ? "Desmarcar" : "Marcar"} passo ${n}" aria-pressed="${ok}" onmousedown="event.preventDefault()" onclick="roteiroToggle('${p.k}')">${ok ? '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m6 12.5 4 4 8-9"/></svg>' : ""}</button>
+        <div class="rt-body">
+          <div class="rt-title"><span class="rt-n">${n}</span>${escHtml(p.t)}</div>
+          <div class="rt-desc">${escHtml(p.d)}</div>
+          ${p.alvo ? (roteiroAlvo() ? `<div class="rt-alvo">Seu concurso: <b>${escHtml(prepNomeCurto(roteiroAlvo()))}</b></div>` : `<div class="rt-alvo">Favorite um concurso para eu abrir direto aqui.</div>`) : ""}
+          ${p.acao ? `<button class="rt-go" onmousedown="event.preventDefault()" onclick="${p.acao[1]}">${escHtml(p.acao[0])} ›</button>` : ""}
+          ${calc}
+        </div>
+      </div>`;
+    }).join("");
+    return `<div class="rt-fase rt-${f.cor}"><div class="rt-fase-h"><span class="rt-fase-n">${fi+1}</span><b>${f.nome}</b><span class="rt-fase-c">${feitosF} de ${f.passos.length}</span></div>${rows}</div>`;
+  }).join("");
+  document.getElementById("sub-topbar-title").textContent = "Roteiro de preparação";
+  const sc = document.getElementById("sub-scroll"); const top = sc.scrollTop;
+  document.getElementById("sub-content").innerHTML = `
+    <div class="rt-hero"><div class="rt-hero-n">${pr.feitos}<small> de ${pr.total}</small></div><div class="rt-hero-t">passos concluídos</div><div class="hj-bar"><i style="width:${pct}%"></i></div></div>
+    ${fases}`;
+  document.getElementById("sub-screen").classList.add("active");
+  sc.scrollTop = manter === true ? top : 0;
+  roteiroCalc();
+}
+function roteiroSemana(){ const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate() - d.getDay()); return isoOfDate(d); }
+function roteiroRetro(){
+  const logs = studyLogsLast7Days();
+  const cutoff = new Date(); cutoff.setHours(0,0,0,0); cutoff.setDate(cutoff.getDate() - 6);
+  const min = logs.reduce((a,l)=>a + (l.minutes||0), 0);
+  const horas = Math.round(min / 6) / 10;
+  const meta = study.goalHours || 0;
+  const errs = study.errors.filter(e => new Date(e.date + "T00:00:00") >= cutoff);
+  const certas = errs.filter(e => e.tipo === "certo").length;
+  const erradas = errs.filter(e => e.tipo === "errado").length;
+  const pctAc = (certas + erradas) ? Math.round(certas / (certas + erradas) * 100) : null;
+  const porMat = {};
+  errs.filter(e => e.tipo === "errado").forEach(e => { porMat[e.materia] = (porMat[e.materia]||0) + 1; });
+  const fraca = Object.keys(porMat).sort((a,b)=>porMat[b]-porMat[a])[0];
+  const minMat = {};
+  logs.forEach(l => { minMat[l.materia] = (minMat[l.materia]||0) + (l.minutes||0); });
+  const parada = study.cycle.map(c=>c.materia).find(m => !minMat[m]);
+  const fmt = n => String(n).replace(".", ",");
+  const atual = (roteiro.retro && roteiro.retro[roteiroSemana()]) || "";
+  const linhas = [
+    `<div class="rt-retro-l"><span>Horas estudadas</span><b>${fmt(horas)}h${meta ? " de " + fmt(meta) + "h" : ""}</b></div>`,
+    `<div class="rt-retro-l"><span>Questões registradas</span><b>${certas + erradas}${pctAc == null ? "" : " · " + pctAc + "% de acerto"}</b></div>`,
+    `<div class="rt-retro-l"><span>Mais erros em</span><b>${fraca ? escHtml(fraca) + " (" + porMat[fraca] + ")" : "Sem erros registrados"}</b></div>`,
+    `<div class="rt-retro-l"><span>Sem estudo esta semana</span><b>${parada ? escHtml(parada) : "Nenhuma matéria do ciclo parada"}</b></div>`
+  ].join("");
+  document.getElementById("sub-topbar-title").textContent = "Revisão da semana";
+  document.getElementById("sub-content").innerHTML = `
+    <div class="rt-retro">
+      <p class="section-note">Últimos 7 dias, com o que você registrou no app.</p>
+      ${linhas}
+      <label class="field-label" for="rt-retro-txt" style="margin-top:16px;">O que ajustar na próxima semana?</label>
+      <textarea class="field-input" id="rt-retro-txt" rows="4" placeholder="Ex: mais questões de Português, revisar crase na quinta">${escHtml(atual)}</textarea>
+      <button class="btn primary" style="margin-top:10px;width:100%;" onmousedown="event.preventDefault()" onclick="roteiroRetroSalvar()">Salvar revisão</button>
+      ${fraca ? `<button class="btn" style="margin-top:8px;width:100%;" onmousedown="event.preventDefault()" onclick="closeSubScreen();goToEstudosReviews()">Ver revisões agendadas</button>` : ""}
+    </div>`;
+  document.getElementById("sub-screen").classList.add("active");
+  document.getElementById("sub-scroll").scrollTop = 0;
+}
+function roteiroRetroSalvar(){
+  const v = document.getElementById("rt-retro-txt").value.trim();
+  if(!roteiro.retro) roteiro.retro = {};
+  if(v) roteiro.retro[roteiroSemana()] = v; else delete roteiro.retro[roteiroSemana()];
+  saveRoteiro();
+  if(typeof toast === "function") toast(v ? "Revisão salva" : "Revisão vazia, nada salvo");
+  renderRoteiroCard();
+  abrirRoteiro();
+}
+function renderRoteiroCard(){
+  const box = document.getElementById("inicio-roteiro"); if(!box) return;
+  const pr = roteiroProgresso();
+  const pct = Math.round(pr.feitos / pr.total * 100);
+  box.innerHTML = `<div class="rt-card" role="button" tabindex="0" onmousedown="event.preventDefault()" onclick="abrirRoteiro()">
+    <div class="rt-card-top"><span class="rt-card-tag">ROTEIRO DE PREPARAÇÃO</span><span class="rt-card-c">${pr.feitos} de ${pr.total}</span></div>
+    <div class="rt-card-t">${pr.prox ? "Próximo passo: " + escHtml(pr.prox.t) : "Roteiro completo. Agora é manter a constância."}</div>
+    <div class="hj-bar"><i style="width:${pct}%"></i></div>
+    <div class="rt-card-go">${pr.prox ? "Continuar roteiro ›" : "Rever roteiro ›"}</div>
+  </div>`;
+}
+
 function goCronograma(){
   closeSubScreen();
   document.querySelector('.tab-btn[data-tab="estudos"]').click();
