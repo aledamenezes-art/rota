@@ -6321,9 +6321,26 @@ function objConfirmar(){
   renderRoteiroCard(); try{ renderPerfilHub(); }catch(e){}
   wizRender(true);
 }
+// ---------- Questionário único: objetivo, rotina, concurso e inglês numa sequência só ----------
+const WZ_NOMES_C = ["Formação","Área","Nível","Esfera","Local","Cargo","Rotina"];
+const WZ_NOMES_I = ["Nível","Meta","Material","Horários","Habilidades"];
+function wzSeq(){
+  const sel = (wizObjView && wizObjSel) ? wizObjSel : (objAtual() === "ambos" ? ["concurso","ingles"] : (objAtual() ? [objAtual()] : (wizObjSel || [])));
+  const seq = ["obj","vida"];
+  if(sel.includes("concurso")) for(let k = 1; k <= 7; k++) seq.push("c" + k);
+  if(sel.includes("ingles")) for(let k = 1; k <= 5; k++) seq.push("i" + k);
+  return seq;
+}
+function wzHead(key){
+  const seq = wzSeq(); let g = seq.indexOf(key) + 1; if(g < 1) g = 1;
+  const n = seq.length;
+  const nome = key === "obj" ? "Objetivo" : (key === "vida" ? "Sua rotina" : (key[0] === "c" ? "Concurso · " + WZ_NOMES_C[+key.slice(1) - 1] : "Inglês · " + WZ_NOMES_I[+key.slice(1) - 1]));
+  if(n <= 2 && key === "obj") return `<div class="wz-eyebrow">Passo 1 · Objetivo</div>`;
+  return `<div class="wz-eyebrow">Passo ${g} de ${n} · ${nome}</div><div class="wz-dots">${seq.map((x, i) => `<i class="${i < g ? "on" : ""}"></i>`).join("")}</div>`;
+}
 function objRender(box){
   const sel = objSelInit();
-  box.innerHTML = `<div class="wz"><div class="wz-eyebrow">Comece pelo caminho certo</div><div class="wz-h">O que você quer estudar?</div>
+  box.innerHTML = `<div class="wz">${wzHead("obj")}<div class="wz-h">O que você quer estudar?</div>
     <p class="wz-sub">Marque um ou os dois. Eu monto a sua trilha de acordo com o que você escolher.</p>
     <div class="wz-opts one">${OBJ_OPCOES.slice(0,2).map(o => { const on = sel.includes(o.id); return `<button class="wz-opt multi ${on ? "on" : ""}" onmousedown="event.preventDefault()" onclick="objToggle('${o.id}')"><span class="ck">${on ? "✓" : ""}</span><span class="ic">${o.ico}</span><b>${o.nome}</b><small>${o.desc}</small></button>`; }).join("")}</div>
     <div class="wz-cta"><span></span><button class="btn primary" ${sel.length ? "" : "disabled"} onmousedown="event.preventDefault()" onclick="objConfirmar()">Continuar ›</button></div></div>`;
@@ -6367,7 +6384,7 @@ function vidaRender(box){
   const both = objAtual() === "ambos", sp = vidaSplit(v);
   const sem = Math.round((sp.c * 60 + sp.i) * v.dias / 6) / 10;
   const meta = both ? `${sp.c}h de concurso e ${wzHm(sp.i)} de inglês por dia` : (objAtual() === "ingles" ? `${wzHm(sp.i)} de inglês por dia` : `${sp.c}h de concurso por dia`);
-  box.innerHTML = `<div class="wz"><div class="wz-eyebrow">Sua rotina · antes de começar</div><div class="wz-h">Como é o seu dia a dia?</div>
+  box.innerHTML = `<div class="wz">${wzHead("vida")}<div class="wz-h">Como é o seu dia a dia?</div>
     <p class="wz-sub">Isso define as metas de estudo da semana${both ? " e como o tempo é dividido entre concurso e inglês" : ""}.</p>
     <div class="wz-opts one">${OCUP.map(o => `<button class="wz-opt ${v.ocup === o.id ? "on" : ""}" onmousedown="event.preventDefault()" onclick="vidaSet('ocup','${o.id}')"><span class="ic">${o.ico}</span><b>${o.nome}</b><small>${o.desc}</small></button>`).join("")}</div>
     <div class="wz-q">Quantas horas por dia dá para estudar?</div><div class="wz-pills">${[1,2,3,4,5,6].map(h => `<button class="${v.horas === h ? "on" : ""}" onmousedown="event.preventDefault()" onclick="vidaSet('horas',${h})">${h}h</button>`).join("")}</div>
@@ -6436,6 +6453,10 @@ function ingRecurso(id){
 function ingAulaDia(d){ const a = ing.aulaDias, i = a.indexOf(d); if(i >= 0) a.splice(i,1); else a.push(d); saveIng(); wizRender(); }
 function ingDia(d){ const a = ing.diasSel, i = a.indexOf(d); if(i >= 0) a.splice(i,1); else a.push(d); ing.dias = a.length; saveIng(); wizRender(); }
 function ingGo(n){
+  if(n < 1){
+    if(objTem("concurso")){ wizFase = "concurso"; wiz.step = 7; saveWiz(); wizRender(true); } else vidaAjustar();
+    return;
+  }
   if(n >= 6){ if(!ingPode(4)) return; ingIrResultado(); return; }
   ing.step = Math.max(1, n); wizFase = "ing";
   saveIng(); wizRender(true); renderRoteiroCard();
@@ -6587,7 +6608,7 @@ function ingRender(box){
   const step = Math.min(ing.step || 1, 6);
   const dots = `<div class="wz-dots">${[1,2,3,4,5].map(i => `<i class="${i <= step ? "on" : ""}"></i>`).join("")}</div>`;
   const volta = objAtual() === "ambos" ? `<button class="wz-skip" onmousedown="event.preventDefault()" onclick="wizFase='concurso';wizRender(true)">‹ Ir para o concurso</button>` : "";
-  const cta = (txt) => `<div class="wz-cta"><button class="wz-back" onmousedown="event.preventDefault()" onclick="ingGo(${step - 1})" ${step === 1 ? "style='visibility:hidden'" : ""}>‹ Voltar</button><button class="btn primary" ${ingPode(step) ? "" : "disabled"} onmousedown="event.preventDefault()" onclick="ingGo(${step + 1})">${txt || "Continuar ›"}</button></div>`;
+  const cta = (txt) => `<div class="wz-cta"><button class="wz-back" onmousedown="event.preventDefault()" onclick="ingGo(${step - 1})">‹ Voltar</button><button class="btn primary" ${ingPode(step) ? "" : "disabled"} onmousedown="event.preventDefault()" onclick="ingGo(${step + 1})">${txt || "Continuar ›"}</button></div>`;
   const pills = (arr, cur, fn, fmt) => `<div class="wz-pills">${arr.map(x => `<button class="${cur === x ? "on" : ""}" onmousedown="event.preventDefault()" onclick="${fn}(${typeof x === "string" ? "'" + x + "'" : x})">${fmt ? fmt(x) : x}</button>`).join("")}</div>`;
   let corpo = "";
   if(step === 1){
@@ -6638,7 +6659,7 @@ function ingRender(box){
       ${wzDet("Quanto tempo leva", reality)}
       <div class="wz-cta"><button class="wz-back" onmousedown="event.preventDefault()" onclick="ingGo(4)">‹ Ajustar rotina</button><button class="wz-back" onmousedown="event.preventDefault()" onclick="ingReset()">↺ Refazer</button></div>`;
   }
-  box.innerHTML = `<div class="wz"><div class="wz-eyebrow">${step < 6 ? "Inglês · passo " + step + " de 5" : "Inglês"}</div>${step < 6 ? dots : ""}${volta}${corpo}</div>`;
+  box.innerHTML = `<div class="wz">${step < 6 ? wzHead("i" + step) : ""}${corpo}</div>`;
 }
 function wizCtaOutroIng(){
   if(!objTem("concurso") && !objTem("ingles")) return "";
@@ -7470,7 +7491,7 @@ function wizRender(rolar){
     corpo = `<div class="wz-h">O que você estudou?</div><p class="wz-sub">A sua formação mostra quais áreas estão abertas para você. Se não souber, pode pular.</p>
       ${why("Posso fazer concurso de outra área?", "Pode. Muitos cargos de nível superior aceitam <b>qualquer graduação</b> (como analista administrativo). Outros exigem o curso (Direito, Medicina, TI). E o <b>nível médio</b> é aberto a todos, em qualquer área.")}
       <div class="wz-opts">${WZ_FORMACOES.map(f=>`<button class="wz-opt ${wiz.formacao===f.id?"on":""}" onmousedown="event.preventDefault()" onclick="wizSet('formacao','${f.id}',true)"><span class="ic">${f.ico}</span><b>${escHtml(f.nome)}</b></button>`).join("")}</div>
-      <div class="wz-cta"><span></span><button class="wz-skip" onmousedown="event.preventDefault()" onclick="wizGo(2)">Pular</button></div>`;
+      <div class="wz-cta"><button class="wz-back" onmousedown="event.preventDefault()" onclick="vidaAjustar()">‹ Voltar</button><button class="wz-skip" onmousedown="event.preventDefault()" onclick="wizGo(2)">Pular</button></div>`;
   } else if(step === 2){
     corpo = `<div class="wz-h">Quais áreas te interessam?</div><p class="wz-sub">Escolha uma ou mais. Toque em "O que é" para entender cada uma.</p>
       <div class="wz-opts one">${WZ_AREAS.map(a=>{
@@ -7505,7 +7526,7 @@ function wizRender(rolar){
     corpo = `<div class="wz-h">Como é a sua rotina?</div><p class="wz-sub">Com isso eu monto a sua semana de estudo. Você pode mudar depois.</p>
       ${vidaResumoHtml()}
       <div class="wz-q">Daqui a quanto tempo quer passar?</div><div class="wz-pills">${WZ_PRAZOS.map(p=>`<button class="${wiz.prazo===p.id?"on":""}" onmousedown="event.preventDefault()" onclick="wizSet('prazo','${p.id}')">${p.nome}</button>`).join("")}</div>
-      <div class="wz-q">Seu ponto de partida</div><div class="wz-opts one">${WZ_INICIOS.map(i=>`<button class="wz-opt ${wiz.inicio===i.id?"on":""}" onmousedown="event.preventDefault()" onclick="wizSet('inicio','${i.id}')"><b>${i.nome}</b><small>${i.desc}</small></button>`).join("")}</div>${cta("Ver meu plano")}`;
+      <div class="wz-q">Seu ponto de partida</div><div class="wz-opts one">${WZ_INICIOS.map(i=>`<button class="wz-opt ${wiz.inicio===i.id?"on":""}" onmousedown="event.preventDefault()" onclick="wizSet('inicio','${i.id}')"><b>${i.nome}</b><small>${i.desc}</small></button>`).join("")}</div>${cta(objTem("ingles") ? "Continuar" : "Ver meu plano")}`;
   } else {
     const T = wizTodos(), cs = wizConcursos(wiz.verTodos), csBase = wizConcursos(false), extra = wizConcursos(true).length - csBase.length, p = wizPlano();
     const pr = wzFind(WZ_PRAZOS, wiz.prazo), totalH = Math.round(p.horasSemana * pr.sem);
@@ -7536,7 +7557,7 @@ function wizRender(rolar){
       ${wzDet("Pesquisar mais concursos", wizBuscaMais())}
       <div class="wz-cta"><button class="wz-back" onmousedown="event.preventDefault()" onclick="wizGo(7)">‹ Ajustar rotina</button><button class="wz-back" onmousedown="event.preventDefault()" onclick="wizReset()">↺ Refazer</button></div>`;
   }
-  box.innerHTML = `<div class="wz"><div class="wz-eyebrow">${step < 8 ? "Concurso · passo " + step + " de 8 · " + WZ_PASSOS_NOMES[step-1] : "Concurso"}</div>${step < 8 ? dots + `<button class="wz-skip" onmousedown="event.preventDefault()" onclick="wizTrocarObjetivo()">Objetivo: ${escHtml((OBJ_OPCOES.find(o => o.id === objAtual()) || {}).nome || "")} ✎</button>` : ""}${selHtml}${corpo}</div>`;
+  box.innerHTML = `<div class="wz">${step < 8 ? wzHead("c" + step) : ""}${selHtml}${corpo}</div>`;
   if(rolar) box.scrollIntoView({ block:"start", behavior:"smooth" });
 }
 
