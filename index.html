@@ -1641,6 +1641,25 @@
   .rt-seg{ display:flex; gap:6px; margin:0 0 12px; }
   .rt-seg button{ flex:1; font-family:inherit; font-size:13px; font-weight:800; padding:9px; border-radius:999px; border:1.5px solid var(--line); background:var(--card); color:var(--ink-soft); cursor:pointer; }
   .rt-seg button.on{ background:var(--blue-bg); border-color:var(--blue-deep); color:var(--blue-deep); }
+
+  .wz-time, .wz-text{ width:100%; box-sizing:border-box; font-family:inherit; font-size:15px; font-weight:700; padding:11px 14px; border-radius:12px; border:1.5px solid var(--line); background:var(--bg); color:var(--ink); }
+  .wz-time{ max-width:160px; }
+  .wz-day span.aula{ background:var(--peach-bg, #FFE9DC); color:var(--peach-deep, #9A4B1F); }
+  .wz-mes{ border:1px solid var(--line); border-radius:14px; padding:12px 14px; margin:8px 0; background:var(--card, #fff); }
+  .wz-mes b{ font-size:14px; }
+  .wz-mes ul{ margin:6px 0 0; padding-left:18px; font-size:13px; line-height:1.5; color:var(--ink-soft); }
+  .wz-agenda{ display:flex; flex-wrap:wrap; gap:8px; margin:6px 0 10px; }
+  .wz-agenda .gcal-btn{ text-decoration:none; }
+  .wz-load{ text-align:center; padding:36px 8px; }
+  .wz-load ul{ list-style:none; padding:0; margin:18px auto 0; max-width:360px; text-align:left; }
+  .wz-load li{ display:flex; gap:10px; align-items:center; padding:9px 0; font-size:14px; font-weight:700; color:var(--ink-soft); opacity:.55; }
+  .wz-load li span{ width:22px; height:22px; border-radius:50%; border:2px solid var(--line); display:inline-flex; align-items:center; justify-content:center; font-size:12px; flex:none; }
+  .wz-load li.now{ opacity:1; color:var(--ink); }
+  .wz-load li.now span{ border-color:var(--blue-deep); border-top-color:transparent; animation:wzspin 0.9s linear infinite; }
+  .wz-load li.ok{ opacity:1; color:var(--ink); }
+  .wz-load li.ok span{ background:var(--blue-deep); border-color:var(--blue-deep); color:#fff; }
+  .wz-spin{ width:44px; height:44px; margin:0 auto 14px; border-radius:50%; border:4px solid var(--line); border-top-color:var(--blue-deep); animation:wzspin 0.9s linear infinite; }
+  @keyframes wzspin{ to{ transform:rotate(360deg); } }
 </style>
 </head>
 <body data-tab="inicio">
@@ -6227,6 +6246,7 @@ const ING_HAB = {
   grammar:{ nome:"Gramática", mat:"Inglês: Gramática", ico:"🧩" }
 };
 const ING_METAS = [
+  { id:"falar", ico:"🗣️", nome:"Aprender a falar", desc:"Perder o medo e conversar de verdade.", pesos:{ speaking:3, listening:2.5, vocab:1.5, grammar:.7, reading:.4, writing:.3 } },
   { id:"trabalho", ico:"💼", nome:"Trabalho e carreira", desc:"Reuniões, e-mails e apresentações.", pesos:{ speaking:2, listening:2, writing:1.5, vocab:1.5, reading:1, grammar:1 } },
   { id:"viagem", ico:"✈️", nome:"Viagem", desc:"Me virar em aeroporto, hotel e restaurante.", pesos:{ speaking:2.5, listening:2.5, vocab:2, grammar:.5, reading:.5, writing:.5 } },
   { id:"conversa", ico:"💬", nome:"Conversar no dia a dia", desc:"Falar e entender com naturalidade.", pesos:{ speaking:3, listening:3, vocab:1.5, grammar:1, reading:.5, writing:.5 } },
@@ -6234,45 +6254,183 @@ const ING_METAS = [
   { id:"cert", ico:"🎓", nome:"Certificação", desc:"TOEFL, IELTS, Cambridge ou similar.", pesos:{ listening:2, speaking:2, reading:2, writing:2, grammar:1, vocab:1.5 } },
   { id:"estudo", ico:"📚", nome:"Faculdade ou intercâmbio", desc:"Ler artigos, escrever trabalhos e assistir aulas.", pesos:{ reading:2.5, writing:2, listening:1.5, vocab:2, grammar:1, speaking:1 } }
 ];
-function ingVazio(){ return { v:1, step:1, nivel:"", metas:[], focos:[], minutos:45, dias:5, feito:false }; }
+function ingVazio(){ return { v:2, step:1, nivel:"", metas:[], focos:[], minutos:45, dias:5, prazo:6, recursos:[], aulaDias:[], aulaIni:"", aulaMin:60, livro:"", diasSel:[], hora:"", feito:false }; }
+const ING_PRAZOS = [3,6,12];
+const ING_RECURSOS = [
+  { id:"aula", ico:"👩‍🏫", nome:"Aula de conversação", desc:"Com professor, escola ou curso." },
+  { id:"livro", ico:"📘", nome:"Livro ou apostila", desc:"Material que você já tem." },
+  { id:"app", ico:"📱", nome:"Apps e vídeos", desc:"Estudo por conta própria." },
+  { id:"nada", ico:"🌱", nome:"Ainda não tenho nada", desc:"O plano começa pelo básico." }
+];
 let ing = ingVazio();
 function saveIng(){ saveState("concursos-rj-ingles", ing); }
 let wizObjView = false, wizFase = "concurso";
 function objAtual(){ return (profile && profile.objetivo) || ((wiz && wiz.areas && wiz.areas.length) ? "concurso" : ""); }
-function objEscolher(id){
-  profile.objetivo = id; saveState("concursos-rj-perfil", profile);
-  wizObjView = false; wizFase = id === "ingles" ? "ing" : "concurso";
+const DIAS_SEM = ["Seg","Ter","Qua","Qui","Sex","Sáb","Dom"];
+const OCUP = [
+  { id:"trab", ico:"💼", nome:"Só trabalho", desc:"O trabalho ocupa boa parte do dia e eu encaixo o estudo.", sug:2 },
+  { id:"trabEst", ico:"🎒", nome:"Trabalho e estudo", desc:"Também faço faculdade ou curso, então o tempo livre é menor.", sug:1 },
+  { id:"est", ico:"📚", nome:"Só estudo", desc:"Posso dedicar a maior parte do dia aos estudos.", sug:4 }
+];
+let wizObjSel = null, wizVidaView = false, vidaDraft = null, wizLoad = null;
+function objTem(id){ const o = objAtual(); return o === id || o === "ambos"; }
+function objSelInit(){ if(!wizObjSel){ const o = objAtual(); wizObjSel = o === "ambos" ? ["concurso","ingles"] : (o ? [o] : []); } return wizObjSel; }
+function objToggle(id){ const a = objSelInit(), i = a.indexOf(id); if(i >= 0) a.splice(i,1); else a.push(id); wizRender(); }
+function objConfirmar(){
+  const a = objSelInit(); if(!a.length) return;
+  profile.objetivo = a.length === 2 ? "ambos" : a[0];
+  saveState("concursos-rj-perfil", profile);
+  wizObjSel = null; wizObjView = false;
+  wizFase = profile.objetivo === "ingles" ? "ing" : "concurso";
+  if(profile.vida) vidaDistribuir(); else { wizVidaView = true; vidaDraft = null; }
   renderRoteiroCard(); try{ renderPerfilHub(); }catch(e){}
   wizRender(true);
 }
 function objRender(box){
-  const atual = objAtual();
+  const sel = objSelInit();
   box.innerHTML = `<div class="wz"><div class="wz-eyebrow">Comece pelo caminho certo</div><div class="wz-h">O que você quer estudar?</div>
-    <p class="wz-sub">Eu monto a sua trilha de acordo com o que você escolher. Dá para mudar depois.</p>
-    <div class="wz-opts one">${OBJ_OPCOES.map(o => `<button class="wz-opt ${atual === o.id ? "on" : ""}" onmousedown="event.preventDefault()" onclick="objEscolher('${o.id}')"><span class="ic">${o.ico}</span><b>${o.nome}</b><small>${o.desc}</small></button>`).join("")}</div></div>`;
+    <p class="wz-sub">Marque um ou os dois. Eu monto a sua trilha de acordo com o que você escolher.</p>
+    <div class="wz-opts one">${OBJ_OPCOES.slice(0,2).map(o => { const on = sel.includes(o.id); return `<button class="wz-opt multi ${on ? "on" : ""}" onmousedown="event.preventDefault()" onclick="objToggle('${o.id}')"><span class="ck">${on ? "✓" : ""}</span><span class="ic">${o.ico}</span><b>${o.nome}</b><small>${o.desc}</small></button>`; }).join("")}</div>
+    <div class="wz-cta"><span></span><button class="btn primary" ${sel.length ? "" : "disabled"} onmousedown="event.preventDefault()" onclick="objConfirmar()">Continuar ›</button></div></div>`;
+}
+// Rotina: trabalho e estudo definem as metas da semana. Com os dois objetivos, o tempo é dividido entre eles.
+function vidaIni(){ return profile.vida ? Object.assign({}, profile.vida) : { ocup:"", horas:2, dias:5, pct:70 }; }
+function vidaSplit(v){
+  v = v || profile.vida || vidaIni();
+  const o = objAtual() || "concurso";
+  if(o === "concurso") return { c:v.horas, i:0 };
+  if(o === "ingles") return { c:0, i:Math.round(v.horas * 60) };
+  const c = Math.max(1, Math.round(v.horas * v.pct / 100));
+  return { c, i:Math.max(20, Math.round((v.horas * 60 - c * 60) / 5) * 5) };
+}
+function vidaDistribuir(){
+  const v = profile.vida; if(!v) return;
+  const sp = vidaSplit(v);
+  if(sp.c){ wiz.horas = sp.c; wiz.dias = v.dias; saveWiz(); }
+  if(sp.i){ ing.minutos = sp.i; if(!ing.diasSel || !ing.diasSel.length){ ing.diasSel = DIAS_SEM.slice(0, v.dias); } ing.dias = ing.diasSel.length; saveIng(); }
+}
+function vidaSet(k, val){
+  if(!vidaDraft) vidaDraft = vidaIni();
+  vidaDraft[k] = val;
+  if(k === "horas") vidaDraft._h = true;
+  if(k === "ocup" && !vidaDraft._h){ const o = wzFind(OCUP, val); if(o) vidaDraft.horas = o.sug; }
+  wizRender();
+}
+function vidaOk(){
+  const d = vidaDraft || vidaIni(); if(!d.ocup) return;
+  profile.vida = { ocup:d.ocup, horas:d.horas, dias:d.dias, pct:d.pct };
+  saveState("concursos-rj-perfil", profile);
+  vidaDistribuir();
+  wizVidaView = false; vidaDraft = null;
+  wizFase = objTem("concurso") ? "concurso" : "ing";
+  try{ renderPerfilHub(); }catch(e){}
+  wizRender(true);
+}
+function vidaAjustar(){ wizVidaView = true; vidaDraft = null; wizRender(true); }
+function vidaRender(box){
+  const v = vidaDraft || (vidaDraft = vidaIni());
+  const both = objAtual() === "ambos", sp = vidaSplit(v);
+  const sem = Math.round((sp.c * 60 + sp.i) * v.dias / 6) / 10;
+  const meta = both ? `${sp.c}h de concurso e ${wzHm(sp.i)} de inglês por dia` : (objAtual() === "ingles" ? `${wzHm(sp.i)} de inglês por dia` : `${sp.c}h de concurso por dia`);
+  box.innerHTML = `<div class="wz"><div class="wz-eyebrow">Sua rotina · antes de começar</div><div class="wz-h">Como é o seu dia a dia?</div>
+    <p class="wz-sub">Isso define as metas de estudo da semana${both ? " e como o tempo é dividido entre concurso e inglês" : ""}.</p>
+    <div class="wz-opts one">${OCUP.map(o => `<button class="wz-opt ${v.ocup === o.id ? "on" : ""}" onmousedown="event.preventDefault()" onclick="vidaSet('ocup','${o.id}')"><span class="ic">${o.ico}</span><b>${o.nome}</b><small>${o.desc}</small></button>`).join("")}</div>
+    <div class="wz-q">Quantas horas por dia dá para estudar?</div><div class="wz-pills">${[1,2,3,4,5,6].map(h => `<button class="${v.horas === h ? "on" : ""}" onmousedown="event.preventDefault()" onclick="vidaSet('horas',${h})">${h}h</button>`).join("")}</div>
+    <div class="wz-q">Quantos dias por semana?</div><div class="wz-pills">${[3,4,5,6,7].map(d => `<button class="${v.dias === d ? "on" : ""}" onmousedown="event.preventDefault()" onclick="vidaSet('dias',${d})">${d} dias</button>`).join("")}</div>
+    ${both ? `<div class="wz-q">Como dividir o tempo?</div><div class="wz-pills">${[[70,"Mais concurso"],[50,"Metade e metade"],[30,"Mais inglês"]].map(x => `<button class="${v.pct === x[0] ? "on" : ""}" onmousedown="event.preventDefault()" onclick="vidaSet('pct',${x[0]})">${x[1]}</button>`).join("")}</div>` : ""}
+    ${v.ocup ? `<div class="wz-ok">Meta da semana: ${String(sem).replace(".", ",")}h de estudo (${meta}, em ${v.dias} dias). Você pode ajustar depois.</div>` : `<p class="wz-sub">Escolha uma opção para continuar.</p>`}
+    <div class="wz-cta"><button class="wz-back" onmousedown="event.preventDefault()" onclick="vidaDraft=null;wizObjView=true;wizVidaView=false;wizRender(true)">‹ Voltar</button><button class="btn primary" ${v.ocup ? "" : "disabled"} onmousedown="event.preventDefault()" onclick="vidaOk()">Continuar ›</button></div></div>`;
+}
+function vidaResumoHtml(){
+  const v = profile.vida;
+  if(!v) return `<div class="wz-q">Quantas horas por dia?</div><div class="wz-pills">${WZ_HORAS.map(h=>`<button class="${wiz.horas===h?"on":""}" onmousedown="event.preventDefault()" onclick="wizSet('horas',${h})">${h === 4 ? "4h ou mais" : h + "h"}</button>`).join("")}</div>
+      <div class="wz-q">Quantos dias por semana?</div><div class="wz-pills">${WZ_DIAS.map(d=>`<button class="${wiz.dias===d?"on":""}" onmousedown="event.preventDefault()" onclick="wizSet('dias',${d})">${d} dias</button>`).join("")}</div>`;
+  const o = wzFind(OCUP, v.ocup);
+  return `<div class="wz-ok">${o ? o.nome + ". " : ""}Concurso: ${wiz.horas}h por dia em ${wiz.dias} dias. <a href="#" style="color:var(--blue-deep);font-weight:800" onmousedown="event.preventDefault()" onclick="vidaAjustar();return false">Ajustar rotina</a></div>`;
+}
+// Tela de carregamento: zera o plano anterior (o histórico de estudo, favoritos e inscrições ficam) e monta tudo.
+function resetPlano(){
+  study.cycle = [];
+  roteiro.done = {}; roteiro.retro = {};
+  saveRoteiro(); saveState("concursos-rj-estudos", study);
+}
+function wizCarregar(){
+  const c = objTem("concurso"), i = objTem("ingles");
+  const passos = [];
+  if(!profile.planoZerado) passos.push(["Zerando o plano anterior", () => { resetPlano(); profile.planoZerado = true; saveState("concursos-rj-perfil", profile); }]);
+  if(c) passos.push(["Montando o seu perfil e procurando os concursos que combinam", () => { wizAplicar(); wiz.sel = []; wiz.verTodos = false; wizCiclo(true); wiz.step = 8; saveWiz(); }]);
+  if(i) passos.push(["Montando a sua trilha de inglês", () => { ing.feito = true; ing.step = 6; saveIng(); ingCiclo(true); }]);
+  passos.push(["Ajustando as metas da semana", () => {
+    const v = profile.vida;
+    if(v){ const sp = vidaSplit(v); study.dailyHours = Math.round((sp.c * 60 + sp.i) / 6) / 10; study.diasSemana = v.dias; study.goalHours = Math.round((sp.c * 60 + sp.i) * v.dias / 6) / 10; saveState("concursos-rj-estudos", study); try{ renderStudyProgress(); renderWeekStrip(); }catch(e){} }
+  }]);
+  wizLoad = { passos: passos.map(p => p[0]), i:0 };
+  wizRender(true);
+  let k = 0;
+  const rodar = () => {
+    if(k < passos.length){
+      try{ passos[k][1](); }catch(e){ console.error(e); }
+      k++; wizLoad.i = k; wizRender();
+      setTimeout(rodar, 750);
+    } else {
+      wizLoad = null; wizFase = c ? "concurso" : "ing";
+      try{ renderRoteiroCard(); renderPerfilHub(); renderEstudoHoje(); }catch(e){}
+      wizRender(true);
+    }
+  };
+  setTimeout(rodar, 600);
+}
+function loadRender(box){
+  const L = wizLoad;
+  box.innerHTML = `<div class="wz"><div class="wz-load"><div class="wz-spin"></div><div class="wz-h">Preparando o seu caminho</div><p class="wz-sub">Estou montando tudo com as suas respostas.</p>
+    <ul>${L.passos.map((t, i) => `<li class="${i < L.i ? "ok" : (i === L.i ? "now" : "")}"><span>${i < L.i ? "✓" : ""}</span>${escHtml(t)}</li>`).join("")}</ul></div></div>`;
 }
 function ingFocosSugeridos(){
   const soma = {};
   ing.metas.forEach(id => { const m = wzFind(ING_METAS, id); if(m) Object.keys(m.pesos).forEach(h => { soma[h] = (soma[h] || 0) + m.pesos[h]; }); });
   return Object.keys(soma).sort((a,b) => soma[b] - soma[a]).slice(0, 4);
 }
-function ingFocosUsados(){ return ing.focos.length ? ing.focos : ingFocosSugeridos(); }
+function ingFocosUsados(){ const b = (ing.focos.length ? ing.focos : ingFocosSugeridos()).slice(); if(!b.includes("speaking")) b.unshift("speaking"); return b; }
 function ingSet(k, v, avanca){ ing[k] = v; if(avanca) ing.step = Math.min(5, ing.step + 1); saveIng(); wizRender(!!avanca); }
 function ingToggle(k, v){ const a = ing[k], i = a.indexOf(v); if(i >= 0) a.splice(i,1); else a.push(v); saveIng(); wizRender(); }
+function ingRecurso(id){
+  if(id === "nada") ing.recursos = ing.recursos.includes("nada") ? [] : ["nada"];
+  else { ing.recursos = ing.recursos.filter(x => x !== "nada"); const i = ing.recursos.indexOf(id); if(i >= 0) ing.recursos.splice(i,1); else ing.recursos.push(id); }
+  saveIng(); wizRender();
+}
+function ingAulaDia(d){ const a = ing.aulaDias, i = a.indexOf(d); if(i >= 0) a.splice(i,1); else a.push(d); saveIng(); wizRender(); }
+function ingDia(d){ const a = ing.diasSel, i = a.indexOf(d); if(i >= 0) a.splice(i,1); else a.push(d); ing.dias = a.length; saveIng(); wizRender(); }
 function ingGo(n){
-  ing.step = Math.max(1, Math.min(5, n));
-  if(ing.step === 5) ing.feito = true;
+  if(n >= 6){ if(!ingPode(4)) return; ingIrResultado(); return; }
+  ing.step = Math.max(1, n);
   saveIng(); wizRender(true); renderRoteiroCard();
 }
-function ingPode(step){ if(step === 1) return !!ing.nivel; if(step === 2) return ing.metas.length > 0; return true; }
+function ingIrResultado(){
+  if(objTem("concurso") && !(wiz.areas.length && wiz.niveis.length && wiz.esferas.length && wiz.locais.length)){
+    wizFase = "concurso";
+    wiz.step = !wiz.areas.length ? 2 : (!wiz.niveis.length ? 3 : (!wiz.esferas.length ? 4 : 5));
+    saveWiz(); wizRender(true); return;
+  }
+  wizCarregar();
+}
+function ingPode(step){
+  if(step === 1) return !!ing.nivel;
+  if(step === 2) return ing.metas.length > 0;
+  if(step === 3) return ing.recursos.length > 0 && (!ing.recursos.includes("aula") || ing.aulaDias.length > 0);
+  if(step === 4) return ing.diasSel.length > 0;
+  return true;
+}
 // Plano: sorteio ponderado e suave (as habilidades de mais peso aparecem mais, sem repetir a mesma em dias seguidos).
+// Falar entra sempre. Os dias de aula de conversação aparecem na semana junto com o estudo por conta própria.
 function ingPlano(){
   const focos = ingFocosUsados();
   const peso = {};
   focos.forEach(h => { peso[h] = 0; ing.metas.forEach(id => { const m = wzFind(ING_METAS, id); if(m) peso[h] += m.pesos[h] || 0; }); if(!peso[h]) peso[h] = 1; });
-  const dd = ["Seg","Ter","Qua","Qui","Sex","Sáb","Dom"].slice(0, ing.dias);
-  const revisao = ing.dias >= 4;
-  const diasEstudo = dd.slice(0, revisao ? ing.dias - 1 : ing.dias);
+  peso.speaking = Math.max(peso.speaking || 0, 2);
+  const aulaDias = ing.recursos.includes("aula") ? DIAS_SEM.filter(d => ing.aulaDias.includes(d)) : [];
+  const sel = (ing.diasSel && ing.diasSel.length) ? DIAS_SEM.filter(d => ing.diasSel.includes(d)) : DIAS_SEM.slice(0, ing.dias);
+  const revisao = sel.length >= 4;
+  const diasEstudo = sel.slice(0, revisao ? sel.length - 1 : sel.length);
   const porDia = ing.minutos >= 60 ? 2 : 1, minBloco = Math.round(ing.minutos / porDia / 5) * 5;
   const total = diasEstudo.length * porDia;
   const cur = {}, fila = [];
@@ -6283,7 +6441,7 @@ function ingPlano(){
     focos.forEach(h => { cur[h] += peso[h]; if(best === null || cur[h] > cur[best]) best = h; });
     cur[best] -= soma; fila.push(best);
   }
-  const semMin = {}, semana = [];
+  const semMin = {}, porDiaItens = {};
   diasEstudo.forEach((d, i) => {
     const itens = [];
     for(let j = 0; j < porDia; j++){
@@ -6292,10 +6450,51 @@ function ingPlano(){
       if(u) u.min += minBloco; else itens.push({ h, n:ING_HAB[h].mat, min:minBloco });
     }
     itens.forEach(it => { semMin[it.h] = (semMin[it.h] || 0) + it.min; });
-    semana.push({ d, itens });
+    porDiaItens[d] = itens;
   });
-  if(revisao) semana.push({ d: dd[dd.length - 1], itens:[{ h:"rev", n:"Revisão da semana", min: ing.minutos }] });
-  return { semana, semMin, focos, total: ing.minutos * ing.dias };
+  if(revisao) porDiaItens[sel[sel.length - 1]] = [{ h:"rev", n:"Revisão da semana", min: ing.minutos }];
+  const semana = DIAS_SEM.filter(d => sel.includes(d) || aulaDias.includes(d)).map(d => {
+    const itens = (porDiaItens[d] || []).slice();
+    if(aulaDias.includes(d)) itens.unshift({ h:"aula", n:"Aula de conversação", min: ing.aulaMin });
+    return { d, itens };
+  });
+  return { semana, semMin, focos, sel, aulaDias, total: ing.minutos * sel.length };
+}
+function ingItemNome(it){ return (it.h === "rev" || it.h === "aula") ? it.n : ING_HAB[it.h].nome; }
+function proxDiaIso(nome){
+  const idx = { Dom:0, Seg:1, Ter:2, Qua:3, Qui:4, Sex:5, "Sáb":6 }[nome];
+  const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate() + ((idx - d.getDay() + 7) % 7));
+  return isoOfDate(d);
+}
+function somaHhmm(hhmm, min){ return hhmmOf(Math.min(minutesOf(hhmm) + min, 24 * 60 - 1)); }
+// Trilha para falar: três fases ao longo do prazo escolhido. As técnicas (shadowing de 30 a 60 segundos, recontar,
+// gravar a própria voz, frases em blocos) vêm de artigos de ensino de idiomas, não de uma regra oficial.
+function ingTrilhaMeses(){
+  const P = ing.prazo || 6, a = Math.max(1, Math.round(P / 3)), b = Math.max(a + 1, Math.round(P * 2 / 3));
+  const rot = (x, y) => x >= y ? "Mês " + y : "Meses " + x + " a " + y;
+  return [
+    { t:rot(1, a), nome:"Base e som", itens:["Aprender frases prontas do dia a dia, em blocos","Vocabulário essencial em flashcards, com frases inteiras","Ouvir inglês todo dia, com legenda em inglês","Narrar em voz alta o que você está fazendo, por 10 minutos"] },
+    { t:rot(a + 1, b), nome:"Falar com apoio", itens:["Shadowing: trecho de 30 a 60 segundos, repetido de 3 a 5 vezes junto com o áudio","Recontar em voz alta o que você ouviu ou leu","Responder perguntas comuns em voz alta, primeiro simples e depois com mais detalhe","Gravar a própria voz e ouvir para achar erros e pausas"] },
+    { t:rot(b + 1, P), nome:"Conversar de verdade", itens:["Diálogos simulados de situações da sua meta","Falar de 2 a 3 minutos sobre um tema e gravar","Conversar com uma pessoa: aula, parceiro ou tutor","Revisar as gravações e corrigir os erros que se repetem"] }
+  ];
+}
+function ingHorasPrazo(){
+  const p = ingPlano();
+  const semH = (ing.minutos * p.sel.length + p.aulaDias.length * ing.aulaMin) / 60;
+  return Math.round(semH * ing.prazo * 4.345);
+}
+function ingAgendaHtml(p){
+  const btns = [];
+  p.semana.forEach(s => {
+    s.itens.forEach(it => {
+      if(it.h === "aula"){
+        if(ing.aulaIni) btns.push(gcalBtn({ titulo:"Aula de conversação de inglês", dia:proxDiaIso(s.d), ini:ing.aulaIni, fim:somaHhmm(ing.aulaIni, ing.aulaMin), semanal:true, detalhes:"Criado pelo Rota." }, "📅 Aula " + s.d, "link"));
+      } else if(ing.hora){
+        btns.push(gcalBtn({ titulo:"Inglês: " + ingItemNome(it), dia:proxDiaIso(s.d), ini:ing.hora, fim:somaHhmm(ing.hora, it.min), semanal:true, detalhes:"Criado pelo Rota." }, "📅 " + s.d, "link"));
+      }
+    });
+  });
+  return btns.length ? `<div class="wz-h3">Colocar na agenda</div><p class="wz-sub" style="margin:0 0 6px">Cada botão cria um evento que se repete toda semana no Google Agenda.</p><div class="wz-agenda">${btns.join("")}</div>` : "";
 }
 function ingBuscar(h){
   const n = wzFind(ING_NIVEIS, ing.nivel);
@@ -6321,14 +6520,14 @@ function ingCiclo(sil){
   renderRoteiroCard(); try{ renderEstudoHoje(); }catch(e){}
 }
 function ingHojeHtml(){
-  if(objAtual() === "concurso" || !objAtual() || !ing.feito) return objAtual() === "ingles" || objAtual() === "ambos" ? `<div class="hj-card main"><div class="hj-tag">INGLÊS</div><div class="hj-title">Monte o seu plano de inglês</div><div class="hj-sub">Responda quatro perguntas e eu monto a sua semana.</div><div class="hj-actions"><button class="btn primary" onmousedown="event.preventDefault()" onclick="abrirIngles()">Começar</button></div></div>` : "";
+  if(objAtual() === "concurso" || !objAtual() || !ing.feito) return objAtual() === "ingles" || objAtual() === "ambos" ? `<div class="hj-card main"><div class="hj-tag">INGLÊS</div><div class="hj-title">Monte o seu plano de inglês</div><div class="hj-sub">Responda algumas perguntas e eu monto a sua semana.</div><div class="hj-actions"><button class="btn primary" onmousedown="event.preventDefault()" onclick="abrirIngles()">Começar</button></div></div>` : "";
   const p = ingPlano(), iso = isoOfDate(new Date());
-  const dow = new Date().getDay();   // 0 domingo
-  const idx = dow === 0 ? 6 : dow - 1;
-  const dia = p.semana[idx];
+  const nome = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"][new Date().getDay()];
+  const dia = p.semana.find(s => s.d === nome);
   if(!dia) return `<div class="hj-card"><div class="hj-tag">INGLÊS</div><div class="hj-title">Dia livre</div><div class="hj-sub">Hoje não tem inglês no seu plano. Um áudio curto ainda ajuda.</div></div>`;
   const logs = study.logs.filter(l => l.date === iso);
   return dia.itens.map(it => {
+    if(it.h === "aula") return `<div class="hj-card main"><div class="hj-tag">AULA DE CONVERSAÇÃO · ${hjFmt(it.min)}</div><div class="hj-title">👩‍🏫 Aula de hoje${ing.aulaIni ? " às " + escHtml(ing.aulaIni) : ""}</div><div class="hj-sub">Depois da aula, anote frases novas e repita em voz alta.</div>${ing.aulaIni ? `<div class="hj-links">${gcalBtn({ titulo:"Aula de conversação de inglês", dia:isoOfDate(new Date()), ini:ing.aulaIni, fim:somaHhmm(ing.aulaIni, it.min), semanal:true, detalhes:"Criado pelo Rota." }, "📅 Agendar toda semana", "link")}</div>` : ""}</div>`;
     if(it.h === "rev") return `<div class="hj-card main"><div class="hj-tag">INGLÊS · ${hjFmt(it.min)}</div><div class="hj-title">Revisão da semana</div><div class="hj-sub">Flashcards, erros e a revisão da semana. Sem conteúdo novo hoje.</div><div class="hj-actions"><button class="btn primary" onmousedown="event.preventDefault()" onclick="hojeIrPara('revisar')">Abrir revisões</button><button class="btn ghost" onmousedown="event.preventDefault()" onclick="roteiroRetro()">Revisão da semana</button></div></div>`;
     const feito = logs.filter(l => l.materia === it.n).reduce((a,l) => a + l.minutes, 0);
     const pc = Math.min(100, Math.round(feito / Math.max(1, it.min) * 100));
@@ -6343,44 +6542,68 @@ function ingHojeHtml(){
       <div class="hj-links">${gcalBtn(gcalProximoBloco("Inglês: " + ING_HAB[it.h].nome, it.min), "📅 Agendar", "link")}<a href="#" onmousedown="event.preventDefault()" onclick="ingBuscar('${it.h}');return false">▶ Buscar material</a></div></div>`;
   }).join("");
 }
-function abrirIngles(){ if(objAtual() === "concurso"){ profile.objetivo = "ambos"; saveState("concursos-rj-perfil", profile); } wizFase = "ing"; wizObjView = false; abrirWizard(); }
+function abrirIngles(){
+  if(objAtual() === "concurso"){ profile.objetivo = "ambos"; saveState("concursos-rj-perfil", profile); }
+  wizFase = "ing"; wizObjView = false;
+  if(profile.vida) vidaDistribuir();
+  abrirWizard();
+}
 function ingRender(box){
-  const step = ing.step || 1;
+  const step = Math.min(ing.step || 1, 6);
   const dots = `<div class="wz-dots">${[1,2,3,4,5].map(i => `<i class="${i <= step ? "on" : ""}"></i>`).join("")}</div>`;
   const volta = objAtual() === "ambos" ? `<button class="wz-skip" onmousedown="event.preventDefault()" onclick="wizFase='concurso';wizRender(true)">‹ Ir para o concurso</button>` : "";
   const cta = (txt) => `<div class="wz-cta"><button class="wz-back" onmousedown="event.preventDefault()" onclick="ingGo(${step - 1})" ${step === 1 ? "style='visibility:hidden'" : ""}>‹ Voltar</button><button class="btn primary" ${ingPode(step) ? "" : "disabled"} onmousedown="event.preventDefault()" onclick="ingGo(${step + 1})">${txt || "Continuar ›"}</button></div>`;
+  const pills = (arr, cur, fn, fmt) => `<div class="wz-pills">${arr.map(x => `<button class="${cur === x ? "on" : ""}" onmousedown="event.preventDefault()" onclick="${fn}(${typeof x === "string" ? "'" + x + "'" : x})">${fmt ? fmt(x) : x}</button>`).join("")}</div>`;
   let corpo = "";
   if(step === 1){
     corpo = `<div class="wz-h">Qual é o seu nível de inglês hoje?</div><p class="wz-sub">Escolha o que mais combina com você. Não precisa ser exato.</p>
       <div class="wz-opts one">${ING_NIVEIS.map(n => `<button class="wz-opt ${ing.nivel === n.id ? "on" : ""}" onmousedown="event.preventDefault()" onclick="ingSet('nivel','${n.id}',true)"><b>${n.nome} · ${n.cefr}</b><small>${n.desc}</small></button>`).join("")}</div>`;
   } else if(step === 2){
-    corpo = `<div class="wz-h">Para que você quer o inglês?</div><p class="wz-sub">Marque uma ou mais metas. Elas decidem o que entra mais na sua semana.</p>
-      <div class="wz-opts">${ING_METAS.map(m => { const on = ing.metas.includes(m.id); return `<button class="wz-opt multi ${on ? "on" : ""}" onmousedown="event.preventDefault()" onclick="ingToggle('metas','${m.id}')"><span class="ck">${on ? "✓" : ""}</span><span class="ic">${m.ico}</span><b>${m.nome}</b><small>${m.desc}</small></button>`; }).join("")}</div>${cta()}`;
+    corpo = `<div class="wz-h">Qual é a sua meta com o inglês?</div><p class="wz-sub">Marque uma ou mais. Falar entra no seu plano em qualquer meta.</p>
+      <div class="wz-opts">${ING_METAS.map(m => { const on = ing.metas.includes(m.id); return `<button class="wz-opt multi ${on ? "on" : ""}" onmousedown="event.preventDefault()" onclick="ingToggle('metas','${m.id}')"><span class="ck">${on ? "✓" : ""}</span><span class="ic">${m.ico}</span><b>${m.nome}</b><small>${m.desc}</small></button>`; }).join("")}</div>
+      <div class="wz-q">Em quanto tempo você quer chegar lá?</div>${pills(ING_PRAZOS, ing.prazo, "ingPrazo", m => m + " meses")}${cta()}`;
   } else if(step === 3){
-    const sug = ingFocosSugeridos();
-    corpo = `<div class="wz-h">O que você quer treinar?</div><p class="wz-sub">Marcamos as habilidades que mais ajudam nas suas metas. Troque se quiser.</p>
-      <div class="wz-opts">${Object.keys(ING_HAB).map(h => { const on = ingFocosUsados().includes(h); return `<button class="wz-opt multi ${on ? "on" : ""}" onmousedown="event.preventDefault()" onclick="ingFoco('${h}')"><span class="ck">${on ? "✓" : ""}</span><span class="ic">${ING_HAB[h].ico}</span><b>${ING_HAB[h].nome}</b>${sug.includes(h) ? `<small>Sugerida para a sua meta</small>` : ""}</button>`; }).join("")}</div>${cta()}`;
+    const aula = ing.recursos.includes("aula"), livro = ing.recursos.includes("livro");
+    const dias = `<div class="wz-pills">${DIAS_SEM.map(d => `<button class="${ing.aulaDias.includes(d) ? "on" : ""}" onmousedown="event.preventDefault()" onclick="ingAulaDia('${d}')">${d}</button>`).join("")}</div>`;
+    corpo = `<div class="wz-h">Como você estuda inglês hoje?</div><p class="wz-sub">Marque o que você já tem. Assim o plano encaixa o seu material.</p>
+      <div class="wz-opts">${ING_RECURSOS.map(r => { const on = ing.recursos.includes(r.id); return `<button class="wz-opt multi ${on ? "on" : ""}" onmousedown="event.preventDefault()" onclick="ingRecurso('${r.id}')"><span class="ck">${on ? "✓" : ""}</span><span class="ic">${r.ico}</span><b>${r.nome}</b><small>${r.desc}</small></button>`; }).join("")}</div>
+      ${aula ? `<div class="wz-q">Em quais dias é a sua aula?</div>${dias}<div class="wz-q">Que horas ela começa?</div><input class="wz-time" type="time" value="${escHtml(ing.aulaIni)}" onchange="ing.aulaIni=this.value;saveIng()"><div class="wz-q">Quanto tempo dura?</div>${pills([45,60,90], ing.aulaMin, "ingAulaMin", m => m + " min")}` : ""}
+      ${livro ? `<div class="wz-q">Qual livro ou apostila?</div><input class="wz-text" type="text" maxlength="60" placeholder="Nome do livro (opcional)" value="${escHtml(ing.livro)}" onchange="ing.livro=this.value.trim();saveIng()">` : ""}${cta()}`;
   } else if(step === 4){
-    corpo = `<div class="wz-h">Como é a sua rotina?</div><p class="wz-sub">Com isso eu monto a sua semana. Você pode mudar depois.</p>
-      <div class="wz-q">Quantos minutos por dia?</div><div class="wz-pills">${[20,30,45,60,90].map(m => `<button class="${ing.minutos === m ? "on" : ""}" onmousedown="event.preventDefault()" onclick="ingSet('minutos',${m})">${m} min</button>`).join("")}</div>
-      <div class="wz-q">Quantos dias por semana?</div><div class="wz-pills">${[3,4,5,6,7].map(d => `<button class="${ing.dias === d ? "on" : ""}" onmousedown="event.preventDefault()" onclick="ingSet('dias',${d})">${d} dias</button>`).join("")}</div>${cta("Ver o meu plano ›")}`;
+    const aula = ing.recursos.includes("aula");
+    corpo = `<div class="wz-h">Quando você vai estudar?</div><p class="wz-sub">Escolha os dias do seu estudo por conta própria.${aula ? " Os dias de aula já entram no plano." : ""}</p>
+      <div class="wz-pills">${DIAS_SEM.map(d => `<button class="${ing.diasSel.includes(d) ? "on" : ""}" onmousedown="event.preventDefault()" onclick="ingDia('${d}')">${d}${aula && ing.aulaDias.includes(d) ? " 👩‍🏫" : ""}</button>`).join("")}</div>
+      <div class="wz-q">Que horas costuma ser? (opcional)</div><input class="wz-time" type="time" value="${escHtml(ing.hora)}" onchange="ing.hora=this.value;saveIng()">
+      <div class="wz-q">Quantos minutos por dia?</div>${pills([20,30,45,60,90], ing.minutos, "ingMin", m => m + " min")}${cta()}`;
+  } else if(step === 5){
+    const sug = ingFocosSugeridos();
+    corpo = `<div class="wz-h">O que você quer treinar?</div><p class="wz-sub">Marcamos as habilidades que mais ajudam nas suas metas. Falar fica sempre incluído.</p>
+      <div class="wz-opts">${Object.keys(ING_HAB).map(h => { const on = ingFocosUsados().includes(h); return `<button class="wz-opt multi ${on ? "on" : ""}" onmousedown="event.preventDefault()" onclick="ingFoco('${h}')"><span class="ck">${on ? "✓" : ""}</span><span class="ic">${ING_HAB[h].ico}</span><b>${ING_HAB[h].nome}</b>${sug.includes(h) ? `<small>Sugerida para a sua meta</small>` : ""}</button>`; }).join("")}</div>${cta("Ver o meu plano ›")}`;
   } else {
     const p = ingPlano(), n = wzFind(ING_NIVEIS, ing.nivel);
-    const horasTot = Math.round(p.total / 6) / 10;
+    const horasSem = Math.round((ing.minutos * p.sel.length + p.aulaDias.length * ing.aulaMin) / 6) / 10;
+    const hp = ingHorasPrazo();
     corpo = `<div class="wz-eyebrow">Seu plano de inglês</div>
       <div class="wz-h">🗣️ ${n ? n.nome + " · " + n.cefr : "Inglês"}</div>
-      <p class="wz-sub">${ing.metas.map(id => (wzFind(ING_METAS, id) || {}).nome).filter(Boolean).join(", ")}. ${ing.minutos} min por dia em ${ing.dias} dias dá cerca de ${String(horasTot).replace(".", ",")}h por semana.</p>
-      <div class="wz-h3">Sua trilha</div>${roteiroResumoHtml("ingles")}
+      <p class="wz-sub">${ing.metas.map(id => (wzFind(ING_METAS, id) || {}).nome).filter(Boolean).join(", ")}. Falar está incluído. ${ing.minutos} min por dia em ${p.sel.length} dias${p.aulaDias.length ? ", mais " + p.aulaDias.length + " aula" + (p.aulaDias.length > 1 ? "s" : "") + " de conversação" : ""} dá cerca de ${String(horasSem).replace(".", ",")}h por semana.${ing.livro ? " Livro: " + escHtml(ing.livro) + "." : ""}</p>
+      <div class="wz-note">Com esse ritmo, em ${ing.prazo} meses você soma cerca de ${hp}h de inglês. Para ir do A1 ao B2, a Cambridge English fala em 500 a 600 horas, segundo o <a href="https://practiceme.app/pt/blog/como-ficar-fluente-em-ingles" target="_blank" rel="noopener" style="color:var(--blue-deep);font-weight:800">PracticeMe</a>. Dá para avançar e falar com mais segurança, mas a fluência pede constância por mais tempo.</div>
+      <div class="wz-h3">Sua trilha de ${ing.prazo} meses para falar</div>
+      ${ingTrilhaMeses().map(f => `<div class="wz-mes"><b>${f.t} · ${f.nome}</b><ul>${f.itens.map(i => `<li>${i}</li>`).join("")}</ul></div>`).join("")}
       <div class="wz-h3">Sua semana de inglês</div>
-      <div class="wz-week">${p.semana.map(s => `<div class="wz-day"><b>${s.d}</b><div>${s.itens.map(it => `<span class="${it.h === "rev" ? "rev" : "base"}">${escHtml(it.h === "rev" ? it.n : ING_HAB[it.h].nome)} <i>${wzHm(it.min)}</i></span>`).join("")}</div></div>`).join("")}</div>
-      <button class="btn primary wz-big" onmousedown="event.preventDefault()" onclick="ingCiclo()">Montar meu ciclo de inglês</button>
-      <p class="wz-sub" style="margin-top:8px">O ciclo coloca cada habilidade no cronômetro e no registro de estudos. Para travar o horário, use o botão Google Agenda nos horários livres da Início.</p>
+      <div class="wz-week">${p.semana.map(s => `<div class="wz-day"><b>${s.d}</b><div>${s.itens.map(it => `<span class="${it.h === "rev" ? "rev" : (it.h === "aula" ? "aula" : "base")}">${escHtml(ingItemNome(it))} <i>${wzHm(it.min)}</i></span>`).join("")}</div></div>`).join("")}</div>
+      ${ingAgendaHtml(p)}
+      <div class="wz-h3">Sua trilha</div>${roteiroResumoHtml("ingles")}
+      <p class="wz-sub" style="margin-top:8px">Cada habilidade já entrou no seu ciclo, no cronômetro e no registro de estudos.</p>
+      ${objAtual() === "ambos" ? `<button class="btn wz-big" onmousedown="event.preventDefault()" onclick="wizFase='concurso';wizRender(true)">Ver o seu concurso ›</button>` : ""}
       <div class="wz-cta"><button class="wz-back" onmousedown="event.preventDefault()" onclick="ingGo(4)">‹ Ajustar rotina</button><button class="wz-back" onmousedown="event.preventDefault()" onclick="ingReset()">↺ Refazer</button></div>`;
   }
-  box.innerHTML = `<div class="wz"><div class="wz-eyebrow">Inglês · passo ${step} de 5</div>${dots}${volta}${corpo}</div>`;
+  box.innerHTML = `<div class="wz"><div class="wz-eyebrow">Inglês · ${step < 6 ? "passo " + step + " de 5" : "seu plano"}</div>${dots}${volta}${corpo}</div>`;
 }
-function ingFoco(h){ const usados = ingFocosUsados().slice(); const i = usados.indexOf(h); if(i >= 0) usados.splice(i,1); else usados.push(h); ing.focos = usados; saveIng(); wizRender(); }
-function ingReset(){ ing = ingVazio(); saveIng(); wizRender(true); renderRoteiroCard(); }
+function ingPrazo(m){ ing.prazo = m; saveIng(); wizRender(); }
+function ingAulaMin(m){ ing.aulaMin = m; saveIng(); wizRender(); }
+function ingMin(m){ ing.minutos = m; saveIng(); wizRender(); }
+function ingFoco(h){ if(h === "speaking") return; const usados = ingFocosUsados().slice(); const i = usados.indexOf(h); if(i >= 0) usados.splice(i,1); else usados.push(h); ing.focos = usados; saveIng(); wizRender(); }
+function ingReset(){ ing = ingVazio(); saveIng(); profile.planoZerado = false; saveState("concursos-rj-perfil", profile); if(profile.vida) vidaDistribuir(); wizRender(true); renderRoteiroCard(); }
 function wizTrocarObjetivo(){ wizObjView = true; wizRender(true); }
 
 const ROTEIRO_FASES_ING = [
@@ -6400,7 +6623,14 @@ const ROTEIRO_FASES_ING = [
     { k:"i_vocab", t:"Vocabulário em flashcards", d:"Crie cartões com frases inteiras, não só palavras soltas.", auto:()=>study.flashcards.some(f => /ingl/i.test(f.materia || "")), acao:["Abrir Estudos","roteiroIr('estudos')"] },
     { k:"i_ler", t:"Ler um pouco por dia", d:"Textos curtos no seu nível. Anote só as palavras que aparecem mais de uma vez.", auto:()=>study.logs.some(l => l.materia === "Inglês: Leitura"), acao:["Buscar textos","ingBuscar('reading')"] },
     { k:"i_falar", t:"Falar em voz alta", d:"Grave um áudio de 1 minuto sobre o seu dia e ouça. Repita toda semana.", auto:()=>study.logs.some(l => l.materia === "Inglês: Speaking"), acao:["Buscar exercícios","ingBuscar('speaking')"] },
+    { k:"i_shadow", t:"Shadowing de 1 minuto", d:"Ouça um trecho de 30 a 60 segundos e repita junto, de 3 a 5 vezes.", acao:["Buscar áudios","ingBuscar('speaking')"] },
     { k:"i_escrever", t:"Escrever um parágrafo", d:"Escreva sobre algo do seu dia e corrija com calma no dia seguinte.", auto:()=>study.logs.some(l => l.materia === "Inglês: Escrita"), acao:["Buscar exercícios","ingBuscar('writing')"] }
+  ]},
+  { nome:"Falar em poucos meses", cor:"mint", passos:[
+    { k:"i_f1", t:"Fase 1: base e som", d:"Frases prontas, vocabulário essencial e narrar o dia em voz alta.", dd:()=>{ const f = ingTrilhaMeses()[0]; return f.t + ": " + f.itens.join(". ") + "."; } },
+    { k:"i_f2", t:"Fase 2: falar com apoio", d:"Shadowing, recontar o que ouviu e gravar a própria voz.", dd:()=>{ const f = ingTrilhaMeses()[1]; return f.t + ": " + f.itens.join(". ") + "."; } },
+    { k:"i_f3", t:"Fase 3: conversar de verdade", d:"Diálogos simulados e conversa com uma pessoa.", dd:()=>{ const f = ingTrilhaMeses()[2]; return f.t + ": " + f.itens.join(". ") + "."; } },
+    { k:"i_aula", t:"Conversar com uma pessoa toda semana", d:"Aula de conversação, parceiro ou tutor.", dd:()=> ing.recursos.includes("aula") && ing.aulaDias.length ? "Sua aula: " + ing.aulaDias.join(", ") + (ing.aulaIni ? " às " + ing.aulaIni : "") + "." : "Sem aula? Procure um parceiro ou tutor para conversar toda semana." }
   ]},
   { nome:"Revisar e ajustar", cor:"vinho", passos:[
     { k:"i_rev", t:"Agendar revisões", d:"Revise vocabulário e erros em 24 horas, 7 dias e 30 dias.", auto:()=>study.reviews.some(r => /ingl/i.test(r.materia || "")), acao:["Ver revisões","goToEstudosReviews()"] },
@@ -6597,6 +6827,7 @@ function goCronograma(){
 function abrirWizard(){
   document.getElementById("sub-topbar-title").textContent = "Seu caminho";
   if(objAtual() === "ingles") wizFase = "ing";
+  if(objAtual() && !profile.vida) wizVidaView = true;
   document.getElementById("sub-content").innerHTML = '<div id="wizard-card"></div>';
   document.getElementById("sub-screen").classList.add("active");
   document.getElementById("sub-scroll").scrollTop = 0;
@@ -6660,7 +6891,8 @@ function renderPerfilHub(){
   renderBancaFav();
   const form = wzFind(WZ_FORMACOES, profile.formacao);
   const nivs = (profile.niveis || []).filter(n => n !== "Técnico" || !(profile.niveis || []).includes("Médio")).join(" e ");
-  const resumo = [form ? form.nome : "Formação não informada", nivs, (profile.estados || []).join(" ")].filter(Boolean).join(" · ");
+  const ocP = profile.vida ? wzFind(OCUP, profile.vida.ocup) : null;
+  const resumo = [ocP ? ocP.nome : "", form ? form.nome : "Formação não informada", nivs, (profile.estados || []).join(" ")].filter(Boolean).join(" · ");
   const horas = Math.round(study.logs.reduce((a,l) => a + l.minutes, 0) / 60 * 10) / 10;
   let un = 0, tot = ACHIEVEMENTS.length;
   try{ const ctx = computeAchievementContext(); un = ACHIEVEMENTS.filter(a => a.check(ctx)).length; }catch(e){}
@@ -6671,7 +6903,7 @@ function renderPerfilHub(){
   const feito = wiz.areas.length > 0 && wiz.step === 8;
   const objP = objAtual();
   const ingCard = () => {
-    if(!ing.feito) return `<div class="pf-plan cta"><div class="eyebrow">Inglês</div><h3>Monte o seu plano de inglês</h3><p>Cinco perguntas rápidas: nível, meta, habilidades e rotina. No fim eu monto a sua semana e a trilha.</p><button class="btn" onmousedown="event.preventDefault()" onclick="abrirIngles()">Começar em 2 minutos</button></div>`;
+    if(!ing.feito) return `<div class="pf-plan cta"><div class="eyebrow">Inglês</div><h3>Monte o seu plano de inglês</h3><p>Algumas perguntas rápidas: nível, meta, aulas, horários e habilidades. No fim eu monto a sua semana e a trilha.</p><button class="btn" onmousedown="event.preventDefault()" onclick="abrirIngles()">Começar em 2 minutos</button></div>`;
     const n = wzFind(ING_NIVEIS, ing.nivel), p = ingPlano();
     return `<div class="pf-plan done"><div class="eyebrow">Seu plano de inglês</div><h3>${ing.minutos} min por dia, ${ing.dias} dias por semana</h3><div class="pf-chips" style="margin-top:6px">${n ? `<span>${escHtml(n.nome)}</span>` : ""}${p.focos.map(h => `<span class="g">${escHtml(ING_HAB[h].nome)}</span>`).join("")}</div><div class="row"><button class="btn primary" onmousedown="event.preventDefault()" onclick="abrirRoteiro(false,'ingles')">Ver trilha</button><button class="btn ghost" onmousedown="event.preventDefault()" onclick="abrirIngles()">Rever respostas</button></div></div>`;
   };
@@ -6911,9 +7143,14 @@ function wizSet(k, v, avanca){
   saveWiz(); wizRender(avanca);
 }
 function wizGo(n){
-  wiz.step = Math.max(1, Math.min(8, n));
-  if(wiz.step === 8){ wizAplicar(); wiz.sel = []; wiz.verTodos = false; }
+  if(n >= 8){ wizIrResultado(); return; }
+  wiz.step = Math.max(1, n);
   saveWiz(); wizRender(true);
+}
+function wizIrResultado(){
+  wiz.step = 7; saveWiz();
+  if(objAtual() === "ambos" && !ing.feito){ wizFase = "ing"; ing.step = 1; saveIng(); wizRender(true); return; }
+  wizCarregar();
 }
 function wizSelToggle(id){ const i = wiz.sel.indexOf(id); if(i >= 0) wiz.sel.splice(i, 1); else wiz.sel.push(id); saveWiz(); wizRender(); }
 function wizSelTodos(){
@@ -6933,7 +7170,7 @@ function wizMontar(){
   try{ renderStudyProgress(); renderWeekStrip(); }catch(e){}
   goCronograma();
 }
-function wizReset(){ wiz = wizVazio(wiz.done); saveWiz(); wizRender(true); }
+function wizReset(){ wiz = wizVazio(wiz.done); saveWiz(); profile.planoZerado = false; saveState("concursos-rj-perfil", profile); if(profile.vida) vidaDistribuir(); wizRender(true); }
 function wizCheck(i){ if(wiz.done[i]) delete wiz.done[i]; else wiz.done[i] = true; saveWiz(); wizRender(); }
 function wizPode(step){
   if(step === 2) return wiz.areas.length > 0;
@@ -7038,12 +7275,24 @@ function wizConcursos(todos){
     if(!ars.some(a => !a.kw || a.kw.test((it.title || "") + " " + (it.cargos || "")))) return false;
     if(todos) return true;
     return itemServeFormacao(it, wiz.formacao) && itemServeEsfera(id, wiz.esferas);
-  }).slice(0, 14);
+  }).slice(0, 40);
+}
+function wizBuscaMais(){
+  const areas = wiz.areas.map(id => (wzFind(WZ_AREAS, id) || {}).nome).filter(Boolean);
+  const locs = wiz.locais.map(id => id === "outro" ? wiz.ufs.join(" ") : (id === "capital" ? "capital" : ((wzFind(WZ_LOCAIS, id) || {}).nome || ""))).filter(Boolean);
+  const nivs = wiz.niveis.map(id => id === "medio" ? "nível médio" : (id === "superior" ? "nível superior" : "")).filter(Boolean);
+  const links = [];
+  areas.slice(0, 4).forEach(a => links.push([a, "concurso " + a + " " + (nivs[0] || "") + " " + (locs[0] || "") + " inscrições abertas 2026"]));
+  wiz.ufs.slice(0, 3).forEach(u => links.push(["Concursos em " + u, "concursos abertos " + u + " 2026 " + (areas[0] || "")]));
+  return `<div class="wz-h3">Pesquisar mais concursos</div><p class="wz-sub" style="margin:0 0 6px">O painel acompanha o Rio de Janeiro em detalhe. Para o resto do Brasil, estas buscas já saem com as suas respostas.</p>
+    <div class="wz-agenda">${links.map(l => `<a class="gcal-btn link" href="${escHtml(crGg(l[1]))}" target="_blank" rel="noopener">🔎 ${escHtml(l[0])}</a>`).join("")}<a class="gcal-btn link" href="https://www.estrategiaconcursos.com.br/blog/mapa-concursos" target="_blank" rel="noopener">🗺️ Mapa de concursos</a></div>`;
 }
 function wizRender(rolar){
   const box = document.getElementById("wizard-card");
   if(!box) return;
+  if(wizLoad){ loadRender(box); if(rolar) box.scrollIntoView({ block:"start", behavior:"smooth" }); return; }
   if(!objAtual() || wizObjView){ objRender(box); if(rolar) box.scrollIntoView({ block:"start", behavior:"smooth" }); return; }
+  if(wizVidaView){ vidaRender(box); if(rolar) box.scrollIntoView({ block:"start", behavior:"smooth" }); return; }
   if(objAtual() === "ingles" || (objAtual() === "ambos" && wizFase === "ing")){ ingRender(box); if(rolar) box.scrollIntoView({ block:"start", behavior:"smooth" }); return; }
   const step = Math.min(wiz.step || 1, 8);
   const dots = `<div class="wz-dots">${[1,2,3,4,5,6,7,8].map(i=>`<i class="${i<=step?"on":""}"></i>`).join("")}</div>`;
@@ -7099,8 +7348,7 @@ function wizRender(rolar){
       ${grupos.length ? grupos.map(g=>`<div class="wz-grp">${escHtml(g.t)}</div><div class="wz-chipsel">${g.l.map(c=>`<button class="${wiz.cargos.includes(c)?"on":""}" data-v="${escHtml(c)}" onmousedown="event.preventDefault()" onclick="wizToggle('cargos',this.dataset.v)">${escHtml(c)}</button>`).join("")}</div>`).join("") : `<p class="wz-sub">Não há cargos mapeados para essa combinação. Pode continuar.</p>`}${cta("Continuar")}`;
   } else if(step === 7){
     corpo = `<div class="wz-h">Como é a sua rotina?</div><p class="wz-sub">Com isso eu monto a sua semana de estudo. Você pode mudar depois.</p>
-      <div class="wz-q">Quantas horas por dia?</div><div class="wz-pills">${WZ_HORAS.map(h=>`<button class="${wiz.horas===h?"on":""}" onmousedown="event.preventDefault()" onclick="wizSet('horas',${h})">${h === 4 ? "4h ou mais" : h + "h"}</button>`).join("")}</div>
-      <div class="wz-q">Quantos dias por semana?</div><div class="wz-pills">${WZ_DIAS.map(d=>`<button class="${wiz.dias===d?"on":""}" onmousedown="event.preventDefault()" onclick="wizSet('dias',${d})">${d} dias</button>`).join("")}</div>
+      ${vidaResumoHtml()}
       <div class="wz-q">Daqui a quanto tempo quer passar?</div><div class="wz-pills">${WZ_PRAZOS.map(p=>`<button class="${wiz.prazo===p.id?"on":""}" onmousedown="event.preventDefault()" onclick="wizSet('prazo','${p.id}')">${p.nome}</button>`).join("")}</div>
       <div class="wz-q">Seu ponto de partida</div><div class="wz-opts one">${WZ_INICIOS.map(i=>`<button class="wz-opt ${wiz.inicio===i.id?"on":""}" onmousedown="event.preventDefault()" onclick="wizSet('inicio','${i.id}')"><b>${i.nome}</b><small>${i.desc}</small></button>`).join("")}</div>${cta("Ver meu plano")}`;
   } else {
@@ -7121,6 +7369,7 @@ function wizRender(rolar){
         <div class="wz-picks">${cs.map(id=>{ const it = T[id], on = wiz.sel.includes(id), ok = prepDisponivel(it); return `<button class="wz-pick ${on?"on":""}" onmousedown="event.preventDefault()" onclick="wizSelToggle('${id}')"><span class="ck">${on?"✓":""}</span><span><b>${escHtml(it.title.replace(/^Concurso\s*/i, ""))}</b><small>${escHtml((it.badge || "") + (it.nivel ? " · " + it.nivel : "") + (ESFERA_ITEM[id] ? " · " + ESFERA_ITEM[id] : ""))}${ok ? "" : " · sem dados para cronograma"}</small></span></button>`; }).join("")}</div>
         ${(extra > 0 || wiz.verTodos) ? `<button class="wz-skip" onmousedown="event.preventDefault()" onclick="wiz.verTodos=!wiz.verTodos;saveWiz();wizRender()">${wiz.verTodos ? "Mostrar só os que combinam" : "Ver também " + extra + " que não consegui confirmar (cargos a definir)"}</button>` : ""}
         <button class="btn primary wz-big" onmousedown="event.preventDefault()" onclick="wizMontar()">${wiz.sel.length ? "Montar cronograma com " + wiz.sel.length + " concurso" + (wiz.sel.length > 1 ? "s" : "") : "Montar só o ciclo de matérias"}</button>` : `<p class="wz-sub">Nenhum concurso do painel combina com essa escolha agora. Posso montar o ciclo só com as matérias.</p><button class="btn primary wz-big" onmousedown="event.preventDefault()" onclick="wizMontar()">Montar ciclo de matérias</button>`) : `${painelNota}<button class="btn primary wz-big" onmousedown="event.preventDefault()" onclick="wizMontar()">Montar ciclo de matérias</button>`}
+      ${wizBuscaMais()}
       ${doisNiveis ? `<div class="wz-note">Médio e superior juntos: estude primeiro a base, que cai nos dois. Quando um edital abrir, você afina o foco para aquele nível.</div>` : ""}
       <div class="wz-h3">Sua semana de estudo</div>
       <p class="wz-sub" style="margin:0 0 8px">${wiz.horas}h por dia em ${wiz.dias} dias dá ${p.horasSemana}h por semana. No prazo escolhido são cerca de ${totalH}h de estudo.</p>
