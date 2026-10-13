@@ -2717,8 +2717,9 @@ abertos.push(
 );
 emAndamento.push(
   _novo({ org:"🛢️ Transpetro", title:"Concurso Transpetro 2026", badge:"INSCRIÇÃO ENCERRADA", badgeType:"encerrado",
-    nivel:"Superior e Médio", cargos:"A definir (quatro editais, de números 1 a 4/2026)", salario:"A definir", vagas:"89 vagas + cadastro de reserva (edital 1/2026); os outros não informam",
-    banca:"A definir", situacao:"Inscrições encerraram em 21/09/2026 e a prova está marcada, segundo o Valor Final. A fonte não informa a data da prova nem a banca",
+    nivel:"Superior e Médio", cargos:"A definir (quatro editais, de números 1 a 4/2026)", salario:"A definir", vagas:"4.171 no total (Gran Cursos). O edital 1/2026 tem 89 + cadastro de reserva (Valor Final)",
+    banca:"A definir", situacao:"Inscrições encerraram em 21/09/2026 (Valor Final). A Gran informa 14/09 e prova em 29/11/2026: confira no edital",
+    provaData:"2026-11-29", prova:"29/11/2026 (segundo a Gran Cursos)",
     inscricoes:"Encerradas em 21/09/2026", inscricaoFim:"2026-09-21", fonteUrl:_urlVal, fonteLabel:_VAL,
     note:"Subsidiária da Petrobras com sede no Rio. Acompanhe a data da prova no site da banca." })
 );
@@ -2764,6 +2765,125 @@ banca.push(
     note:"Fora do perfil de Administração. Entra para quem escolher Segurança pública." })
 );
 
+
+// ---------- Concursos federais e nacionais (Estratégia 09/10/2026, Gran Cursos, páginas do TCU e do TSE) ----------
+const _FEDE="Estratégia Concursos: concursos federais", _FEDG="Gran Cursos: concursos federais";
+const _urlFedE="https://concursos.estrategia.com/portal/concursos-federais/", _urlFedG="https://blog.grancursosonline.com.br/concursos-federais/";
+window.__FED_ESFERA = {};
+(function(){
+  const sl = t => t.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
+  const N = {M:"Médio", S:"Superior", MS:"Médio e Superior", D:"A definir"};
+  const T = {
+    ab:["INSCRIÇÕES ABERTAS","aberto"], bd:["BANCA DEFINIDA","banca"], au:["AUTORIZADO","anunciado"],
+    so:["SOLICITADO","anunciado"], pv:["PREVISTO","anunciado"], es:["EM ESTUDO","anunciado"], cf:["COMISSÃO FORMADA","anunciado"]
+  };
+  function add(t, org, nome, nv, cargos, sal, vagas, bancaN, sit, ex){
+    const it = { org:org, title:"Concurso "+nome, badge:T[t][0], badgeType:T[t][1], nivel:N[nv]||nv, cargos:cargos, salario:sal, vagas:vagas,
+      banca:bancaN||"A definir", situacao:sit, fonteUrl:_urlFedE, fonteLabel:_FEDE, estado:"Nacional", cidade:"Todo o Brasil (federal)",
+      editalUrl:"", inscricoes:"Ainda não abertas", prova:"A definir", taxa:"A definir",
+      note:"Concurso federal: a vaga pode ser em qualquer cidade. Confira o edital quando sair." };
+    Object.assign(it, ex||{});
+    (T[t][1]==="aberto" ? abertos : T[t][1]==="banca" ? banca : anunciados).push(it);
+    window.__FED_ESFERA[sl(it.title)] = "federal";
+  }
+  // Prioridade: pedidos dela
+  add("au","🏛️ TCU: Tribunal de Contas da União","TCU: Auditor Federal de Controle Externo","S","Auditor Federal de Controle Externo (área geral)","R$ 27.633,10","100 autorizadas (Estratégia). PLOA 2027 cita 43","A definir",
+    "Autorizado para 2026, banca ainda não informada. O concurso anterior (Auditor de TI e Técnico) já foi homologado. Confira o edital para vagas e data",
+    { note:"Muito alinhado a Administração, Contábeis e Direito: exige nível superior em qualquer área para a área geral (confirme no edital). Salário inicial entre os mais altos do país." });
+  add("au","⚖️ TSE: Tribunal Superior Eleitoral","TSE: Unificado e TRE-RJ","MS","Analista e Técnico Judiciário (TSE e TREs)","A definir","412 + cadastro de reserva no último concurso","Cebraspe",
+    "Último concurso homologado, com nomeações em andamento e validade até 02/07/2027. Não achei novo edital confirmado. No TRE-RJ foram 17 vagas + cadastro de reserva",
+    { badge:"VIGENTE", fonteUrl:"https://concursos.estrategia.com/portal/concurso-tse/", fonteLabel:"Estratégia Concursos: TSE",
+      note:"Quem passou no último concurso ainda pode ser chamado até a validade. Para um novo edital, acompanhe os pedidos de provimento do TSE e dos TREs." });
+  // Aberto / em andamento: dados da Gran
+  add("ab","🧪 AgSUS","AgSUS","S","A definir","R$ 8.800,00","Cadastro de reserva","A definir","Inscrições até 16/10/2026. Prova em 22/11/2026",
+    { inscricoes:"Até 16/10/2026", inscricaoFim:"2026-10-16", provaData:"2026-11-22", prova:"22/11/2026", fonteUrl:_urlFedG, fonteLabel:_FEDG, area:"Saúde" });
+  add("ab","⚖️ TRF 5","TRF 5: Juiz Federal","S","Juiz Federal Substituto","R$ 37.765,55","11 + cadastro de reserva","A definir","Inscrições de 28/08 a 28/09/2026. Prova em 20/12/2026. Confira se ainda há prazo no edital",
+    { inscricoes:"28/08 a 28/09/2026", provaData:"2026-12-20", prova:"20/12/2026", fonteUrl:_urlFedG, fonteLabel:_FEDG, area:"Direito" });
+  // Banca definida
+  add("bd","⛽ Petrobras","Petrobras","MS","Vários cargos (médio, técnico e superior)","R$ 5.878,82 (Gran) a R$ 15.200,52 (Estratégia)","1.000 a 1.400 (as fontes divergem)","Cesgranrio","Banca definida. Confirme vagas e salário no edital");
+  add("bd","📊 IBGE","IBGE: Recenseador","M","Recenseador (temporário)","Até R$ 4,2 mil","27.279","Cesgranrio","Banca definida (a Gran ainda marca em definição)");
+  add("bd","🏥 EBSERH","EBSERH","MS","Assistencial, administrativa e médica","R$ 3.057,56 a R$ 19.107,31 (últimos editais)","A definir","FGV (concurso) e AOCP (processo seletivo)","Banca definida. Comissão formada");
+  add("bd","⚖️ TRT 8","TRT 8","S","Cargos de nível superior","Até R$ 16.040,85","A definir","FCC","Banca definida");
+  add("bd","⚖️ TRT 4","TRT 4","S","Cargos de nível superior","Até R$ 16.040,85","A definir","A definir","Banca em definição, segundo a Gran");
+  add("bd","⚖️ TRF 3","TRF 3","S","Cargos de nível superior","A definir","A definir","A definir","Banca em definição, segundo a Gran");
+  add("bd","🩺 Cofen","Cofen","MS","A definir","A definir","A definir","Instituto Quadrix","Banca definida, edital iminente segundo a Gran");
+  add("bd","🏋️ CONFEF","CONFEF","MS","A definir","A definir","A definir","Instituto Quadrix","Banca definida");
+  add("bd","📒 CFC","CFC: Conselho Federal de Contabilidade","MS","Cargos de nível médio e superior","R$ 3.402,48 e R$ 10.242,02","6","EPL","Banca definida", {note:"Conselho de Contabilidade: bom encaixe para quem tem Administração ou Contábeis. Confirme os cargos no edital."});
+  add("bd","🌾 Anater","Anater","MS","Assistente e Analista","R$ 2.786,30 a R$ 10.302,00 (último edital)","A definir","Instituto Exata","Banca definida");
+  add("bd","🩺 Ministério da Saúde (temporários)","Ministério da Saúde: temporários","MS","Analista e Técnico","R$ 3.731,83 a R$ 8.330,00 (fontes divergem)","300 + cadastro de reserva","Instituto Avalia","Banca definida");
+  add("bd","🏦 Banco do Brasil","Banco do Brasil","M","Escriturário (a confirmar)","R$ 3.622,23 a R$ 5.948,80 (fontes divergem)","A definir","A definir","Em estudos. Banca em definição segundo a Gran");
+  // Autorizados
+  add("au","🏦 BACEN: Banco Central","BACEN: Banco Central","MS","Técnico, Analista e Procurador","R$ 7.938,81 a R$ 20.924,80","170 (Estratégia) ou 560 (Gran, solicitado)","A definir","Autorizado. Edital previsto até 01/2027");
+  add("au","🔐 ANPD","ANPD","S","Especialista em Regulação de Proteção de Dados","R$ 17.726,42 (Estratégia). A Gran traz outros valores","50","A definir","Autorizado. Edital previsto até 12/2026");
+  add("au","🔎 CGU","CGU: Controladoria-Geral da União","S","Cargos de nível superior","Até R$ 36 mil","60","A definir","Autorizado, segundo a Gran", {note:"Bom encaixe para Administração e Contábeis."});
+  add("au","🛡️ Ministério da Defesa (temporários)","Ministério da Defesa: temporários","MS","A definir","A definir","91","A definir","Autorizado, segundo a Gran",{area:"Segurança pública"});
+  add("au","⚓ Marinha","Marinha: Juiz do Tribunal Marítimo","S","Juiz do Tribunal Marítimo","A definir","1","A definir","Autorizado, segundo a Gran",{area:"Direito"});
+  add("au","📚 Ministério da Saúde","Ministério da Saúde","MS","A definir","A definir","7.027 (solicitado, Estratégia)","A definir","Aparece como autorizado e como solicitado nas fontes");
+  // Comissão formada
+  add("cf","🪶 FUNAI (temporários)","FUNAI: temporários","D","A definir","Até R$ 10 mil","A definir","A definir","Comissão formada, segundo a Gran");
+  // Previstos / em estudo
+  add("es","🏦 BNDES","BNDES","M","A definir","R$ 5.246,74 a R$ 21.869,76","A definir","A definir","Em estudo");
+  add("pv","✉️ Correios","Correios","M","Atendente Comercial","R$ 2.256,18 a R$ 2.429,26","A definir","A definir","Anunciado");
+  add("es","🏦 CAIXA","CAIXA","M","Técnico Bancário","R$ 3.762,00 (último edital)","A definir","A definir","Em estudos");
+  add("pv","🧭 CPNU 3","CPNU 3: Concurso Nacional Unificado","MS","Diversos","R$ 4.804,89 a R$ 16.413,35 (último edital)","A definir","A definir","Possível em 2027 ou 2028", {note:"O Concurso Nacional Unificado reúne vários órgãos federais em uma prova só. Acompanhe, porque atende Administração."});
+  add("pv","⚖️ STF","STF","MS","A definir","R$ 9.052,51","40 (projeto de lei a ser votado)","A definir","Previsto");
+  add("pv","🏛️ DPU","DPU: Defensoria Pública da União","MS","Servidores","R$ 2.171,03","210","A definir","Previsto");
+  add("pv","⚖️ DPU Defensor","DPU: Defensor Público Federal","S","Defensor Público Federal","R$ 28.109,19","A definir","A definir","Previsto no PLOA",{area:"Direito"});
+  add("pv","🏛️ Câmara dos Deputados","Câmara dos Deputados","S","A definir","A definir","A definir","A definir","Anunciado");
+  add("pv","🚚 Ministério dos Transportes","Ministério dos Transportes","MS","Diversos","A definir","411 a 472 (fontes divergem)","A definir","Solicitado e previsto");
+  add("es","⚖️ TST","TST","D","A definir","Até R$ 21.013,03","A definir","A definir","Estudos em andamento");
+  add("es","📺 EBC","EBC","D","A definir","Inicial de R$ 4,4 mil","A definir","A definir","Estudos em andamento");
+  add("es","⚡ MME","MME: Ministério de Minas e Energia","S","Analista e Especialista","A definir","185 a 254 (fontes divergem)","A definir","Solicitado e em estudos");
+  add("es","📡 Ministério das Comunicações","Ministério das Comunicações","D","A definir","A definir","A definir","A definir","Estudos em andamento");
+  add("pv","🤝 MDS","MDS: Ministério do Desenvolvimento Social","D","A definir","A definir","A definir","A definir","Anunciado");
+  add("pv","🛡️ Ministério da Defesa","Ministério da Defesa","MS","Diversos","A definir","300 (Gran) a 4.414 (Estratégia, solicitado)","A definir","Anunciado",{area:"Segurança pública"});
+  // Solicitados
+  [
+    ["🛰️ MCID","MCID: Ministério das Cidades","S","Arquiteto, Assistente Social e Economista","A definir","15"],
+    ["🚌 ANTT","ANTT","MS","Especialista, Analista e Técnico Administrativo","R$ 7.648,17 a R$ 16.413,35","720"],
+    ["✈️ ANAC","ANAC","MS","Técnico e Analista Administrativo","R$ 7.648,17 a R$ 15.050,25","169"],
+    ["👩 Ministério das Mulheres","Ministério das Mulheres","MS","Arquiteto, Engenheiro Civil, Economista, Estatístico, Técnico em Contabilidade e Agente Administrativo","A definir","118"],
+    ["🌱 MAPA","MAPA","MS","Auditor Fiscal Federal Agropecuário e cargos técnicos","R$ 3.301,89 a R$ 22.210,10 (fontes divergem)","210 (Gran) a 2.629 (Estratégia)"],
+    ["📈 SUSEP","SUSEP","M","Agente Executivo","R$ 7.837,07","70"],
+    ["📏 INMETRO","INMETRO","MS","Diversos","R$ 4.074,06 a R$ 13.400,00","269"],
+    ["☢️ CNEN","CNEN","D","A definir","R$ 3.867,27 a R$ 14.734,44 (último edital)","340"],
+    ["🌎 SUDAM","SUDAM","MS","Diversos","R$ 2.570 a R$ 5.081","60"],
+    ["🪶 FUNAI","FUNAI","MS","Técnico e Especialista em Indigenismo","R$ 6.456,64 a R$ 10.453,94","2.568"],
+    ["📶 ANATEL","ANATEL","MS","Diversos","R$ 8.053,32 (último edital)","180"],
+    ["🌳 MMA","MMA: Ministério do Meio Ambiente","S","Analista Ambiental","R$ 8.817,72 a R$ 9.475,72","350 a 400 (fontes divergem)"],
+    ["🚢 ANTAQ","ANTAQ","MS","Analista, Especialista e Técnico","R$ 7.648,17 a R$ 16.413,35","117"],
+    ["🩺 ANS","ANS","MS","Analista, Especialista e Técnico","R$ 7.648,17 a R$ 16.413,35","60"],
+    ["💧 ANA","ANA: Agência Nacional de Águas","MS","Analista Administrativo e Técnico Administrativo","R$ 7.648,17 a R$ 15.050,25","57"],
+    ["🔬 MCTI","MCTI","D","Diversos","A definir","1.587"],
+    ["📈 CVM","CVM","MS","Agente Executivo e outros","R$ 4.750,20 a R$ 20.924,80","119 a 139 (fontes divergem)"],
+    ["💡 INPI","INPI","S","A definir","R$ 9.144,01 a R$ 12.918,20","502"],
+    ["🛢️ ANP","ANP","MS","Especialista, Analista e Técnico Administrativo","R$ 7.648,17 a R$ 16.413,35","143"],
+    ["⚡ ANEEL","ANEEL","MS","Técnico e Analista Administrativo; Especialistas em Regulação","R$ 7.648,17 a R$ 16.413,35","173"],
+    ["🏛️ INSS","INSS","MS","Analista e Técnico do Seguro Social","R$ 6.355,13 a R$ 16.769,79","8.500 a 12.000 (fontes divergem)"],
+    ["📑 STN: Tesouro Nacional","STN","S","Cargos de nível superior","R$ 20.924,80","120"],
+    ["⚖️ AGU Procurador","AGU: Procurador","S","Procurador","R$ 21.014,49","120 a 170 (fontes divergem)"],
+    ["⚖️ AGU Advogado","AGU: Advogado","S","Advogado","R$ 27.264,30","50"],
+    ["🏥 Fiocruz","Fiocruz","MS","Diversos","A definir","600"],
+    ["🏥 IEC","IEC","MS","Diversos","R$ 4.063,50 a R$ 11.124,10","231"],
+    ["🏥 CENP","CENP","MS","Diversos","R$ 4.370,00 a R$ 11.124,10","28"],
+    ["🏥 INC","INC","MS","Diversos","R$ 4.063,50 a R$ 5.982,50","884"],
+    ["🏥 INTO","INTO","MS","Diversos","R$ 4.370,00 a R$ 11.124,10","1.133"],
+    ["🏥 INCA","INCA","MS","Diversos","R$ 4.370,00 a R$ 11.124,10","1.498"],
+    ["🏥 PREVIC","PREVIC","S","Cargos de nível superior","A definir","110"],
+    ["💼 MTE","MTE: Ministério do Trabalho","D","A definir","R$ 2.573,22 a R$ 3.981,42 (último edital)","A definir"],
+    ["🌵 DNOCS","DNOCS","D","A definir","A definir","180"],
+    ["💰 Ministério da Fazenda","Ministério da Fazenda: ATA","MS","Analista Técnico-Administrativo","R$ 3.727,83 a R$ 9.728,38","1.625"]
+  ].forEach(r=>add("so",r[0],r[1],r[2],r[3],r[4],r[5],"A definir","Solicitado em 2026, ainda sem autorização confirmada"));
+  // Segurança pública (fora do perfil de Administração)
+  [
+    ["🚓 PRF","PRF: Policial Rodoviário","S","Policial Rodoviário Federal","R$ 11.670,33","263 a 269 (fontes divergem)"],
+    ["🚓 PRF Administrativo","PRF: Administrativo","M","Agente Administrativo","R$ 5.173,28","248 a 264 (fontes divergem)"],
+    ["🕵️ ABIN","ABIN","S","Oficial Técnico de Inteligência e Oficial de Inteligência","R$ 6.181,80 a R$ 25.718,98 (fontes divergem)","301"],
+    ["🔒 Senappen","Senappen","S","Policial, Especialista e Técnico","R$ 4.142,00 a R$ 6.681,70","11 + cadastro de reserva"],
+    ["🔒 DEPEN","DEPEN","MS","Diversos","R$ 4.337,36 a R$ 17.632,85","A definir"]
+  ].forEach(r=>add("so",r[0],r[1],r[2],r[3],r[4],r[5],"A definir","Solicitado em 2026, ainda sem autorização confirmada",{area:"Segurança pública"}));
+})();
+
 // Tags genéricas de área/estado/cidade em cada concurso, usadas pelo filtro de perfil.
 // Hoje todo o conteúdo cadastrado é de Administração no Rio de Janeiro (capital); ao
 // pesquisar e cadastrar outras áreas/estados no futuro, é só dar valores diferentes
@@ -2799,6 +2919,7 @@ const ESFERA_ITEM = {
   "concurso-crf-rj-2026":"federal", "concurso-detran-rj":"estadual", "concurso-pge-rj-analista":"estadual", "concurso-assistencia-social-rj":"estadual",
   "concurso-tce-rj-auditor-de-controle-externo":"estadual", "concurso-tcm-rj":"municipal", "concurso-pedro-ii-tecnico-administrativo":"federal", "concurso-inea-rj":"estadual", "concurso-previrio":"municipal", "concurso-cedae":"estadual", "concurso-receita-federal":"federal", "concurso-ibc-edital-39-2026":"federal", "concurso-unirio-editais-avulsos":"federal", "concurso-transpetro-2026":"federal", "concurso-rjprev":"estadual", "concurso-der-rj":"estadual", "concurso-secec-rj":"estadual", "concurso-ieea-rj":"estadual", "concurso-emater-rio":"estadual", "concurso-iterj":"estadual", "concurso-pmerj-soldado":"estadual", "concurso-pmerj-oficial":"estadual", "concurso-pc-rj-peritos-e-piloto":"estadual", "concurso-bombeiros-rj-temporarios":"estadual"
 };
+Object.assign(ESFERA_ITEM, window.__FED_ESFERA||{});
 function itemFechado(it){ return it.badgeType === "encerrado"; }
 function itemServeFormacao(it, formacao){
   if(!formacao) return true;
@@ -2822,7 +2943,7 @@ function passesProfile(item){
     }
   }
   if(profile.area && profile.area.trim() && item.area && item.area.toLowerCase() !== profile.area.trim().toLowerCase()) return false;
-  if(profile.estados.length && item.estado && !profile.estados.includes(item.estado.toUpperCase())) return false;
+  if(profile.estados.length && item.estado && item.estado.toUpperCase()!=="NACIONAL" && !profile.estados.includes(item.estado.toUpperCase())) return false;
   if(profile.niveis.length && item.nivel && !/^a definir/i.test(item.nivel)){
     const ok = profile.niveis.some(n => item.nivel.includes(n));
     if(!ok) return false;
@@ -7696,7 +7817,7 @@ function dayTimelineBlocks(dow){
 // mais confiáveis, e copia o pedido pronto pra colar no Claude, que confere e devolve
 // o painel atualizado. ----------
 const DATA_CHECKED = "13/10/2026";
-const DATA_CHECKED_HORA = "17:35";
+const DATA_CHECKED_HORA = "19:10";
 const UPDATE_SOURCES = [
   { name:"JC Concursos: abertos no RJ", url:"https://jcconcursos.com.br/concursos/inscricoes-abertas/rj" },
   { name:"PCI Concursos: Rio de Janeiro", url:"https://www.pciconcursos.com.br/concursos/rj/rio-de-janeiro" },
