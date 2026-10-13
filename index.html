@@ -2082,6 +2082,7 @@
       <button class="pf-link" id="import-data-btn" onmousedown="event.preventDefault()" onclick="document.getElementById('import-data-file').click()"><span>⬆️</span><div><b>Importar backup</b><small>Restaurar de um arquivo salvo</small></div><i>›</i></button>
       <input type="file" id="import-data-file" accept="application/json" style="display:none;">
       <button class="pf-link" id="export-ics-btn" onmousedown="event.preventDefault()" onclick="exportAgendaICS()"><span>📅</span><div><b>Exportar agenda inteira</b><small>Arquivo .ics com rotina, provas e revisões para importar no Google Agenda. Para um item só, use o botão Google Agenda no próprio item</small></div><i>›</i></button>
+      <button class="pf-link" onmousedown="event.preventDefault()" onclick="zerarTudo()"><span>🧹</span><div><b>Apagar tudo e recomeçar</b><small>Zera o app neste aparelho e abre as perguntas</small></div><i>›</i></button>
       <div class="import-hint" id="import-hint" style="padding:0 16px 12px"></div>
     </div>
 
@@ -2170,6 +2171,21 @@
 </div>
 
 <script>
+// Recomeço do zero: na primeira abertura depois deste ajuste, apaga os dados do app neste aparelho (guardando uma cópia)
+// e abre o questionário. Para um novo recomeço, o botão "Apagar tudo e recomeçar" no Perfil faz o mesmo.
+(function(){
+  try{
+    const V = "2026-10-13-zero";
+    if(localStorage.getItem("rota-zerado") !== V){
+      const bk = {};
+      Object.keys(localStorage).forEach(k => { if(k.indexOf("concursos-rj") === 0){ bk[k] = localStorage.getItem(k); localStorage.removeItem(k); } });
+      if(Object.keys(bk).length) localStorage.setItem("rota-backup-antes-de-zerar", JSON.stringify(bk));
+      localStorage.setItem("rota-zerado", V);
+      window.__rotaZerado = true;
+    }
+    if(sessionStorage.getItem("rota-abrir-wizard")){ sessionStorage.removeItem("rota-abrir-wizard"); window.__rotaZerado = true; }
+  }catch(e){}
+})();
 const abertos = [
   {
     org: "⚕️ Cremerj: Conselho Regional de Medicina do RJ",
@@ -8114,7 +8130,17 @@ document.getElementById("inicio-ver-concursos").addEventListener("click", ()=>{
   document.querySelector('.tab-btn[data-tab="concursos"]')?.click();
 });
 
-loadFavorites();
+loadFavorites().then(() => { if(window.__rotaZerado) setTimeout(() => { try{ abrirWizard(); }catch(e){} }, 500); });
+function zerarTudo(){
+  if(!confirm("Apagar tudo e recomeçar do zero? Seus favoritos, inscrições, estudos e respostas serão apagados neste aparelho.")) return;
+  try{
+    const bk = {};
+    Object.keys(localStorage).forEach(k => { if(k.indexOf("concursos-rj") === 0){ bk[k] = localStorage.getItem(k); localStorage.removeItem(k); } });
+    if(Object.keys(bk).length) localStorage.setItem("rota-backup-antes-de-zerar", JSON.stringify(bk));
+    sessionStorage.setItem("rota-abrir-wizard", "1");
+  }catch(e){}
+  location.reload();
+}
 
 // Contagens dos tiles do topo e a lista + o alerta de situação, tudo lido a partir do
 // filtro de perfil atual — chamado de novo sempre que o perfil muda.
