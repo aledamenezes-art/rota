@@ -1660,6 +1660,19 @@
   .wz-load li.ok span{ background:var(--blue-deep); border-color:var(--blue-deep); color:#fff; }
   .wz-spin{ width:44px; height:44px; margin:0 auto 14px; border-radius:50%; border:4px solid var(--line); border-top-color:var(--blue-deep); animation:wzspin 0.9s linear infinite; }
   @keyframes wzspin{ to{ transform:rotate(360deg); } }
+
+  .wz-next{ border:1.5px solid var(--blue-deep); border-radius:16px; padding:14px 16px; margin:6px 0 10px; background:var(--mint-bg, #E6F4F1); }
+  .wz-next small{ display:block; font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--blue-deep); }
+  .wz-next b{ display:block; font-size:16px; margin:4px 0 2px; }
+  .wz-next p{ margin:0 0 10px; font-size:13px; line-height:1.45; color:var(--ink-soft); }
+  .wz-det{ border:1px solid var(--line); border-radius:14px; margin:8px 0; background:var(--card, #fff); }
+  .wz-det summary{ cursor:pointer; font-weight:800; font-size:14px; padding:13px 14px; list-style:none; display:flex; justify-content:space-between; }
+  .wz-det summary::after{ content:"+"; color:var(--blue-deep); font-size:18px; line-height:1; }
+  .wz-det[open] summary::after{ content:"−"; }
+  .wz-det > div{ padding:0 14px 14px; }
+  .wz-outro{ border:1.5px dashed var(--line); border-radius:16px; padding:14px 16px; margin:12px 0; }
+  .wz-outro b{ font-size:15px; }
+  .wz-outro p{ margin:4px 0 10px; font-size:13px; color:var(--ink-soft); }
 </style>
 </head>
 <body data-tab="inicio">
@@ -6583,21 +6596,31 @@ function ingRender(box){
     const p = ingPlano(), n = wzFind(ING_NIVEIS, ing.nivel);
     const horasSem = Math.round((ing.minutos * p.sel.length + p.aulaDias.length * ing.aulaMin) / 6) / 10;
     const hp = ingHorasPrazo();
-    corpo = `<div class="wz-eyebrow">Seu plano de inglês</div>
-      <div class="wz-h">🗣️ ${n ? n.nome + " · " + n.cefr : "Inglês"}</div>
-      <p class="wz-sub">${ing.metas.map(id => (wzFind(ING_METAS, id) || {}).nome).filter(Boolean).join(", ")}. Falar está incluído. ${ing.minutos} min por dia em ${p.sel.length} dias${p.aulaDias.length ? ", mais " + p.aulaDias.length + " aula" + (p.aulaDias.length > 1 ? "s" : "") + " de conversação" : ""} dá cerca de ${String(horasSem).replace(".", ",")}h por semana.${ing.livro ? " Livro: " + escHtml(ing.livro) + "." : ""}</p>
-      <div class="wz-note">Com esse ritmo, em ${ing.prazo} meses você soma cerca de ${hp}h de inglês. Para ir do A1 ao B2, a Cambridge English fala em 500 a 600 horas, segundo o <a href="https://practiceme.app/pt/blog/como-ficar-fluente-em-ingles" target="_blank" rel="noopener" style="color:var(--blue-deep);font-weight:800">PracticeMe</a>. Dá para avançar e falar com mais segurança, mas a fluência pede constância por mais tempo.</div>
-      <div class="wz-h3">Sua trilha de ${ing.prazo} meses para falar</div>
-      ${ingTrilhaMeses().map(f => `<div class="wz-mes"><b>${f.t} · ${f.nome}</b><ul>${f.itens.map(i => `<li>${i}</li>`).join("")}</ul></div>`).join("")}
-      <div class="wz-h3">Sua semana de inglês</div>
-      <div class="wz-week">${p.semana.map(s => `<div class="wz-day"><b>${s.d}</b><div>${s.itens.map(it => `<span class="${it.h === "rev" ? "rev" : (it.h === "aula" ? "aula" : "base")}">${escHtml(ingItemNome(it))} <i>${wzHm(it.min)}</i></span>`).join("")}</div></div>`).join("")}</div>
-      ${ingAgendaHtml(p)}
-      <div class="wz-h3">Sua trilha</div>${roteiroResumoHtml("ingles")}
-      <p class="wz-sub" style="margin-top:8px">Cada habilidade já entrou no seu ciclo, no cronômetro e no registro de estudos.</p>
+    const metasTxt = ing.metas.map(id => (wzFind(ING_METAS, id) || {}).nome).filter(Boolean).join(", ");
+    const trilhaMeses = ingTrilhaMeses().map(f => `<div class="wz-mes"><b>${f.t} · ${f.nome}</b><ul>${f.itens.map(i => `<li>${i}</li>`).join("")}</ul></div>`).join("");
+    const semanaIng = `<div class="wz-week">${p.semana.map(s => `<div class="wz-day"><b>${s.d}</b><div>${s.itens.map(it => `<span class="${it.h === "rev" ? "rev" : (it.h === "aula" ? "aula" : "base")}">${escHtml(ingItemNome(it))} <i>${wzHm(it.min)}</i></span>`).join("")}</div></div>`).join("")}</div>`;
+    const reality = `<p class="wz-sub" style="margin:0">Com esse ritmo, em ${ing.prazo} meses você soma cerca de ${hp}h de inglês. Para ir do A1 ao B2, a Cambridge English fala em 500 a 600 horas, segundo o <a href="https://practiceme.app/pt/blog/como-ficar-fluente-em-ingles" target="_blank" rel="noopener" style="color:var(--blue-deep);font-weight:800">PracticeMe</a>. Dá para avançar e falar com mais segurança, mas a fluência pede constância por mais tempo.</p>`;
+    const agenda = ingAgendaHtml(p).replace(/<div class="wz-h3">Colocar na agenda<\/div>/, "");
+    corpo = `<div class="wz-h">🗣️ Seu plano de inglês</div>
+      <p class="wz-sub">${n ? n.nome + " · " + n.cefr : "Inglês"} · ${escHtml(metasTxt)} · falar incluído · ${ing.minutos} min por dia em ${p.sel.length} dias${p.aulaDias.length ? " e " + p.aulaDias.length + " aula" + (p.aulaDias.length > 1 ? "s" : "") : ""} (cerca de ${String(horasSem).replace(".", ",")}h por semana).</p>
+      <div class="wz-h3">Faça agora</div>
+      ${proxPassoHtml("ingles")}
+      <div class="wz-h3">Esta semana</div>
+      ${semanaIng}
+      ${wizCtaOutroIng()}
       ${objAtual() === "ambos" ? `<button class="btn wz-big" onmousedown="event.preventDefault()" onclick="wizFase='concurso';wizRender(true)">Ver o seu concurso ›</button>` : ""}
+      <div class="wz-h3">Ver detalhes</div>
+      ${wzDet("Trilha de " + ing.prazo + " meses para falar", trilhaMeses)}
+      ${agenda ? wzDet("Colocar na agenda", agenda) : ""}
+      ${wzDet("Sua trilha completa", roteiroResumoHtml("ingles"))}
+      ${wzDet("Quanto tempo leva", reality)}
       <div class="wz-cta"><button class="wz-back" onmousedown="event.preventDefault()" onclick="ingGo(4)">‹ Ajustar rotina</button><button class="wz-back" onmousedown="event.preventDefault()" onclick="ingReset()">↺ Refazer</button></div>`;
   }
-  box.innerHTML = `<div class="wz"><div class="wz-eyebrow">Inglês · ${step < 6 ? "passo " + step + " de 5" : "seu plano"}</div>${dots}${volta}${corpo}</div>`;
+  box.innerHTML = `<div class="wz"><div class="wz-eyebrow">${step < 6 ? "Inglês · passo " + step + " de 5" : "Inglês"}</div>${step < 6 ? dots : ""}${volta}${corpo}</div>`;
+}
+function wizCtaOutroIng(){
+  if(!objTem("concurso")) return `<div class="wz-outro"><b>Quer estudar para concurso também?</b><p>Eu monto o plano do concurso e divido o seu tempo com o inglês.</p><button class="btn" onmousedown="event.preventDefault()" onclick="wizAddConcurso()">Adicionar concurso</button></div>`;
+  return "";
 }
 function ingPrazo(m){ ing.prazo = m; saveIng(); wizRender(); }
 function ingAulaMin(m){ ing.aulaMin = m; saveIng(); wizRender(); }
@@ -6907,7 +6930,8 @@ function renderPerfilHub(){
     const n = wzFind(ING_NIVEIS, ing.nivel), p = ingPlano();
     return `<div class="pf-plan done"><div class="eyebrow">Seu plano de inglês</div><h3>${ing.minutos} min por dia, ${ing.dias} dias por semana</h3><div class="pf-chips" style="margin-top:6px">${n ? `<span>${escHtml(n.nome)}</span>` : ""}${p.focos.map(h => `<span class="g">${escHtml(ING_HAB[h].nome)}</span>`).join("")}</div><div class="row"><button class="btn primary" onmousedown="event.preventDefault()" onclick="abrirRoteiro(false,'ingles')">Ver trilha</button><button class="btn ghost" onmousedown="event.preventDefault()" onclick="abrirIngles()">Rever respostas</button></div></div>`;
   };
-  if(objP === "ingles"){ plano.innerHTML = ingCard(); return; }
+  const addOutro = (id) => id === "ingles" && !objTem("ingles") ? `<div class="pf-plan cta"><div class="eyebrow">Inglês</div><h3>Quer estudar inglês também?</h3><p>Eu monto um plano de inglês e encaixo no seu tempo junto com o concurso.</p><button class="btn" onmousedown="event.preventDefault()" onclick="abrirIngles()">Adicionar inglês</button></div>` : "";
+  if(objP === "ingles"){ plano.innerHTML = ingCard() + `<div class="pf-plan cta"><div class="eyebrow">Concurso</div><h3>Quer estudar para concurso também?</h3><p>Eu monto o plano do concurso e divido o seu tempo com o inglês.</p><button class="btn" onmousedown="event.preventDefault()" onclick="abrirWizard();wizAddConcurso()">Adicionar concurso</button></div>`; return; }
   if(!feito){
     plano.innerHTML = (objP === "ambos" ? ingCard() : "") + `<div class="pf-plan cta"><div class="eyebrow">Primeiro passo</div><h3>Descubra por onde começar</h3><p>Oito perguntas rápidas: formação, área, nível, onde trabalhar e a sua rotina. No fim eu monto o perfil, sugiro concursos e crio o cronograma.</p><button class="btn" onmousedown="event.preventDefault()" onclick="abrirWizard()">Começar em 2 minutos</button></div>`;
     return;
@@ -6916,7 +6940,7 @@ function renderPerfilHub(){
   const chips = wiz.areas.map(a => `<span>${escHtml(nome(a))}</span>`).join("")
     + wiz.esferas.map(e => `<span class="g">${escHtml(wzFind(WZ_ESFERAS, e).nome)}</span>`).join("")
     + wiz.locais.map(l => `<span class="g">${escHtml(l === "outro" ? (wiz.ufs.join(" ") || "Outro estado") : wzFind(WZ_LOCAIS, l).nome)}</span>`).join("");
-  plano.innerHTML = `<div class="pf-plan done"><div class="eyebrow">Seu plano</div><h3>${wiz.horas}h por dia, ${wiz.dias} dias por semana</h3><div class="pf-chips" style="margin-top:6px">${chips}</div><p>${favIds.length} concurso${favIds.length === 1 ? "" : "s"} no cronograma. Prazo: ${escHtml(wzFind(WZ_PRAZOS, wiz.prazo).nome.toLowerCase())}.</p><div class="row"><button class="btn primary" onmousedown="event.preventDefault()" onclick="goCronograma()">Ver cronograma</button><button class="btn ghost" onmousedown="event.preventDefault()" onclick="abrirWizard()">Rever respostas</button></div><button class="wz-skip" style="margin-top:6px" onmousedown="event.preventDefault()" onclick="pfRefazer()">Refazer do zero</button></div>` + (objP === "ambos" ? ingCard() : "");
+  plano.innerHTML = `<div class="pf-plan done"><div class="eyebrow">Seu plano</div><h3>${wiz.horas}h por dia, ${wiz.dias} dias por semana</h3><div class="pf-chips" style="margin-top:6px">${chips}</div><p>${favIds.length} concurso${favIds.length === 1 ? "" : "s"} no cronograma. Prazo: ${escHtml(wzFind(WZ_PRAZOS, wiz.prazo).nome.toLowerCase())}.</p><div class="row"><button class="btn primary" onmousedown="event.preventDefault()" onclick="goCronograma()">Ver cronograma</button><button class="btn ghost" onmousedown="event.preventDefault()" onclick="abrirWizard()">Rever respostas</button></div><button class="wz-skip" style="margin-top:6px" onmousedown="event.preventDefault()" onclick="pfRefazer()">Refazer do zero</button></div>` + (objP === "ambos" ? ingCard() : addOutro("ingles"));
 }
 function goPerfil(rolarPara){
   closeSubScreen();
@@ -7277,6 +7301,24 @@ function wizConcursos(todos){
     return itemServeFormacao(it, wiz.formacao) && itemServeEsfera(id, wiz.esferas);
   }).slice(0, 40);
 }
+function proxPassoHtml(t){
+  const pr = roteiroProgresso(t), p = pr.prox;
+  if(!p) return `<div class="wz-next"><small>Trilha completa</small><b>Você concluiu todos os passos.</b></div>`;
+  return `<div class="wz-next"><small>Passo ${pr.feitos + 1} de ${pr.total}</small><b>${escHtml(p.t)}</b><p>${escHtml(p.dd ? p.dd() : p.d)}</p>${p.acao ? `<button class="btn primary" onmousedown="event.preventDefault()" onclick="${p.acao[1]}">${escHtml(p.acao[0])}</button>` : `<button class="btn primary" onmousedown="event.preventDefault()" onclick="roteiroToggle('${p.k}')">Marcar como feito</button>`}</div>`;
+}
+function wzDet(titulo, html, aberto){ return `<details class="wz-det" ${aberto ? "open" : ""}><summary>${titulo}</summary><div>${html}</div></details>`; }
+function wizAddConcurso(){
+  profile.objetivo = objTem("ingles") ? "ambos" : "concurso";
+  saveState("concursos-rj-perfil", profile);
+  wizFase = "concurso"; wizObjView = false;
+  if(profile.vida) vidaDistribuir(); else { wizVidaView = true; vidaDraft = null; }
+  wiz.step = (wiz.areas.length && wiz.niveis.length && wiz.esferas.length && wiz.locais.length) ? 8 : 1; saveWiz();
+  renderRoteiroCard(); wizRender(true);
+}
+function wizCtaOutro(){
+  if(!objTem("ingles")) return `<div class="wz-outro"><b>Quer estudar inglês também?</b><p>Eu monto um plano de inglês e encaixo no seu tempo junto com o concurso.</p><button class="btn" onmousedown="event.preventDefault()" onclick="abrirIngles()">Adicionar inglês</button></div>`;
+  return "";
+}
 function wizBuscaMais(){
   const areas = wiz.areas.map(id => (wzFind(WZ_AREAS, id) || {}).nome).filter(Boolean);
   const locs = wiz.locais.map(id => id === "outro" ? wiz.ufs.join(" ") : (id === "capital" ? "capital" : ((wzFind(WZ_LOCAIS, id) || {}).nome || ""))).filter(Boolean);
@@ -7284,7 +7326,7 @@ function wizBuscaMais(){
   const links = [];
   areas.slice(0, 4).forEach(a => links.push([a, "concurso " + a + " " + (nivs[0] || "") + " " + (locs[0] || "") + " inscrições abertas 2026"]));
   wiz.ufs.slice(0, 3).forEach(u => links.push(["Concursos em " + u, "concursos abertos " + u + " 2026 " + (areas[0] || "")]));
-  return `<div class="wz-h3">Pesquisar mais concursos</div><p class="wz-sub" style="margin:0 0 6px">O painel acompanha o Rio de Janeiro em detalhe. Para o resto do Brasil, estas buscas já saem com as suas respostas.</p>
+  return `<p class="wz-sub" style="margin:0 0 6px">O painel acompanha o Rio de Janeiro em detalhe. Para o resto do Brasil, estas buscas já saem com as suas respostas.</p>
     <div class="wz-agenda">${links.map(l => `<a class="gcal-btn link" href="${escHtml(crGg(l[1]))}" target="_blank" rel="noopener">🔎 ${escHtml(l[0])}</a>`).join("")}<a class="gcal-btn link" href="https://www.estrategiaconcursos.com.br/blog/mapa-concursos" target="_blank" rel="noopener">🗺️ Mapa de concursos</a></div>`;
 }
 function wizRender(rolar){
@@ -7352,38 +7394,36 @@ function wizRender(rolar){
       <div class="wz-q">Daqui a quanto tempo quer passar?</div><div class="wz-pills">${WZ_PRAZOS.map(p=>`<button class="${wiz.prazo===p.id?"on":""}" onmousedown="event.preventDefault()" onclick="wizSet('prazo','${p.id}')">${p.nome}</button>`).join("")}</div>
       <div class="wz-q">Seu ponto de partida</div><div class="wz-opts one">${WZ_INICIOS.map(i=>`<button class="wz-opt ${wiz.inicio===i.id?"on":""}" onmousedown="event.preventDefault()" onclick="wizSet('inicio','${i.id}')"><b>${i.nome}</b><small>${i.desc}</small></button>`).join("")}</div>${cta("Ver meu plano")}`;
   } else {
-    const T = wizTodos(), m = wizMaterias(), cs = wizConcursos(wiz.verTodos), csBase = wizConcursos(false), extra = wizConcursos(true).length - csBase.length, p = wizPlano();
+    const T = wizTodos(), cs = wizConcursos(wiz.verTodos), csBase = wizConcursos(false), extra = wizConcursos(true).length - csBase.length, p = wizPlano();
     const pr = wzFind(WZ_PRAZOS, wiz.prazo), totalH = Math.round(p.horasSemana * pr.sem);
     const temRJ = wiz.locais.some(l => l !== "outro");
-    const painelNota = temRJ ? "" : `<p class="wz-sub">O painel acompanha concursos do Rio de Janeiro. Os passos e as matérias valem para qualquer estado. Quando houver editais dos estados que você escolheu, eles aparecem aqui.</p>`;
-    const doisNiveis = wiz.niveis.includes("medio") && wiz.niveis.includes("superior");
     const nomeNv = wiz.niveis.map(id => wzFind(WZ_NIVEIS, id).nome.split(" ")[0]).join(" e ");
     const ordemMats = p.todas.slice().sort((a,b) => (p.semMin[b]||0) - (p.semMin[a]||0));
-    corpo = `<div class="wz-eyebrow">Seu ponto de partida</div>
-      <div class="wz-h">${wiz.areas.map(id => wzFind(WZ_AREAS, id).ico).join(" ")} ${escHtml(wiz.areas.length > 2 ? wiz.areas.length + " áreas" : wiz.areas.map(nomeArea).join(" e "))}</div>
-      <p class="wz-sub">${escHtml(nomeNv)} · ${escHtml(wiz.esferas.map(id => wzFind(WZ_ESFERAS, id).nome).join(", "))} · ${escHtml(wiz.locais.map(id => id === "outro" ? (wiz.ufs.join(" ") || "Outro estado") : wzFind(WZ_LOCAIS, id).nome).join(", "))}${wiz.cargos.length ? " · " + escHtml(wiz.cargos.join(", ")) : ""}</p>
-      <div class="wz-ok">✓ Seu perfil foi montado: ${escHtml(wiz.areas.map(nomeArea).join(", "))} · ${escHtml(nomeNv)}${temRJ ? " · RJ" : ""}${wiz.ufs.length ? " " + escHtml(wiz.ufs.join(" ")) : ""}. Os concursos do app já seguem essa escolha.</div>
-      <div class="wz-h3">Concursos sugeridos para você</div>
-      <p class="wz-sub" style="margin:0 0 6px">Só aparecem concursos com inscrição aberta, previstos ou em análise, que servem para a sua formação e para o que você respondeu.</p>
-      ${temRJ ? (cs.length ? `<p class="wz-sub" style="margin:0 0 8px">Marque os que quer estudar. Eu monto o cronograma com eles, juntando as matérias que se repetem. <a href="#" style="color:var(--blue-deep);font-weight:800" onmousedown="event.preventDefault()" onclick="wizSelTodos();return false">Marcar todos</a></p>
-        <div class="wz-picks">${cs.map(id=>{ const it = T[id], on = wiz.sel.includes(id), ok = prepDisponivel(it); return `<button class="wz-pick ${on?"on":""}" onmousedown="event.preventDefault()" onclick="wizSelToggle('${id}')"><span class="ck">${on?"✓":""}</span><span><b>${escHtml(it.title.replace(/^Concurso\s*/i, ""))}</b><small>${escHtml((it.badge || "") + (it.nivel ? " · " + it.nivel : "") + (ESFERA_ITEM[id] ? " · " + ESFERA_ITEM[id] : ""))}${ok ? "" : " · sem dados para cronograma"}</small></span></button>`; }).join("")}</div>
-        ${(extra > 0 || wiz.verTodos) ? `<button class="wz-skip" onmousedown="event.preventDefault()" onclick="wiz.verTodos=!wiz.verTodos;saveWiz();wizRender()">${wiz.verTodos ? "Mostrar só os que combinam" : "Ver também " + extra + " que não consegui confirmar (cargos a definir)"}</button>` : ""}
-        <button class="btn primary wz-big" onmousedown="event.preventDefault()" onclick="wizMontar()">${wiz.sel.length ? "Montar cronograma com " + wiz.sel.length + " concurso" + (wiz.sel.length > 1 ? "s" : "") : "Montar só o ciclo de matérias"}</button>` : `<p class="wz-sub">Nenhum concurso do painel combina com essa escolha agora. Posso montar o ciclo só com as matérias.</p><button class="btn primary wz-big" onmousedown="event.preventDefault()" onclick="wizMontar()">Montar ciclo de matérias</button>`) : `${painelNota}<button class="btn primary wz-big" onmousedown="event.preventDefault()" onclick="wizMontar()">Montar ciclo de matérias</button>`}
-      ${wizBuscaMais()}
-      ${doisNiveis ? `<div class="wz-note">Médio e superior juntos: estude primeiro a base, que cai nos dois. Quando um edital abrir, você afina o foco para aquele nível.</div>` : ""}
-      <div class="wz-h3">Sua semana de estudo</div>
-      <p class="wz-sub" style="margin:0 0 8px">${wiz.horas}h por dia em ${wiz.dias} dias dá ${p.horasSemana}h por semana. No prazo escolhido são cerca de ${totalH}h de estudo.</p>
-      ${p.W > 1 ? `<p class="wz-sub" style="margin:0 0 8px">São muitas matérias para uma semana só. O plano é um ciclo de ${p.W} semanas: o que não entra na semana 1 entra nas seguintes, e depois tudo recomeça.</p>` : ""}
-      ${p.semanas.map((sem, wi) => { const corpoSem = `<div class="wz-week">${sem.map(s=>`<div class="wz-day"><b>${s.d}</b><div>${s.itens.map(it=>`<span class="${it.n.startsWith("Revisão")?"rev":(WZ_BASE.includes(it.n)?"base":"area")}">${escHtml(it.n)} <i>${wzHm(it.min)}</i></span>`).join("")}</div></div>`).join("")}</div>`; return wi === 0 ? corpoSem : `<details class="wz-sem"><summary>Semana ${wi+1}</summary>${corpoSem}</details>`; }).join("")}
-      <div class="wz-h3">Tempo médio por matéria, por semana</div>
-      <p class="wz-sub" style="margin:0">Mapa geral do que costuma cair. O edital do concurso é quem decide.</p>
-      <div class="wz-chips">${ordemMats.map(x=>`<span class="${WZ_BASE.includes(x)?"base":"area"}">${escHtml(x)} · ${wzHm(Math.max(15, Math.round((p.semMin[x] || 0) / p.W / 15) * 15))}</span>`).join("")}</div>
-      <div class="wz-h3">Sua trilha</div>
-      ${roteiroResumoHtml("concurso")}
-      ${objAtual() === "ambos" ? `<button class="btn wz-big" onmousedown="event.preventDefault()" onclick="wizFase='ing';wizRender(true)">Agora o seu inglês ›</button>` : ""}
+    const nAreas = wiz.areas.length, areasTxt = nAreas > 2 ? nomeArea(wiz.areas[0]) + " e mais " + (nAreas - 1) + " áreas" : wiz.areas.map(nomeArea).join(" e ");
+    const mostra = wiz.mais ? cs : cs.slice(0, 5);
+    const pick = id => { const it = T[id], on = wiz.sel.includes(id), ok = prepDisponivel(it); return `<button class="wz-pick ${on?"on":""}" onmousedown="event.preventDefault()" onclick="wizSelToggle('${id}')"><span class="ck">${on?"✓":""}</span><span><b>${escHtml(it.title.replace(/^Concurso\s*/i, ""))}</b><small>${escHtml((it.badge || "") + (it.nivel ? " · " + it.nivel : ""))}${ok ? "" : " · sem dados para cronograma"}</small></span></button>`; };
+    const bloco1 = temRJ ? (cs.length ? `<div class="wz-h3">1. Escolha os concursos</div><p class="wz-sub" style="margin:0 0 8px">${cs.length} combinam com você. Marque os que quer estudar. <a href="#" style="color:var(--blue-deep);font-weight:800" onmousedown="event.preventDefault()" onclick="wizSelTodos();return false">Marcar todos</a></p>
+        <div class="wz-picks">${mostra.map(pick).join("")}</div>
+        ${cs.length > 5 ? `<button class="wz-skip" onmousedown="event.preventDefault()" onclick="wiz.mais=!wiz.mais;saveWiz();wizRender()">${wiz.mais ? "Mostrar menos" : "Ver os outros " + (cs.length - 5)}</button>` : ""}
+        ${(extra > 0 || wiz.verTodos) ? `<button class="wz-skip" onmousedown="event.preventDefault()" onclick="wiz.verTodos=!wiz.verTodos;saveWiz();wizRender()">${wiz.verTodos ? "Mostrar só os que combinam" : "Ver também " + extra + " com cargos a definir"}</button>` : ""}
+        <button class="btn primary wz-big" onmousedown="event.preventDefault()" onclick="wizMontar()">${wiz.sel.length ? "Montar cronograma com " + wiz.sel.length : "Montar só o ciclo de matérias"}</button>` : `<div class="wz-h3">1. Monte o seu ciclo</div><p class="wz-sub">Nenhum concurso do painel combina com essa escolha agora. Posso montar o ciclo só com as matérias.</p><button class="btn primary wz-big" onmousedown="event.preventDefault()" onclick="wizMontar()">Montar ciclo de matérias</button>`) : `<div class="wz-h3">1. Monte o seu ciclo</div><p class="wz-sub">O painel acompanha o Rio de Janeiro. Para os seus estados, use as buscas lá embaixo.</p><button class="btn primary wz-big" onmousedown="event.preventDefault()" onclick="wizMontar()">Montar ciclo de matérias</button>`;
+    const semanaHtml = `<p class="wz-sub" style="margin:0 0 8px">${wiz.horas}h por dia em ${wiz.dias} dias dá ${p.horasSemana}h por semana. No prazo escolhido são cerca de ${totalH}h.</p>${p.W > 1 ? `<p class="wz-sub" style="margin:0 0 8px">São muitas matérias para uma semana. O plano é um ciclo de ${p.W} semanas.</p>` : ""}` + p.semanas.map((sem, wi) => { const corpoSem = `<div class="wz-week">${sem.map(s=>`<div class="wz-day"><b>${s.d}</b><div>${s.itens.map(it=>`<span class="${it.n.startsWith("Revisão")?"rev":(WZ_BASE.includes(it.n)?"base":"area")}">${escHtml(it.n)} <i>${wzHm(it.min)}</i></span>`).join("")}</div></div>`).join("")}</div>`; return wi === 0 ? corpoSem : `<details class="wz-sem"><summary>Semana ${wi+1}</summary>${corpoSem}</details>`; }).join("");
+    const matsHtml = `<p class="wz-sub" style="margin:0">Mapa geral do que costuma cair. O edital é quem decide.</p><div class="wz-chips">${ordemMats.map(x=>`<span class="${WZ_BASE.includes(x)?"base":"area"}">${escHtml(x)} · ${wzHm(Math.max(15, Math.round((p.semMin[x] || 0) / p.W / 15) * 15))}</span>`).join("")}</div>`;
+    corpo = `<div class="wz-h">Seu plano de concurso</div>
+      <p class="wz-sub">${escHtml(areasTxt)} · ${escHtml(nomeNv)} · ${wiz.horas}h por dia, ${wiz.dias} dias por semana.</p>
+      ${bloco1}
+      <div class="wz-h3">2. Depois, siga a trilha</div>
+      ${proxPassoHtml("concurso")}
+      ${wizCtaOutro()}
+      ${objAtual() === "ambos" ? `<button class="btn wz-big" onmousedown="event.preventDefault()" onclick="wizFase='ing';wizRender(true)">Ver o seu inglês ›</button>` : ""}
+      <div class="wz-h3">Ver detalhes</div>
+      ${wzDet("Sua trilha completa", roteiroResumoHtml("concurso"))}
+      ${wzDet("Sua semana de estudo", semanaHtml)}
+      ${wzDet("Tempo por matéria", matsHtml)}
+      ${wzDet("Pesquisar mais concursos", wizBuscaMais())}
       <div class="wz-cta"><button class="wz-back" onmousedown="event.preventDefault()" onclick="wizGo(7)">‹ Ajustar rotina</button><button class="wz-back" onmousedown="event.preventDefault()" onclick="wizReset()">↺ Refazer</button></div>`;
   }
-  box.innerHTML = `<div class="wz"><div class="wz-eyebrow">Concurso · passo ${step} de 8 · ${WZ_PASSOS_NOMES[step-1]}</div>${dots}<button class="wz-skip" onmousedown="event.preventDefault()" onclick="wizTrocarObjetivo()">Objetivo: ${escHtml((OBJ_OPCOES.find(o => o.id === objAtual()) || {}).nome || "")} ✎</button>${selHtml}${corpo}</div>`;
+  box.innerHTML = `<div class="wz"><div class="wz-eyebrow">${step < 8 ? "Concurso · passo " + step + " de 8 · " + WZ_PASSOS_NOMES[step-1] : "Concurso"}</div>${step < 8 ? dots + `<button class="wz-skip" onmousedown="event.preventDefault()" onclick="wizTrocarObjetivo()">Objetivo: ${escHtml((OBJ_OPCOES.find(o => o.id === objAtual()) || {}).nome || "")} ✎</button>` : ""}${selHtml}${corpo}</div>`;
   if(rolar) box.scrollIntoView({ block:"start", behavior:"smooth" });
 }
 
