@@ -1673,6 +1673,12 @@
   .wz-outro{ border:1.5px dashed var(--line); border-radius:16px; padding:14px 16px; margin:12px 0; }
   .wz-outro b{ font-size:15px; }
   .wz-outro p{ margin:4px 0 10px; font-size:13px; color:var(--ink-soft); }
+
+  .wz-lin{ display:flex; flex-direction:column; gap:4px; margin:6px 0 4px; font-size:13.5px; }
+  .wz-lin b{ color:var(--blue-deep); margin-right:6px; }
+  .wz-day span.ing{ background:#F4E6EC; color:var(--vinho, #6E1F3A); }
+  .wz-next.soft{ background:var(--bg); border-color:var(--line); }
+  .wz-cta.wrap{ flex-wrap:wrap; gap:8px; }
 </style>
 </head>
 <body data-tab="inicio">
@@ -6415,7 +6421,7 @@ function ingAulaDia(d){ const a = ing.aulaDias, i = a.indexOf(d); if(i >= 0) a.s
 function ingDia(d){ const a = ing.diasSel, i = a.indexOf(d); if(i >= 0) a.splice(i,1); else a.push(d); ing.dias = a.length; saveIng(); wizRender(); }
 function ingGo(n){
   if(n >= 6){ if(!ingPode(4)) return; ingIrResultado(); return; }
-  ing.step = Math.max(1, n);
+  ing.step = Math.max(1, n); wizFase = "ing";
   saveIng(); wizRender(true); renderRoteiroCard();
 }
 function ingIrResultado(){
@@ -6619,6 +6625,7 @@ function ingRender(box){
   box.innerHTML = `<div class="wz"><div class="wz-eyebrow">${step < 6 ? "Inglês · passo " + step + " de 5" : "Inglês"}</div>${step < 6 ? dots : ""}${volta}${corpo}</div>`;
 }
 function wizCtaOutroIng(){
+  if(!objTem("concurso") && !objTem("ingles")) return "";
   if(!objTem("concurso")) return `<div class="wz-outro"><b>Quer estudar para concurso também?</b><p>Eu monto o plano do concurso e divido o seu tempo com o inglês.</p><button class="btn" onmousedown="event.preventDefault()" onclick="wizAddConcurso()">Adicionar concurso</button></div>`;
   return "";
 }
@@ -7168,7 +7175,7 @@ function wizSet(k, v, avanca){
 }
 function wizGo(n){
   if(n >= 8){ wizIrResultado(); return; }
-  wiz.step = Math.max(1, n);
+  wiz.step = Math.max(1, n); wizFase = "concurso";
   saveWiz(); wizRender(true);
 }
 function wizIrResultado(){
@@ -7329,12 +7336,102 @@ function wizBuscaMais(){
   return `<p class="wz-sub" style="margin:0 0 6px">O painel acompanha o Rio de Janeiro em detalhe. Para o resto do Brasil, estas buscas já saem com as suas respostas.</p>
     <div class="wz-agenda">${links.map(l => `<a class="gcal-btn link" href="${escHtml(crGg(l[1]))}" target="_blank" rel="noopener">🔎 ${escHtml(l[0])}</a>`).join("")}<a class="gcal-btn link" href="https://www.estrategiaconcursos.com.br/blog/mapa-concursos" target="_blank" rel="noopener">🗺️ Mapa de concursos</a></div>`;
 }
+// ---------- Resultado unificado: concurso e inglês juntos, uma pessoa só, uma semana só ----------
+function resultadoPronto(){
+  const c = objTem("concurso"), i = objTem("ingles");
+  if(!c && !i) return false;
+  if(c && wiz.step !== 8) return false;
+  if(i && !(ing.feito && ing.step === 6)) return false;
+  return true;
+}
+function semanaUnificada(){
+  const dias = {}; DIAS_SEM.forEach(d => dias[d] = []);
+  if(objTem("concurso")){ const c = wizPlano(); c.semanas[0].forEach(sm => sm.itens.forEach(it => dias[sm.d].push({ cls: it.n.startsWith("Revisão") ? "rev" : (WZ_BASE.includes(it.n) ? "base" : "area"), n: it.n, min: it.min }))); }
+  if(objTem("ingles")){ const p = ingPlano(); p.semana.forEach(sm => sm.itens.forEach(it => dias[sm.d].push({ cls: it.h === "aula" ? "aula" : "ing", n: "Inglês: " + ingItemNome(it), min: it.min }))); }
+  return DIAS_SEM.filter(d => dias[d].length).map(d => ({ d, itens: dias[d], total: dias[d].reduce((a,x) => a + x.min, 0) }));
+}
+function proximosPassosHtml(){
+  const ts = ["concurso","ingles"].filter(t => objTem(t));
+  const listas = ts.map(t => roteiroPassos(t).filter(p => !roteiroFeito(p)).map(p => ({ p, t })));
+  const out = [];
+  for(let k = 0; k < 4 && out.length < 3; k++) listas.forEach(l => { if(l[k] && out.length < 3) out.push(l[k]); });
+  if(!out.length) return `<div class="wz-next"><small>Trilha completa</small><b>Você concluiu todos os passos.</b></div>`;
+  const tag = t => t === "ingles" ? "Inglês" : "Concurso";
+  const btn = x => x.p.acao ? `<button class="btn ${x.big ? "primary" : "ghost"}" onmousedown="event.preventDefault()" onclick="${x.p.acao[1]}">${escHtml(x.p.acao[0])}</button>` : `<button class="btn ${x.big ? "primary" : "ghost"}" onmousedown="event.preventDefault()" onclick="roteiroToggle('${x.p.k}')">Marcar como feito</button>`;
+  out[0].big = true;
+  return out.map(x => `<div class="${x.big ? "wz-next" : "wz-next soft"}"><small>${tag(x.t)}</small><b>${escHtml(x.p.t)}</b><p>${escHtml(x.p.dd ? x.p.dd() : x.p.d)}</p>${btn(x)}</div>`).join("");
+}
+function wizRefazerTudo(){
+  wiz = wizVazio(wiz.done); saveWiz(); ing = ingVazio(); saveIng();
+  profile.planoZerado = false; saveState("concursos-rj-perfil", profile);
+  wizObjView = true; wizObjSel = null; wizFase = "concurso"; wizRender(true);
+}
+function resultRender(box){
+  const c = objTem("concurso"), i = objTem("ingles");
+  const nomeArea = id => (wzFind(WZ_AREAS, id) || {}).nome;
+  const linhas = [];
+  let pecas = "";
+  if(c){
+    const nAreas = wiz.areas.length, areasTxt = nAreas > 2 ? nomeArea(wiz.areas[0]) + " e mais " + (nAreas - 1) + " áreas" : wiz.areas.map(nomeArea).join(" e ");
+    const nomeNv = wiz.niveis.map(id => wzFind(WZ_NIVEIS, id).nome.split(" ")[0]).join(" e ");
+    linhas.push(`<span><b>Concurso</b> ${escHtml(areasTxt)} · ${escHtml(nomeNv)} · ${wiz.horas}h por dia</span>`);
+  }
+  if(i){
+    const n = wzFind(ING_NIVEIS, ing.nivel);
+    linhas.push(`<span><b>Inglês</b> ${n ? n.nome + " " + n.cefr : ""} · falar incluído · ${ing.minutos} min por dia${ing.recursos.includes("aula") && ing.aulaDias.length ? " e " + ing.aulaDias.length + " aula" + (ing.aulaDias.length > 1 ? "s" : "") : ""}</span>`);
+  }
+  const sem = semanaUnificada();
+  const semHtml = `<div class="wz-week">${sem.map(sm => `<div class="wz-day"><b>${sm.d}</b><div>${sm.itens.map(it => `<span class="${it.cls}">${escHtml(it.n)} <i>${wzHm(it.min)}</i></span>`).join("")}</div></div>`).join("")}</div>`;
+  const totalMin = sem.reduce((a,d) => a + d.total, 0);
+  // concursos
+  let blocoC = "", detC = "";
+  if(c){
+    const T = wizTodos(), cs = wizConcursos(wiz.verTodos), csBase = wizConcursos(false), extra = wizConcursos(true).length - csBase.length, p = wizPlano();
+    const pr = wzFind(WZ_PRAZOS, wiz.prazo), totalH = Math.round(p.horasSemana * pr.sem);
+    const temRJ = wiz.locais.some(l => l !== "outro");
+    const mostra = wiz.mais ? cs : cs.slice(0, 5);
+    const pick = id => { const it = T[id], on = wiz.sel.includes(id), ok = prepDisponivel(it); return `<button class="wz-pick ${on?"on":""}" onmousedown="event.preventDefault()" onclick="wizSelToggle('${id}')"><span class="ck">${on?"✓":""}</span><span><b>${escHtml(it.title.replace(/^Concurso\s*/i, ""))}</b><small>${escHtml((it.badge || "") + (it.nivel ? " · " + it.nivel : ""))}${ok ? "" : " · sem dados para cronograma"}</small></span></button>`; };
+    blocoC = temRJ ? (cs.length ? `<div class="wz-h3">Concursos para você</div><p class="wz-sub" style="margin:0 0 8px">${cs.length} combinam com você. Marque os que quer estudar. <a href="#" style="color:var(--blue-deep);font-weight:800" onmousedown="event.preventDefault()" onclick="wizSelTodos();return false">Marcar todos</a></p>
+        <div class="wz-picks">${mostra.map(pick).join("")}</div>
+        ${cs.length > 5 ? `<button class="wz-skip" onmousedown="event.preventDefault()" onclick="wiz.mais=!wiz.mais;saveWiz();wizRender()">${wiz.mais ? "Mostrar menos" : "Ver os outros " + (cs.length - 5)}</button>` : ""}
+        ${(extra > 0 || wiz.verTodos) ? `<button class="wz-skip" onmousedown="event.preventDefault()" onclick="wiz.verTodos=!wiz.verTodos;saveWiz();wizRender()">${wiz.verTodos ? "Mostrar só os que combinam" : "Ver também " + extra + " com cargos a definir"}</button>` : ""}
+        <button class="btn primary wz-big" onmousedown="event.preventDefault()" onclick="wizMontar()">${wiz.sel.length ? "Montar cronograma com " + wiz.sel.length : "Montar só o ciclo de matérias"}</button>` : `<div class="wz-h3">Concursos para você</div><p class="wz-sub">Nenhum concurso do painel combina com essa escolha agora.</p>`) : `<div class="wz-h3">Concursos para você</div><p class="wz-sub">O painel acompanha o Rio de Janeiro. Para os seus estados, use as buscas em "Ver detalhes".</p>`;
+    const ordemMats = p.todas.slice().sort((a,b) => (p.semMin[b]||0) - (p.semMin[a]||0));
+    const semanasC = `<p class="wz-sub" style="margin:0 0 8px">${wiz.horas}h por dia em ${wiz.dias} dias dá ${p.horasSemana}h por semana de concurso. No prazo escolhido são cerca de ${totalH}h.</p>${p.W > 1 ? `<p class="wz-sub" style="margin:0 0 8px">São muitas matérias para uma semana. O plano é um ciclo de ${p.W} semanas.</p>` : ""}` + p.semanas.map((sm, wi) => { const cw = `<div class="wz-week">${sm.map(x=>`<div class="wz-day"><b>${x.d}</b><div>${x.itens.map(it=>`<span class="${it.n.startsWith("Revisão")?"rev":(WZ_BASE.includes(it.n)?"base":"area")}">${escHtml(it.n)} <i>${wzHm(it.min)}</i></span>`).join("")}</div></div>`).join("")}</div>`; return wi === 0 ? cw : `<details class="wz-sem"><summary>Semana ${wi+1}</summary>${cw}</details>`; }).join("");
+    const mats = `<p class="wz-sub" style="margin:0">Mapa geral do que costuma cair. O edital é quem decide.</p><div class="wz-chips">${ordemMats.map(x=>`<span class="${WZ_BASE.includes(x)?"base":"area"}">${escHtml(x)} · ${wzHm(Math.max(15, Math.round((p.semMin[x] || 0) / p.W / 15) * 15))}</span>`).join("")}</div>`;
+    detC = wzDet("Concurso: matérias por semana", semanasC) + wzDet("Concurso: tempo por matéria", mats) + wzDet("Pesquisar mais concursos", wizBuscaMais());
+  }
+  let detI = "";
+  if(i){
+    const p = ingPlano(), hp = ingHorasPrazo();
+    const trilhaMeses = ingTrilhaMeses().map(f => `<div class="wz-mes"><b>${f.t} · ${f.nome}</b><ul>${f.itens.map(x => `<li>${x}</li>`).join("")}</ul></div>`).join("");
+    const reality = `<p class="wz-sub" style="margin:0">Com esse ritmo, em ${ing.prazo} meses você soma cerca de ${hp}h de inglês. Para ir do A1 ao B2, a Cambridge English fala em 500 a 600 horas, segundo o <a href="https://practiceme.app/pt/blog/como-ficar-fluente-em-ingles" target="_blank" rel="noopener" style="color:var(--blue-deep);font-weight:800">PracticeMe</a>. Dá para avançar e falar com mais segurança, mas a fluência pede constância por mais tempo.</p>`;
+    const agenda = ingAgendaHtml(p).replace(/<div class="wz-h3">Colocar na agenda<\/div>/, "");
+    detI = wzDet("Inglês: trilha de " + ing.prazo + " meses para falar", trilhaMeses) + (agenda ? wzDet("Inglês: colocar na agenda", agenda) : "") + wzDet("Inglês: quanto tempo leva", reality);
+  }
+  const trilhas = ["concurso","ingles"].filter(t => objTem(t)).map(t => (c && i ? `<div class="wz-h3" style="margin-top:6px">${t === "ingles" ? "Inglês" : "Concurso"}</div>` : "") + roteiroResumoHtml(t)).join("");
+  const ajustar = (c ? `<button class="wz-back" onmousedown="event.preventDefault()" onclick="wizGo(7)">‹ Ajustar concurso</button>` : "") + (i ? `<button class="wz-back" onmousedown="event.preventDefault()" onclick="ingGo(4)">‹ Ajustar inglês</button>` : "");
+  box.innerHTML = `<div class="wz"><div class="wz-eyebrow">Tudo pronto</div>
+    <div class="wz-h">Seu plano de estudos</div>
+    <div class="wz-lin">${linhas.join("")}</div>
+    <p class="wz-sub">Uma semana só, com tudo junto: ${wzHm(totalMin)} de estudo em ${sem.length} dias${profile.vida ? ". Meta da semana: " + String(study.goalHours || "").toString().replace(".", ",") + "h" : ""}.</p>
+    <div class="wz-h3">Sua semana</div>${semHtml}
+    <div class="wz-h3">Faça agora</div>${proximosPassosHtml()}
+    ${blocoC}
+    ${wizCtaOutro()}${wizCtaOutroIng()}
+    <div class="wz-h3">Ver detalhes</div>
+    ${wzDet("Sua trilha completa", trilhas)}
+    ${detC}${detI}
+    <div class="wz-cta wrap">${ajustar}<button class="wz-back" onmousedown="event.preventDefault()" onclick="wizRefazerTudo()">↺ Refazer</button></div></div>`;
+}
 function wizRender(rolar){
   const box = document.getElementById("wizard-card");
   if(!box) return;
   if(wizLoad){ loadRender(box); if(rolar) box.scrollIntoView({ block:"start", behavior:"smooth" }); return; }
   if(!objAtual() || wizObjView){ objRender(box); if(rolar) box.scrollIntoView({ block:"start", behavior:"smooth" }); return; }
   if(wizVidaView){ vidaRender(box); if(rolar) box.scrollIntoView({ block:"start", behavior:"smooth" }); return; }
+  if(objAtual() === "ambos" && wiz.step >= 8 && !ing.feito) wizFase = "ing";
+  if(resultadoPronto()){ resultRender(box); if(rolar) box.scrollIntoView({ block:"start", behavior:"smooth" }); return; }
   if(objAtual() === "ingles" || (objAtual() === "ambos" && wizFase === "ing")){ ingRender(box); if(rolar) box.scrollIntoView({ block:"start", behavior:"smooth" }); return; }
   const step = Math.min(wiz.step || 1, 8);
   const dots = `<div class="wz-dots">${[1,2,3,4,5,6,7,8].map(i=>`<i class="${i<=step?"on":""}"></i>`).join("")}</div>`;
