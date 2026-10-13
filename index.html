@@ -6897,9 +6897,9 @@ function refreshStats(){
   // abertos + em andamento).
   const statsData = [
     { n: fa.length + fe.length, label: "Ativos", ico:"🟢", goFilter:"abertos" },
-    { n: fb.length, label: "Banca definida", ico:"🍑", goFilter:"banca" },
-    { n: fn.length, label: "Anunciados", ico:"🔮", goFilter:"anunciado" },
-    { n: fb.length + fn.length, label: "Todos os previstos", ico:"🗺️", goFilter:"previstos" }
+    { n: fb.length, label: "Banca definida", ico:"🕒", goFilter:"banca" },
+    { n: fn.length, label: "Anunciados", ico:"👁️", goFilter:"anunciado" },
+    { n: fb.length + fn.length, label: "Todos os previstos", ico:"✅", goFilter:"previstos" }
   ];
   document.getElementById("stats").innerHTML = statsData.map((s,i) => `<div class="stat" data-go-filter="${s.goFilter}"><span class="stat-ico">${s.ico}</span><b>${s.n}</b><span>${s.label}</span><span class="stat-arrow">›</span></div>`).join("");
 
