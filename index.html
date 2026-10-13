@@ -2696,6 +2696,74 @@ const anunciados = [
 
 ];
 
+
+// ---------- Radar da Estratégia, 13/10/2026: concursos do RJ que o painel ainda não tinha. As fontes são as listas públicas
+// da Estratégia (atualizada em 23/09), da Gran Cursos (03/10) e do Valor Final. Onde a fonte não traz cargo, banca ou data,
+// o campo fica "A definir" e o texto manda conferir o edital. ----------
+const _EST = "Estratégia Concursos: concursos RJ", _GRAN = "Gran Cursos: concursos RJ", _VAL = "Valor Final: concursos RJ";
+const _urlEst = "https://www.estrategiaconcursos.com.br/blog/concursos-RJ/", _urlGran = "https://blog.grancursosonline.com.br/concursos-rj", _urlVal = "https://valorfinal.com.br/concursos/estado/rj";
+function _novo(o){ o.editalUrl = o.editalUrl || ""; o.inscricoes = o.inscricoes || "Ainda não abertas"; o.prova = o.prova || "A definir"; o.taxa = o.taxa || "A definir"; return o; }
+abertos.push(
+  _novo({ org:"♿ Instituto Benjamin Constant (IBC)", title:"Concurso IBC: edital 39/2026", badge:"EDITAL PUBLICADO", badgeType:"aberto",
+    nivel:"A definir", cargos:"A definir (a fonte não traz os cargos)", salario:"A definir", vagas:"A definir", banca:"A definir",
+    situacao:"Edital 39/2026 com inscrições abertas até 03/11/2026, segundo o Valor Final. A fonte não informa cargos, nível nem banca: confira no edital",
+    inscricoes:"Até 03/11/2026", inscricaoFim:"2026-11-03", fonteUrl:_urlVal, fonteLabel:_VAL,
+    note:"Órgão federal com sede no Rio de Janeiro. Só uma fonte cita este edital, então vale confirmar no site do IBC antes de contar com ele." }),
+  _novo({ org:"🎓 UNIRIO: Universidade Federal do Estado do Rio de Janeiro", title:"Concurso UNIRIO: editais avulsos", badge:"EDITAL PUBLICADO", badgeType:"aberto",
+    nivel:"Superior", cargos:"A definir (a fonte não traz os cargos)", salario:"A definir", vagas:"1 vaga em cada um dos editais 221, 222, 223, 224 e 229/2026", banca:"A definir",
+    situacao:"Cinco editais de 1 vaga cada, de nível superior. Inscrições até 20/10 (221), 22/10 (223, 224 e 229) e 30/10 (222, que ainda não começou), segundo o Valor Final. Os cargos não aparecem na fonte: confira cada edital",
+    inscricoes:"Até 20/10, 22/10 ou 30/10/2026, conforme o edital", inscricaoFim:"2026-10-22", fonteUrl:_urlVal, fonteLabel:_VAL,
+    note:"Editais de 1 vaga costumam ser de seleção de docentes ou de áreas específicas, por isso nem sempre servem para Administração. Confira o cargo antes." })
+);
+emAndamento.push(
+  _novo({ org:"🛢️ Transpetro", title:"Concurso Transpetro 2026", badge:"INSCRIÇÃO ENCERRADA", badgeType:"encerrado",
+    nivel:"Superior e Médio", cargos:"A definir (quatro editais, de números 1 a 4/2026)", salario:"A definir", vagas:"89 vagas + cadastro de reserva (edital 1/2026); os outros não informam",
+    banca:"A definir", situacao:"Inscrições encerraram em 21/09/2026 e a prova está marcada, segundo o Valor Final. A fonte não informa a data da prova nem a banca",
+    inscricoes:"Encerradas em 21/09/2026", inscricaoFim:"2026-09-21", fonteUrl:_urlVal, fonteLabel:_VAL,
+    note:"Subsidiária da Petrobras com sede no Rio. Acompanhe a data da prova no site da banca." })
+);
+anunciados.push(
+  _novo({ org:"🏦 RJPrev: Fundação de Previdência Complementar do RJ", title:"Concurso RJPrev", badge:"EM ESTUDO", badgeType:"anunciado",
+    nivel:"Médio e Superior", cargos:"Assistente, Analista e Técnico em Previdência Complementar", salario:"A definir", vagas:"5 + cadastro de reserva", banca:"A definir",
+    situacao:"Comissão formada, segundo a Estratégia (23/09/2026). Ainda sem banca nem edital", fonteUrl:_urlEst, fonteLabel:_EST,
+    note:"Cargos administrativos, que combinam com quem estuda para Administração." }),
+  _novo({ org:"🛣️ DER RJ: Departamento de Estradas de Rodagem", title:"Concurso DER RJ", badge:"EM ESTUDO", badgeType:"anunciado",
+    nivel:"A definir", cargos:"A definir", salario:"A definir", vagas:"A definir", banca:"A definir",
+    situacao:"Comissão formada, segundo a Estratégia (23/09/2026). Sem cargos, vagas nem banca ainda", fonteUrl:_urlEst, fonteLabel:_EST }),
+  _novo({ org:"🎨 Secec RJ", title:"Concurso Secec RJ", badge:"EM ESTUDO", badgeType:"anunciado",
+    nivel:"A definir", cargos:"A definir", salario:"A definir", vagas:"A definir", banca:"A definir",
+    situacao:"Comissão formada, segundo a Estratégia (23/09/2026). Sem cargos, vagas nem banca ainda", fonteUrl:_urlEst, fonteLabel:_EST }),
+  _novo({ org:"📐 IEEA RJ", title:"Concurso IEEA RJ", badge:"EM ESTUDO", badgeType:"anunciado",
+    nivel:"A definir", cargos:"A definir", salario:"A definir", vagas:"A definir", banca:"A definir",
+    situacao:"Comissão formada, segundo a Estratégia (23/09/2026). Sem cargos, vagas nem banca ainda", fonteUrl:_urlEst, fonteLabel:_EST }),
+  _novo({ org:"🌾 EMATER-Rio", title:"Concurso EMATER Rio", badge:"AUTORIZADO", badgeType:"anunciado",
+    nivel:"A definir", cargos:"A definir", salario:"A definir", vagas:"A definir", banca:"A definir",
+    situacao:"Autorizado, com banca em definição, segundo a Estratégia (23/09/2026) e a Gran Cursos (03/10/2026)", fonteUrl:_urlGran, fonteLabel:_GRAN,
+    note:"Confirme onde ficam as vagas antes de contar com a capital." }),
+  _novo({ org:"🗺️ ITERJ: Instituto de Terras e Cartografia do RJ", title:"Concurso ITERJ", badge:"PREVISTO", badgeType:"anunciado",
+    nivel:"Médio e Superior", cargos:"A definir", salario:"A definir", vagas:"A definir", banca:"A definir",
+    situacao:"Previsto, na lista de solicitados da Estratégia (23/09/2026). Não achei autorização nem banca", fonteUrl:_urlEst, fonteLabel:_EST,
+    note:"A sede do órgão não foi confirmada nas fontes consultadas." }),
+  _novo({ org:"🛡️ Polícia Militar do RJ", title:"Concurso PMERJ: Soldado", badge:"PREVISTO", badgeType:"anunciado", area:"Segurança pública",
+    nivel:"Médio", cargos:"Soldado da Polícia Militar", salario:"R$ 5.233,88 (valor citado em 2025)", vagas:"Cerca de 2.000 (declaração do governador)", banca:"A definir",
+    situacao:"Previsto, na lista de solicitados da Estratégia (23/09/2026). Sem edital nem banca", fonteUrl:_urlEst, fonteLabel:_EST,
+    note:"Fora do perfil de Administração. Entra para quem escolher Segurança pública." })
+);
+banca.push(
+  _novo({ org:"🛡️ Polícia Militar do RJ", title:"Concurso PMERJ: Oficial", badge:"BANCA DEFINIDA", badgeType:"banca", area:"Segurança pública",
+    nivel:"Superior", cargos:"Oficial da Polícia Militar (e Oficial Capelão, 7 vagas, banca IBDO)", salario:"Até R$ 10.348,18", vagas:"100 (Oficial)", banca:"FGV (Gran Cursos); a Estratégia cita Cesgranrio",
+    situacao:"Banca definida, sem edital. As fontes divergem na banca: a Gran Cursos (03/10/2026) diz FGV e a Estratégia (23/09/2026) diz Cesgranrio", fonteUrl:_urlGran, fonteLabel:_GRAN,
+    note:"Fora do perfil de Administração. Confirme a banca quando o edital sair." }),
+  _novo({ org:"🛡️ Polícia Civil do RJ", title:"Concurso PC RJ: peritos e piloto", badge:"BANCA DEFINIDA", badgeType:"banca", area:"Segurança pública",
+    nivel:"Superior", cargos:"Perito Criminal, Perito Legista e Piloto Policial (a Gran Cursos soma também Delegado, 85 vagas)", salario:"Até R$ 26,9 mil (delegado); demais cargos cerca de R$ 13,8 mil", vagas:"329 (Estratégia) ou 414 com delegados (Gran Cursos)", banca:"FGV (peritos e piloto)",
+    situacao:"Banca definida, sem edital. A Estratégia cita 329 vagas e a Gran Cursos, 414 com delegados, que teriam banca à parte (Cesgranrio)", fonteUrl:_urlGran, fonteLabel:_GRAN,
+    note:"Fora do perfil de Administração. Entra para quem escolher Segurança pública." }),
+  _novo({ org:"🚒 Bombeiros RJ: contratação temporária", title:"Concurso Bombeiros RJ: temporários", badge:"BANCA DEFINIDA", badgeType:"banca", area:"Segurança pública",
+    nivel:"Médio", cargos:"Soldado e Oficial (processo seletivo simplificado)", salario:"A definir", vagas:"1.500 (Estratégia e Gran Cursos)", banca:"AOCP",
+    situacao:"Banca definida, segundo a Estratégia e a Gran Cursos. Em 07/10 achei notícia de 192 vagas só de saúde para o CBMERJ: confirme qual vale", fonteUrl:_urlGran, fonteLabel:_GRAN,
+    note:"Fora do perfil de Administração. Entra para quem escolher Segurança pública." })
+);
+
 // Tags genéricas de área/estado/cidade em cada concurso, usadas pelo filtro de perfil.
 // Hoje todo o conteúdo cadastrado é de Administração no Rio de Janeiro (capital); ao
 // pesquisar e cadastrar outras áreas/estados no futuro, é só dar valores diferentes
@@ -2729,7 +2797,7 @@ const ESFERA_ITEM = {
   "concurso-seplag-rj-eppgg-e-apo":"estadual", "concurso-cremerj-2026":"federal", "concurso-cra-rj-2026":"federal", "concurso-dataprev-2026":"federal",
   "concurso-ses-rj-iaserj-2026":"estadual", "concurso-theatro-municipal-rj":"municipal", "concurso-agetransp-rj":"estadual", "concurso-inb-cadastro-de-reserva":"federal",
   "concurso-crf-rj-2026":"federal", "concurso-detran-rj":"estadual", "concurso-pge-rj-analista":"estadual", "concurso-assistencia-social-rj":"estadual",
-  "concurso-tce-rj-auditor-de-controle-externo":"estadual", "concurso-tcm-rj":"municipal", "concurso-pedro-ii-tecnico-administrativo":"federal", "concurso-inea-rj":"estadual", "concurso-previrio":"municipal", "concurso-cedae":"estadual", "concurso-receita-federal":"federal"
+  "concurso-tce-rj-auditor-de-controle-externo":"estadual", "concurso-tcm-rj":"municipal", "concurso-pedro-ii-tecnico-administrativo":"federal", "concurso-inea-rj":"estadual", "concurso-previrio":"municipal", "concurso-cedae":"estadual", "concurso-receita-federal":"federal", "concurso-ibc-edital-39-2026":"federal", "concurso-unirio-editais-avulsos":"federal", "concurso-transpetro-2026":"federal", "concurso-rjprev":"estadual", "concurso-der-rj":"estadual", "concurso-secec-rj":"estadual", "concurso-ieea-rj":"estadual", "concurso-emater-rio":"estadual", "concurso-iterj":"estadual", "concurso-pmerj-soldado":"estadual", "concurso-pmerj-oficial":"estadual", "concurso-pc-rj-peritos-e-piloto":"estadual", "concurso-bombeiros-rj-temporarios":"estadual"
 };
 function itemFechado(it){ return it.badgeType === "encerrado"; }
 function itemServeFormacao(it, formacao){
@@ -7628,7 +7696,7 @@ function dayTimelineBlocks(dow){
 // mais confiáveis, e copia o pedido pronto pra colar no Claude, que confere e devolve
 // o painel atualizado. ----------
 const DATA_CHECKED = "13/10/2026";
-const DATA_CHECKED_HORA = "16:27";
+const DATA_CHECKED_HORA = "17:35";
 const UPDATE_SOURCES = [
   { name:"JC Concursos: abertos no RJ", url:"https://jcconcursos.com.br/concursos/inscricoes-abertas/rj" },
   { name:"PCI Concursos: Rio de Janeiro", url:"https://www.pciconcursos.com.br/concursos/rj/rio-de-janeiro" },
