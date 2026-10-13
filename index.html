@@ -1601,6 +1601,26 @@
   .rt-retro-l{ display:flex; justify-content:space-between; gap:14px; align-items:baseline; padding:12px 0; border-bottom:1px solid var(--line); font-size:13.5px; }
   .rt-retro-l span{ color:var(--ink-soft); }
   .rt-retro-l b{ text-align:right; color:var(--ink); }
+
+  .mini-chip.banca{ background:var(--card); border:1px solid var(--blue-deep); color:var(--blue-deep); }
+  .mini-chip.banca.ultima{ border-color:var(--line); color:var(--ink-soft); font-weight:700; }
+  .mini-chip.banca.fav{ background:var(--blue-bg); }
+  .item-tags{ flex-wrap:wrap; }
+  .bf-card{ background:var(--card); border:1px solid var(--line); border-radius:16px; margin-bottom:8px; overflow:hidden; }
+  .bf-card.sel{ border-color:var(--blue-deep); box-shadow:0 0 0 2px var(--blue-bg); }
+  .bf-card summary{ list-style:none; cursor:pointer; display:flex; align-items:center; gap:10px; padding:13px 14px; }
+  .bf-card summary::-webkit-details-marker{ display:none; }
+  .bf-name{ font-family:var(--serif); font-weight:800; font-size:16px; flex:1; }
+  .bf-chip{ font-size:10.5px; font-weight:800; padding:3px 9px; border-radius:20px; background:var(--sand); color:var(--sand-deep); white-space:nowrap; }
+  .bf-chip.hard{ background:var(--vinho-bg); color:var(--vinho); }
+  .bf-chip.mid{ background:var(--peach-bg); color:var(--peach-deep); }
+  .bf-chip.easy{ background:var(--mint-bg); color:var(--mint-deep); }
+  .bf-caret{ color:var(--ink-soft); font-size:18px; transition:transform .15s; }
+  .bf-card[open] .bf-caret{ transform:rotate(90deg); }
+  .bf-body{ padding:0 14px 14px; }
+  .bf-fato{ margin:0 0 10px; font-size:13px; color:var(--ink); line-height:1.5; }
+  .bf-l{ display:flex; gap:10px; padding:8px 0; border-top:1px solid var(--line); font-size:12.5px; line-height:1.45; }
+  .bf-l b{ flex:0 0 92px; color:var(--ink-soft); font-size:11px; text-transform:uppercase; letter-spacing:.04em; padding-top:1px; }
 </style>
 </head>
 <body data-tab="inicio">
@@ -2007,6 +2027,9 @@
       <div class="import-hint" id="import-hint" style="padding:0 16px 12px"></div>
     </div>
 
+    <div class="pf-label">Minha banca favorita</div>
+    <div id="pf-banca"></div>
+
     <div class="insight-strip" style="margin-top:16px">📊 Administração é a <b>3ª carreira mais buscada</b> em concursos no Brasil, com <b>64,6%</b> de aproveitamento médio.</div>
   </section>
 
@@ -2341,6 +2364,45 @@ const banca = [
     hist: { ano:"2024", banca:"IBEST", salario:"R$ 3.144,52 a R$ 5.595,49 inicial", concorrencia:"Não localizada com segurança nas fontes consultadas" },
     note: "Cargo de Administrador Júnior existiu na última edição (2024): bom sinal de que deve repetir. Lotação costuma ser espalhada por várias cidades do RJ, incluindo a sede na capital; vale confirmar no próximo edital."
   }
+  ,{
+    org: "🦷 CRO-RJ: Conselho Regional de Odontologia do Rio de Janeiro",
+    title: "Concurso CRO-RJ 2026",
+    badge: "BANCA DEFINIDA", badgeType: "banca",
+    nivel: "Médio e Superior",
+    cargos: "Auxiliar administrativo e fiscal (médio). Analista técnico executivo, analista contábil, analista de desenvolvimento de sistemas, assistente jurídico e fiscal de odontologia (superior)",
+    salario: "R$ 2.750 a R$ 5.450 (40h), mais vale alimentação de R$ 1.320, plano de saúde e vale transporte",
+    vagas: "5 imediatas + cadastro de reserva",
+    banca: "Instituto Consulplan",
+    situacao: "Banca contratada: contrato assinado em 30/09/2026 e extrato no PNCP em 05/10/2026. Edital iminente, sem data. Cronograma ainda em fechamento",
+    inscricoes: "Ainda não abertas",
+    prova: "Objetiva e títulos, em polos nas seis regiões do estado. Data a definir",
+    taxa: "R$ 75 (médio) e R$ 100 (superior), segundo a JC Concursos",
+    editalUrl: "",
+    fonteUrl: "https://folha.qconcursos.com/n/concurso-cro-rj-2026-vagas-e-cargos",
+    fonteLabel: "Folha Dirigida / QConcursos",
+    hist: { ano:"2016", banca:"Não informada nas fontes consultadas", salario:"Não localizado", concorrencia:"Não localizada nas fontes consultadas" },
+    note: "O cargo mais próximo de Administração é o de analista técnico executivo. As vagas imediatas são poucas, então o cadastro de reserva é o que conta. Confirme a lotação e o conteúdo programático no edital, que ainda não saiu."
+  },
+  {
+    org: "🎓 IFRJ: Instituto Federal do Rio de Janeiro",
+    title: "Concurso IFRJ",
+    badge: "BANCA DEFINIDA", badgeType: "banca",
+    nivel: "Médio e Superior",
+    cargos: "Técnico administrativo em educação e professor EBTT. Cargos e áreas ainda não divulgados",
+    salario: "A definir",
+    vagas: "70 previstas no orçamento de 2027 (estimativa, não é o número final)",
+    banca: "Instituto Access",
+    situacao: "Instituto Access contratado diretamente, com ato do reitor (matéria de 24/09/2026). A Idecan tinha sido contratada em setembro de 2024, mas nenhum edital saiu. Previsto no orçamento de 2027",
+    inscricoes: "Ainda não abertas",
+    prova: "A definir",
+    taxa: "A definir",
+    editalUrl: "",
+    fonteUrl: "https://folha.qconcursos.com/n/concurso-ifrj-ploa-2027",
+    fonteLabel: "Folha Dirigida / QConcursos",
+    hist: { ano:"Não localizado", banca:"Não localizada", salario:"Não localizado", concorrencia:"Não localizada nas fontes consultadas" },
+    note: "A matéria não informa campus nem cargos. Confirme se há vaga na capital e se o cargo aceita Administração antes de contar com ele."
+  }
+
 ];
 
 const anunciados = [
@@ -2432,7 +2494,7 @@ const anunciados = [
     salario: "A definir",
     vagas: "A definir",
     banca: "A definir",
-    situacao: "Carreiras reestruturadas pela Lei nº 9.204/2025. Concurso aguardado após 17 anos sem edital",
+    situacao: "Carreiras reestruturadas pela Lei nº 9.204/2025. Concurso aguardado após 17 anos sem edital. Em 22/07/2026 o Diário Oficial do Município incluiu o concurso nas metas da LDO 2027, mas previsão orçamentária não equivale a edital: faltam levantamento de vagas, autorização, comissão e contratação da banca",
     inscricoes: "Ainda não abertas",
     prova: "A definir",
     taxa: "A definir",
@@ -2481,6 +2543,83 @@ const anunciados = [
     hist: { ano:"2013", banca:"FGV", salario:"R$ 950,33 a R$ 7.183,19 (base); de R$ 1.914,37 a R$ 8.147,23 somando o auxílio alimentação", concorrencia:"~121,5 candidatos/vaga (10.452 inscritos para 86 vagas)" },
     note: "A autorização oficial saiu em 23/09/2026 (Diário Oficial), passo importante depois de 13 anos parado, mas é cedo pra contar com cargo específico: banca e distribuição de vagas seguem em definição pela comissão."
   }
+  ,{
+    org: "🏛️ PreviRio: Instituto de Previdência e Assistência do Município do Rio de Janeiro",
+    title: "Concurso PreviRio",
+    badge: "NO ORÇAMENTO 2027", badgeType: "anunciado",
+    nivel: "Superior",
+    cargos: "Cargos vagos de nível superior. Estudos de 2022 citaram analista de processo previdenciário, analista de sistema previdenciário, arquiteto, assessor jurídico, atuário, estatístico e técnico em comunicação social",
+    salario: "A definir",
+    vagas: "A definir",
+    banca: "A definir",
+    situacao: "Previsto no Projeto de Lei Orçamentária de 2027 da cidade do Rio. O Conselho de Administração confirmou a inclusão em 21/07/2026 (ata publicada em 19/08/2026). Ainda depende de autorização formal do prefeito",
+    inscricoes: "Ainda não abertas",
+    prova: "A definir",
+    taxa: "A definir",
+    editalUrl: "",
+    fonteUrl: "https://folha.qconcursos.com/n/concurso-previrio-previsto-no-orcamento-de-2027",
+    fonteLabel: "Folha Dirigida / QConcursos",
+    hist: { ano:"2002", banca:"Não localizada", salario:"Não localizado", concorrencia:"Não localizada nas fontes consultadas" },
+    note: "Municipal, na capital. O último concurso efetivo foi em 2002, então a expectativa é alta. Previsão orçamentária não é edital: ainda faltam autorização, comissão e banca."
+  },
+  {
+    org: "💧 Cedae: Companhia Estadual de Águas e Esgotos",
+    title: "Concurso Cedae",
+    badge: "EM ESTUDO", badgeType: "anunciado",
+    nivel: "Médio, Técnico e Superior",
+    cargos: "A definir. No último concurso (2012) havia cargos de nível fundamental, médio, médio técnico e superior",
+    salario: "A definir",
+    vagas: "A definir (estudo interno aponta necessidade de até 2 mil)",
+    banca: "A definir",
+    situacao: "A empresa finaliza o levantamento de pessoal e o termo de referência para contratar a banca. Depois o relatório segue para a presidência e para o governador, que precisa autorizar. A Cedae diz querer publicar o edital em 2026, só se o governo autorizar (matéria de 20/07/2026)",
+    inscricoes: "Ainda não abertas",
+    prova: "A definir",
+    taxa: "A definir",
+    editalUrl: "",
+    fonteUrl: "https://folha.qconcursos.com/n/concurso-cedae-2026-previsa-edital-este-ano",
+    fonteLabel: "Folha Dirigida / QConcursos",
+    hist: { ano:"2012", banca:"Fundação Ceperj", salario:"Não localizado", concorrencia:"Não localizada nas fontes consultadas" },
+    note: "Empresa estadual com sede no Rio. Sem autorização formal, o prazo pode escorregar para 2027."
+  },
+  {
+    org: "💼 Receita Federal do Brasil",
+    title: "Concurso Receita Federal",
+    badge: "AUTORIZADO", badgeType: "anunciado",
+    nivel: "Superior",
+    cargos: "Auditor Fiscal e Analista Tributário. A formação exigida e a lotação só saem no edital",
+    salario: "Entre R$ 12.735,99 e R$ 22.921,71 (valores citados em 2025 para as duas carreiras)",
+    vagas: "146 autorizadas (30 Auditor Fiscal e 116 Analista Tributário). O órgão tem cerca de 22,7 mil cargos vagos",
+    banca: "A definir. A contratação ainda é uma etapa pendente",
+    situacao: "Autorizado e em preparação, segundo matéria de 24/09/2026. Em 2025, um auditor do órgão disse buscar autorização em 2026 para publicar o edital em 2027",
+    inscricoes: "Ainda não abertas",
+    prova: "A definir",
+    taxa: "A definir",
+    editalUrl: "",
+    fonteUrl: "https://dol.com.br/concursos/federais/963630/concursos-2027-oportunidades-previstas-para-o-proximo-ano",
+    fonteLabel: "DOL",
+    hist: { ano:"Não localizado", banca:"Não localizada", salario:"Não localizado", concorrencia:"Não localizada nas fontes consultadas" },
+    note: "Concurso nacional. As fontes consultadas não informam lotação no Rio de Janeiro, então confirme no edital antes de contar com a capital."
+  }
+  ,{
+    org: "📑 JUCERJA: Junta Comercial do Estado do Rio de Janeiro",
+    title: "Concurso JUCERJA",
+    badge: "EM ESTUDO", badgeType: "anunciado",
+    nivel: "A definir (o último concurso teve médio e superior)",
+    cargos: "A definir",
+    salario: "A definir",
+    vagas: "A definir (o grupo de trabalho vai propor o número)",
+    banca: "A definir",
+    situacao: "Grupo de trabalho de cinco servidores formado em 29/07/2026 para os estudos técnicos. Ainda não autorizado: o grupo vai pedir autorização ao governo",
+    inscricoes: "Ainda não abertas",
+    prova: "A definir",
+    taxa: "A definir",
+    editalUrl: "",
+    fonteUrl: "https://folha.qconcursos.com/n/concurso-jucerja-2026-grupo-de-trabalho",
+    fonteLabel: "Folha Dirigida / QConcursos",
+    hist: { ano:"2008", banca:"Funrio", salario:"R$ 986,40 a R$ 1.600,00 (valores de 2008)", concorrencia:"Não localizada. Foram 103 vagas de níveis médio e superior" },
+    note: "Órgão estadual com sede no Rio. O último concurso foi há 18 anos, então vale acompanhar, mas ainda não há cargos nem vagas definidos."
+  }
+
 ];
 
 // Tags genéricas de área/estado/cidade em cada concurso, usadas pelo filtro de perfil.
@@ -2516,7 +2655,7 @@ const ESFERA_ITEM = {
   "concurso-seplag-rj-eppgg-e-apo":"estadual", "concurso-cremerj-2026":"federal", "concurso-cra-rj-2026":"federal", "concurso-dataprev-2026":"federal",
   "concurso-ses-rj-iaserj-2026":"estadual", "concurso-theatro-municipal-rj":"municipal", "concurso-agetransp-rj":"estadual", "concurso-inb-cadastro-de-reserva":"federal",
   "concurso-crf-rj-2026":"federal", "concurso-detran-rj":"estadual", "concurso-pge-rj-analista":"estadual", "concurso-assistencia-social-rj":"estadual",
-  "concurso-tce-rj-auditor-de-controle-externo":"estadual", "concurso-tcm-rj":"municipal", "concurso-pedro-ii-tecnico-administrativo":"federal", "concurso-inea-rj":"estadual"
+  "concurso-tce-rj-auditor-de-controle-externo":"estadual", "concurso-tcm-rj":"municipal", "concurso-pedro-ii-tecnico-administrativo":"federal", "concurso-inea-rj":"estadual", "concurso-previrio":"municipal", "concurso-cedae":"estadual", "concurso-receita-federal":"federal"
 };
 function itemFechado(it){ return it.badgeType === "encerrado"; }
 function itemServeFormacao(it, formacao){
@@ -2542,7 +2681,7 @@ function passesProfile(item){
   }
   if(profile.area && profile.area.trim() && item.area && item.area.toLowerCase() !== profile.area.trim().toLowerCase()) return false;
   if(profile.estados.length && item.estado && !profile.estados.includes(item.estado.toUpperCase())) return false;
-  if(profile.niveis.length && item.nivel){
+  if(profile.niveis.length && item.nivel && !/^a definir/i.test(item.nivel)){
     const ok = profile.niveis.some(n => item.nivel.includes(n));
     if(!ok) return false;
   }
@@ -3600,7 +3739,12 @@ function bancaDescriptor(bancaText){
   return found ? found.nota : null;
 }
 
-function factBanca(banca){
+function factBanca(banca, item){
+  const t = item ? bancaTagInfo(item) : null;
+  if(t && t.ultima){
+    const h = item.hist && item.hist.banca && !/^(n[ãa]o|dado)/i.test(item.hist.banca) ? item.hist.banca : "";
+    return `<div class="fact full"><span class="fact-label">Banca organizadora</span><span class="fact-val">${banca || "A definir"}</span>${h ? `<div class="banca-note">🏦 Última banca conhecida: ${h}${item.hist.ano ? " (" + item.hist.ano + ")" : ""}. A banca desta edição ainda não foi definida.</div>` : ""}</div>`;
+  }
   if(!banca) return "";
   const nota = bancaDescriptor(banca);
   return `<div class="fact full"><span class="fact-label">Banca organizadora</span><span class="fact-val">${banca}</span>${nota ? `<div class="banca-note">🏦 ${nota}</div>` : ""}</div>`;
@@ -3730,6 +3874,37 @@ function nivelChipLabel(nivel){
   return nivel.length > 16 ? nivel.slice(0,14).trim() + "…" : nivel;
 }
 
+// Tag da banca nos cards: nome da banca atual; se ainda não há banca, a última banca conhecida
+// (marcada como "Última"); se nem isso, "Banca a definir".
+function bancaCurta(txt){
+  let t = String(txt || "").split(":")[0].split("(")[0].split(".")[0].trim();
+  t = t.replace(/^Instituto\s+/i, m => t.length > 18 ? "" : m).replace(/\s+de\s+Gest.*$/i, "");
+  if(t.length > 18) t = t.split(/\s+/).slice(0,2).join(" ");
+  return t;
+}
+function bancaTagInfo(item){
+  const b = String(item.banca || "").trim();
+  const semBanca = !b || /^(a definir|historicamente|n[ãa]o)/i.test(b);
+  if(!semBanca){
+    const nome = bancaCurta(b);
+    return { label: nome + (/indicad/i.test(b) ? " (indicada)" : ""), ultima:false, nome };
+  }
+  const h = item.hist && item.hist.banca ? String(item.hist.banca) : "";
+  if(h && !/^(n[ãa]o|dado)/i.test(h)){
+    let nome = bancaCurta(h);
+    if(/^pr[óo]pria|^comiss[ãa]o/i.test(nome)) nome = "Comissão própria";
+    const ano = item.hist && /^\d{4}$/.test(String(item.hist.ano || "").trim()) ? " (" + String(item.hist.ano).trim() + ")" : "";
+    return { label: "Última: " + nome + ano, ultima:true, nome };
+  }
+  if(/historicamente.*comiss/i.test(b)) return { label: "Última: Comissão própria", ultima:true, nome:"Comissão própria" };
+  return { label: "Banca a definir", ultima:true, nome:"" };
+}
+function bancaChipHtml(item){
+  const t = bancaTagInfo(item);
+  const fav = !t.ultima && typeof bancaEhFavorita === "function" && bancaEhFavorita(item);
+  return `<span class="mini-chip banca${t.ultima ? " ultima" : ""}${fav ? " fav" : ""}" title="${t.ultima ? "Última banca conhecida" : "Banca organizadora"}">${fav ? "★ " : ""}${escHtml(t.label)}</span>`;
+}
+
 // Compact list row shown in the lists — tapping it (outside the star) opens the dedicated
 // detail screen. Curto por design: ícone + título + uma linha de status + tags de
 // identificação rápida (estágio + nível) + seta — dá pra reconhecer o concurso sem abrir.
@@ -3747,6 +3922,7 @@ function renderCardCompact(item, catClass, itemId){
         <div class="item-tags">
           <span class="badge mini ${item.badgeType}">${item.badge}</span>
           <span class="mini-chip nivel">${nivelChipLabel(item.nivel)}</span>
+          ${bancaChipHtml(item)}
         </div>
       </div>
       <div class="item-side">
@@ -3857,7 +4033,7 @@ function renderSubGeral(item){
       ${factFull("Situação", item.situacao)}
       ${fact("Vagas", item.vagas)}
       ${factFull("Cargos / áreas", item.cargos)}
-      ${factBanca(item.banca)}
+      ${factBanca(item.banca, item)}
     </div>
   `;
 }
@@ -6120,9 +6296,56 @@ function pfFiltrar(v){
   saveState("concursos-rj-perfil", profile);
   rebuildLists();
 }
+// ---------- Banca favorita (Perfil): perfil geral de cada banca. A "fama" vem de percepções amplas da
+// comunidade e do Censo dos Concursos 2025 (quando citado); não é regra, cada prova varia. ----------
+const BANCAS_FAMA = [
+  { id:"FGV", nome:"FGV", fama:"Muito difícil", tom:"hard", fato:"Apontada pelo Censo dos Concursos 2025 como a banca mais difícil do país, com 61,8% de aproveitamento médio. Também está entre as preferidas dos concurseiros.", estilo:"Múltipla escolha com enunciados longos e questões interpretativas.", pros:["Muito material e questões antigas para treinar","Padrão de prova conhecido, bom para quem gosta de método"], atencao:"O tamanho dos textos faz a gestão do tempo ser decisiva." },
+  { id:"Cebraspe", nome:"Cebraspe", fama:"Difícil", tom:"hard", fato:"Foi a banca preferida dos concurseiros em 2025, com 26,6% dos votos, mas é conhecida por punir o chute.", estilo:"Certo ou Errado: cada item errado anula um certo.", pros:["Cobra muito a letra da lei, o que premia quem estuda com constância","Banco enorme de questões para resolver"], atencao:"Chutar derruba a nota. Quando não souber, vale deixar em branco." },
+  { id:"Cesgranrio", nome:"Cesgranrio", fama:"Média a difícil", tom:"mid", fato:"Muito usada por bancos e estatais.", estilo:"Múltipla escolha com enunciados objetivos.", pros:["Questões diretas, sem textos exageradamente longos","Bom histórico de provas para treinar"], atencao:"Costuma exigir rapidez em cálculos e raciocínio." },
+  { id:"IBFC", nome:"IBFC", fama:"Fama de mais acessível", tom:"easy", fato:"Costuma ser vista pela comunidade como uma banca de provas mais diretas. Não achei número oficial de desempenho dela.", estilo:"Múltipla escolha de estilo direto.", pros:["Boa para ganhar confiança no começo","Questões objetivas e fáceis de revisar"], atencao:"Em prova mais acessível, a nota de corte tende a subir." },
+  { id:"Consulplan", nome:"Consulplan", fama:"Média", tom:"mid", fato:"Comum em concursos municipais e conselhos no RJ.", estilo:"Múltipla escolha tradicional.", pros:["Estilo tradicional, fácil de se adaptar","Atua em concursos do seu painel, como o Cremerj"], atencao:"O estilo pode mudar entre órgãos, então treine com provas do mesmo concurso." },
+  { id:"IADES", nome:"IADES", fama:"Média", tom:"mid", fato:"Muito presente em conselhos profissionais.", estilo:"Múltipla escolha, em alguns editais com discursiva.", pros:["Conhecida de quem acompanha conselhos de classe","Banca do CRA-RJ, que está no seu painel"], atencao:"Confira se o edital traz discursiva, como no CRA-RJ." },
+  { id:"IBDO", nome:"IBDO", fama:"Sem dado suficiente", tom:"none", fato:"Banca do concurso da SES RJ.", estilo:"Veja o edital de cada concurso.", pros:["Atua em concursos de saúde do RJ"], atencao:"As fontes consultadas trazem pouco material público de provas anteriores." },
+  { id:"Avalia", nome:"Instituto Avalia", fama:"Sem dado suficiente", tom:"none", fato:"Banca mais nova no mercado.", estilo:"Veja o edital de cada concurso.", pros:["Banca do Theatro Municipal RJ, do seu painel"], atencao:"Ainda tem pouco histórico de provas para treinar." },
+  { id:"Access", nome:"Instituto Access", fama:"Sem dado suficiente", tom:"none", fato:"Banca do concurso do IFRJ, que está no seu painel.", estilo:"Veja o edital de cada concurso.", pros:["Atua em concursos de institutos federais e prefeituras"], atencao:"Poucas informações públicas sobre dificuldade nas fontes consultadas." },
+  { id:"IBAM", nome:"IBAM", fama:"Sem dado suficiente", tom:"none", fato:"Especializada em prefeituras e câmaras municipais.", estilo:"Veja o edital de cada concurso.", pros:["Foco em concursos municipais"], atencao:"Poucas informações públicas sobre dificuldade nas fontes consultadas." }
+];
+function bancaMatchItem(item, b){ return String(item.banca || "").toLowerCase().includes(b.id.toLowerCase()); }
+function bancaEhFavorita(item){
+  const f = profile.bancaFav; if(!f) return false;
+  const b = BANCAS_FAMA.find(x => x.id === f);
+  return !!b && bancaMatchItem(item, b);
+}
+function escolherBancaFav(id){
+  profile.bancaFav = profile.bancaFav === id ? "" : id;
+  saveState("concursos-rj-perfil", profile);
+  renderBancaFav();
+  rebuildLists();
+}
+function renderBancaFav(){
+  const box = document.getElementById("pf-banca"); if(!box) return;
+  const todos = [].concat(abertos, emAndamento, banca, anunciados);
+  const fav = profile.bancaFav;
+  box.innerHTML = BANCAS_FAMA.map(b => {
+    const nos = todos.filter(it => bancaMatchItem(it, b)).map(it => it.title.replace(/^Concurso\s*/i, ""));
+    const sel = fav === b.id;
+    return `<details class="bf-card${sel ? " sel" : ""}">
+      <summary><span class="bf-name">${sel ? "★ " : ""}${escHtml(b.nome)}</span><span class="bf-chip ${b.tom}">${b.fama}</span><span class="bf-caret">›</span></summary>
+      <div class="bf-body">
+        <p class="bf-fato">${escHtml(b.fato)}</p>
+        <div class="bf-l"><b>Estilo</b><span>${escHtml(b.estilo)}</span></div>
+        <div class="bf-l"><b>Vantagens</b><span>${b.pros.map(escHtml).join(". ")}.</span></div>
+        <div class="bf-l"><b>Atenção</b><span>${escHtml(b.atencao)}</span></div>
+        <div class="bf-l"><b>No seu painel</b><span>${nos.length ? escHtml(nos.join(", ")) : "Nenhum concurso com essa banca agora"}</span></div>
+        <button class="btn ${sel ? "" : "primary"}" style="width:100%;margin-top:10px;" onmousedown="event.preventDefault()" onclick="escolherBancaFav('${b.id}')">${sel ? "Remover como favorita" : "Escolher como favorita"}</button>
+      </div>
+    </details>`;
+  }).join("") + `<p class="section-note" style="margin-top:10px;">Fama é percepção geral da comunidade e dados do Censo dos Concursos 2025 quando citados. Cada prova pode variar, então confira provas anteriores do seu concurso.</p>`;
+}
 function renderPerfilHub(){
   const head = document.getElementById("pf-head"), plano = document.getElementById("pf-plano");
   if(!head || !plano) return;
+  renderBancaFav();
   const form = wzFind(WZ_FORMACOES, profile.formacao);
   const nivs = (profile.niveis || []).filter(n => n !== "Técnico" || !(profile.niveis || []).includes("Médio")).join(" e ");
   const resumo = [form ? form.nome : "Formação não informada", nivs, (profile.estados || []).join(" ")].filter(Boolean).join(" · ");
@@ -6662,7 +6885,7 @@ function dayTimelineBlocks(dow){
 // mais confiáveis, e copia o pedido pronto pra colar no Claude, que confere e devolve
 // o painel atualizado. ----------
 const DATA_CHECKED = "13/10/2026";
-const DATA_CHECKED_HORA = "16:13";
+const DATA_CHECKED_HORA = "16:27";
 const UPDATE_SOURCES = [
   { name:"JC Concursos: abertos no RJ", url:"https://jcconcursos.com.br/concursos/inscricoes-abertas/rj" },
   { name:"PCI Concursos: Rio de Janeiro", url:"https://www.pciconcursos.com.br/concursos/rj/rio-de-janeiro" },
