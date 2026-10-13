@@ -2884,6 +2884,10 @@ window.__FED_ESFERA = {};
   ].forEach(r=>add("so",r[0],r[1],r[2],r[3],r[4],r[5],"A definir","Solicitado em 2026, ainda sem autorização confirmada",{area:"Segurança pública"}));
 })();
 
+[...abertos, ...emAndamento, ...banca, ...anunciados].forEach(it => {
+  if(/TCU:|TSE:|TCE RJ|TCM RJ|Receita Federal|CGU|BACEN|Dataprev|Petrobras/.test(it.title)) it.destaque = true;
+});
+
 // Tags genéricas de área/estado/cidade em cada concurso, usadas pelo filtro de perfil.
 // Hoje todo o conteúdo cadastrado é de Administração no Rio de Janeiro (capital); ao
 // pesquisar e cadastrar outras áreas/estados no futuro, é só dar valores diferentes
@@ -2922,7 +2926,7 @@ const ESFERA_ITEM = {
 Object.assign(ESFERA_ITEM, window.__FED_ESFERA||{});
 function itemFechado(it){ return it.badgeType === "encerrado"; }
 function itemServeFormacao(it, formacao){
-  if(!formacao) return true;
+  if(!formacao || it.destaque) return true;
   if(formacao === "medio") return /m[ée]dio|fundamental/i.test(it.nivel || "");
   const re = FIT_FORMACAO[formacao];
   return re ? re.test((it.cargos || "") + " " + (it.title || "")) : true;
@@ -6399,6 +6403,10 @@ function irEstudosHoje(){
   setTimeout(()=>{ setStudySeg("hoje"); window.scrollTo(0,0); }, 60);
 }
 function renderInicioHoje(g, ev){
+  try{ renderInicioHoje0(g, ev); }catch(e){ console.error(e); }
+  try{ const b = document.getElementById("inicio-hoje"); if(b && resultadoPronto()) b.insertAdjacentHTML("beforeend", semanaCardHtml(profile.planoNovo ? "SEU PLANO ESTÁ PRONTO" : "SUA SEMANA")); }catch(e){ console.error(e); }
+}
+function renderInicioHoje0(g, ev){
   const box = document.getElementById("inicio-hoje");
   if(!box) return;
   if(g === undefined) g = prepGeral();
@@ -6601,6 +6609,7 @@ function wizCarregar(){
   if(!profile.planoZerado) passos.push(["Zerando o plano anterior", () => { resetPlano(); profile.planoZerado = true; saveState("concursos-rj-perfil", profile); }]);
   if(c) passos.push(["Montando o seu perfil e procurando os concursos que combinam", () => { wizAplicar(); wiz.sel = []; wiz.verTodos = false; wizCiclo(true); wiz.step = 8; saveWiz(); }]);
   if(i) passos.push(["Montando a sua trilha de inglês", () => { ing.feito = true; ing.step = 6; saveIng(); ingCiclo(true); }]);
+  if(c) passos.push(["Escolhendo os concursos e montando o cronograma", () => { wizAutoSel(); }]);
   passos.push(["Ajustando as metas da semana", () => {
     const v = profile.vida;
     if(v){ const sp = vidaSplit(v); study.dailyHours = Math.round((sp.c * 60 + sp.i) / 6) / 10; study.diasSemana = v.dias; study.goalHours = Math.round((sp.c * 60 + sp.i) * v.dias / 6) / 10; saveState("concursos-rj-estudos", study); try{ renderStudyProgress(); renderWeekStrip(); }catch(e){} }
@@ -6616,7 +6625,7 @@ function wizCarregar(){
     } else {
       wizLoad = null; wizFase = c ? "concurso" : "ing";
       try{ renderRoteiroCard(); renderPerfilHub(); renderEstudoHoje(); }catch(e){}
-      wizRender(true);
+      wizPronto();
     }
   };
   setTimeout(rodar, 600);
@@ -7525,14 +7534,32 @@ function wizConcursos(todos){
   const ars = wiz.areas.map(id => wzFind(WZ_AREAS, id)).filter(Boolean);
   const nvs = wiz.niveis.map(id => wzFind(WZ_NIVEIS, id)).filter(Boolean);
   if(!ars.length || !nvs.length) return [];
-  return Object.keys(wizTodos()).filter(id => {
-    const it = wizTodos()[id];
+  const temRJ = wiz.locais.some(l => l !== "outro");
+  const ordem = it => it.destaque ? 0 : (it.badgeType === "aberto" ? 1 : (it.badgeType === "banca" ? 2 : 3));
+  const T = wizTodos();
+  return Object.keys(T).filter(id => {
+    const it = T[id];
     if(itemFechado(it)) return false;
+    const uf = (it.estado || "RJ").toUpperCase();
+    if(uf !== "NACIONAL" && !(uf === "RJ" ? temRJ : wiz.ufs.includes(uf))) return false;
     if(!nvs.some(n => n.re.test(it.nivel || ""))) return false;
     if(!ars.some(a => !a.kw || a.kw.test((it.title || "") + " " + (it.cargos || "")))) return false;
     if(todos) return true;
     return itemServeFormacao(it, wiz.formacao) && itemServeEsfera(id, wiz.esferas);
-  }).slice(0, 40);
+  }).map((id, k) => ({ id, o: ordem(T[id]) * 1000 + k })).sort((a, b) => a.o - b.o).map(x => x.id).slice(0, 80);
+}
+function wizAutoSel(){
+  const T = wizTodos();
+  wiz.sel = wizConcursos().filter(id => prepDisponivel(T[id])).slice(0, 6);
+  saveWiz();
+  wiz.sel.forEach(id => { if(!favIds.includes(id)) favIds.push(id); });
+  saveFavorites(); rebuildLists();
+}
+function wizPronto(){
+  profile.planoNovo = true; saveState("concursos-rj-perfil", profile);
+  closeSubScreen();
+  document.querySelector('.tab-btn[data-tab="inicio"]').click();
+  setTimeout(() => { try{ renderInicioHoje(); }catch(e){} window.scrollTo(0, 0); }, 80);
 }
 function proxPassoHtml(t){
   const pr = roteiroProgresso(t), p = pr.prox;
@@ -7570,11 +7597,62 @@ function resultadoPronto(){
   if(i && !(ing.feito && ing.step === 6)) return false;
   return true;
 }
+// Semana integrada: o tempo do dia (rotina) é um só. Inglês entra curto e todo dia, a aula de conversação conta como
+// prática de fala, e o concurso ocupa o resto do tempo. Dia de aula = concurso mais leve. Matéria nova primeiro,
+// questões no fim do bloco, inglês depois. Último dia = revisão dos dois.
 function semanaUnificada(){
-  const dias = {}; DIAS_SEM.forEach(d => dias[d] = []);
-  if(objTem("concurso")){ const c = wizPlano(); c.semanas[0].forEach(sm => sm.itens.forEach(it => dias[sm.d].push({ cls: it.n.startsWith("Revisão") ? "rev" : (WZ_BASE.includes(it.n) ? "base" : "area"), n: it.n, min: it.min }))); }
-  if(objTem("ingles")){ const p = ingPlano(); p.semana.forEach(sm => sm.itens.forEach(it => dias[sm.d].push({ cls: it.h === "aula" ? "aula" : "ing", n: "Inglês: " + ingItemNome(it), min: it.min }))); }
-  return DIAS_SEM.filter(d => dias[d].length).map(d => ({ d, itens: dias[d], total: dias[d].reduce((a,x) => a + x.min, 0) }));
+  const c = objTem("concurso"), i = objTem("ingles");
+  const orc = profile.vida ? Math.round(profile.vida.horas * 60) : 0;
+  const pc = c ? wizPlano() : null, pi = i ? ingPlano() : null;
+  const r5 = x => Math.max(5, Math.round(x / 5) * 5);
+  return DIAS_SEM.map(d => {
+    const itens = []; let nota = "";
+    const ic = c ? pc.semanas[0].find(x => x.d === d) : null;
+    const ii = i ? pi.semana.find(x => x.d === d) : null;
+    let ingItens = ii ? ii.itens.map(it => ({ cls: it.h === "aula" ? "aula" : "ing", n: "Inglês: " + ingItemNome(it), min: it.min })) : [];
+    const aula = ingItens.some(x => x.cls === "aula");
+    if(aula) ingItens = ingItens.filter(x => x.cls === "aula");
+    const iMin = ingItens.reduce((a, x) => a + x.min, 0);
+    if(ic){
+      const base = ic.itens.reduce((a, x) => a + x.min, 0);
+      let cMin = (orc && i) ? Math.max(30, orc - iMin) : base;
+      cMin = r5(cMin);
+      const rev = ic.itens.some(x => x.n.startsWith("Revisão"));
+      if(rev){
+        itens.push({ cls:"rev", n:"Revisão da semana e questões", min:cMin });
+        nota = "Dia de revisão: refaça o que errou na semana.";
+      } else {
+        const mats = ic.itens.map(x => x.n).filter((n, k, a) => a.indexOf(n) === k).slice(0, 2);
+        const q = cMin >= 60 ? r5(cMin * 0.25) : 0;
+        let resto = cMin - q;
+        mats.forEach((n, k) => { const m = k === mats.length - 1 ? resto : r5(resto / mats.length); resto -= m; itens.push({ cls: WZ_BASE.includes(n) ? "base" : "area", n, min:m }); });
+        if(q) itens.push({ cls:"rev", n:"Questões do dia", min:q });
+        if(aula) nota = "Dia de aula: a aula já é o seu inglês do dia.";
+      }
+    }
+    ingItens.sort((a, b) => (a.cls === "aula" ? 1 : 0) - (b.cls === "aula" ? 1 : 0)).forEach(x => itens.push(x));
+    return { d, itens, nota, total: itens.reduce((a, x) => a + x.min, 0) };
+  }).filter(x => x.itens.length);
+}
+function faseProva(){
+  const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+  let melhor = null;
+  favIds.forEach(id => {
+    const e = allItemsById[id]; const it = e && e.item; if(!it || !it.provaData) return;
+    const dt = new Date(it.provaData + "T00:00:00"); const dias = Math.round((dt - hoje) / 86400000);
+    if(dias >= 0 && (!melhor || dias < melhor.dias)) melhor = { dias, nome: it.title.replace(/^Concurso\s*/i, "") };
+  });
+  if(!melhor) return { t:"Fase de base", d:"Sem prova marcada nos seus concursos. Foque em Português, Raciocínio e nas matérias do edital passado, com questões todo dia." };
+  const f = melhor.dias > 60 ? "Fase 1: matéria nova e base" : (melhor.dias > 30 ? "Fase 2: questões e pontos fracos" : "Fase 3: revisão e simulados");
+  return { t: f, d: "Faltam " + melhor.dias + " dias para " + melhor.nome + ". " + (melhor.dias > 60 ? "Cubra todas as matérias antes de aprofundar." : (melhor.dias > 30 ? "Faça mais questões e volte no que errou." : "Revise e treine com tempo de prova.")) };
+}
+function semanaCardHtml(titulo){
+  const sem = semanaUnificada(); if(!sem.length) return "";
+  const hojeNome = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"][new Date().getDay()];
+  const fase = objTem("concurso") ? faseProva() : null;
+  return `<div class="hj-card"><div class="hj-tag">${titulo}</div>${fase ? `<div class="hj-title">${escHtml(fase.t)}</div><div class="hj-sub">${escHtml(fase.d)}</div>` : ""}
+    <div class="wz-week" style="margin-top:10px">${sem.map(sm => `<div class="wz-day" ${sm.d === hojeNome ? 'style="border-color:var(--blue-deep)"' : ""}><b>${sm.d}</b><div>${sm.itens.map(it => `<span class="${it.cls}">${escHtml(it.n)} <i>${wzHm(it.min)}</i></span>`).join("")}${sm.nota ? `<small style="flex-basis:100%;opacity:.75">${escHtml(sm.nota)}</small>` : ""}</div></div>`).join("")}</div>
+    <div class="hj-actions"><button class="btn" onmousedown="event.preventDefault()" onclick="abrirWizard()">Ver plano completo</button></div></div>`;
 }
 function proximosPassosHtml(){
   const ts = ["concurso","ingles"].filter(t => objTem(t));
@@ -7607,7 +7685,7 @@ function resultRender(box){
     linhas.push(`<span><b>Inglês</b> ${n ? n.nome + " " + n.cefr : ""} · falar incluído · ${ing.minutos} min por dia${ing.recursos.includes("aula") && ing.aulaDias.length ? " e " + ing.aulaDias.length + " aula" + (ing.aulaDias.length > 1 ? "s" : "") : ""}</span>`);
   }
   const sem = semanaUnificada();
-  const semHtml = `<div class="wz-week">${sem.map(sm => `<div class="wz-day"><b>${sm.d}</b><div>${sm.itens.map(it => `<span class="${it.cls}">${escHtml(it.n)} <i>${wzHm(it.min)}</i></span>`).join("")}</div></div>`).join("")}</div>`;
+  const semHtml = `<div class="wz-week">${sem.map(sm => `<div class="wz-day"><b>${sm.d}</b><div>${sm.itens.map(it => `<span class="${it.cls}">${escHtml(it.n)} <i>${wzHm(it.min)}</i></span>`).join("")}${sm.nota ? `<small style="flex-basis:100%;opacity:.75">${escHtml(sm.nota)}</small>` : ""}</div></div>`).join("")}</div>`;
   const totalMin = sem.reduce((a,d) => a + d.total, 0);
   // concursos
   let blocoC = "", detC = "";
@@ -7617,7 +7695,7 @@ function resultRender(box){
     const temRJ = wiz.locais.some(l => l !== "outro");
     const mostra = wiz.mais ? cs : cs.slice(0, 5);
     const pick = id => { const it = T[id], on = wiz.sel.includes(id), ok = prepDisponivel(it); return `<button class="wz-pick ${on?"on":""}" onmousedown="event.preventDefault()" onclick="wizSelToggle('${id}')"><span class="ck">${on?"✓":""}</span><span><b>${escHtml(it.title.replace(/^Concurso\s*/i, ""))}</b><small>${escHtml((it.badge || "") + (it.nivel ? " · " + it.nivel : ""))}${ok ? "" : " · sem dados para cronograma"}</small></span></button>`; };
-    blocoC = temRJ ? (cs.length ? `<div class="wz-h3">Concursos para você</div><p class="wz-sub" style="margin:0 0 8px">${cs.length} combinam com você. Marque os que quer estudar. <a href="#" style="color:var(--blue-deep);font-weight:800" onmousedown="event.preventDefault()" onclick="wizSelTodos();return false">Marcar todos</a></p>
+    blocoC = (cs.length || temRJ) ? (cs.length ? `<div class="wz-h3">Concursos para você</div><p class="wz-sub" style="margin:0 0 8px">${cs.length} combinam com você. Marque os que quer estudar. <a href="#" style="color:var(--blue-deep);font-weight:800" onmousedown="event.preventDefault()" onclick="wizSelTodos();return false">Marcar todos</a></p>
         <div class="wz-picks">${mostra.map(pick).join("")}</div>
         ${cs.length > 5 ? `<button class="wz-skip" onmousedown="event.preventDefault()" onclick="wiz.mais=!wiz.mais;saveWiz();wizRender()">${wiz.mais ? "Mostrar menos" : "Ver os outros " + (cs.length - 5)}</button>` : ""}
         ${(extra > 0 || wiz.verTodos) ? `<button class="wz-skip" onmousedown="event.preventDefault()" onclick="wiz.verTodos=!wiz.verTodos;saveWiz();wizRender()">${wiz.verTodos ? "Mostrar só os que combinam" : "Ver também " + extra + " com cargos a definir"}</button>` : ""}
@@ -7646,6 +7724,7 @@ function resultRender(box){
     ${blocoC}
     ${wizCtaOutro()}${wizCtaOutroIng()}
     <div class="wz-h3">Ver detalhes</div>
+    ${wzDet("Por que a semana é assim", `<ul class="wz-why-l"><li>O tempo do dia é um só: o inglês entra curto e todo dia, e o concurso ocupa o resto.</li><li>Dia de aula de conversação: a aula já é o inglês do dia, sem estudo extra.</li><li>Matéria nova primeiro, quando você está descansada. Questões no fim do bloco, para fixar.</li><li>O último dia é de revisão dos dois, com o que você errou na semana.</li></ul>`)}
     ${wzDet("Sua trilha completa", trilhas)}
     ${detC}${detI}
     <div class="wz-cta wrap">${ajustar}<button class="wz-back" onmousedown="event.preventDefault()" onclick="wizRefazerTudo()">↺ Refazer</button></div></div>`;
