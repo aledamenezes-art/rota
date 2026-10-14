@@ -1763,6 +1763,12 @@
   .cu-row span{font-size:13px;line-height:1.35}.cu-row small{display:block;color:var(--ink-soft);font-size:12px;margin-top:2px}
   .fit-resumo{display:flex;flex-wrap:wrap;align-items:center;gap:2px 10px;margin:0 0 12px;padding:11px 14px;border-radius:14px;background:#F3E4EC;color:#702A55;font-size:12.5px}
   .fit-resumo b{flex:1 1 100%;font-size:14px}.fit-resumo span{flex:1;color:#4a3340}.fit-resumo button{background:none;border:0;font-weight:700;color:#702A55;padding:6px 0}
+
+  .cta-duo{display:flex;gap:10px;max-width:520px;margin:0 auto}
+  .detail-sticky-cta .cta-duo .insc-toggle{flex:1;min-width:0;width:auto;font-size:13.5px;padding:12px 10px;gap:7px;margin:0}
+  .detail-sticky-cta .cta-duo .pesq-cta{background:#fff;color:#702A55;border:1.5px solid #D9B4C8;box-shadow:none}
+  .iso-box{margin-top:8px;padding:10px 12px;border-radius:12px;background:#F3E4EC;color:#4a3340;font-size:12.5px}
+  .iso-box button{margin:8px 8px 0 0;padding:8px 12px;border-radius:10px;border:1.5px solid #702A55;background:#fff;color:#702A55;font-weight:700;font-size:12.5px}
 </style>
 </head>
 <body data-tab="inicio">
@@ -2211,6 +2217,17 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="isencao-modal">
+  <div class="modal-card">
+    <div class="modal-emoji">🩸</div>
+    <div class="modal-title">Você pediu isenção da taxa?</div>
+    <p class="modal-sub">Por doação de sangue ou medula, CadÚnico ou outra regra. Se pediu, eu te aviso para acompanhar o resultado.</p>
+    <div class="modal-actions">
+      <button class="btn ghost" id="isencao-no">Não pedi</button>
+      <button class="btn primary" id="isencao-yes">Pedi isenção</button>
+    </div>
+  </div>
+</div>
 <div class="modal-overlay" id="boleto-modal">
   <div class="modal-card">
     <div class="modal-emoji">🧾</div>
@@ -4465,7 +4482,8 @@ function renderInscCta(item, itemId, catClass){
   const podeInscrever = catClass === "cat-aberto";
   const jaInscrito = inscritoIds.includes(itemId);
   if(poucaInfo(item) && !jaInscrito && catClass !== "cat-encerrado"){
-    return `<button class="insc-toggle pesq-cta" onclick="pesquisarConcurso('${itemId}')"><span class="insc-check"><svg class="insc-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 16l4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span class="insc-text">Pesquisar sobre este concurso</span></button>`;
+    const insc = podeInscrever ? `<button class="insc-toggle" data-insc-id="${itemId}" onclick="toggleInscrito('${itemId}')"><span class="insc-check"></span><span class="insc-text">Marcar que já me inscrevi</span></button>` : "";
+    return `<div class="cta-duo"><button class="insc-toggle pesq-cta" onclick="pesquisarConcurso('${itemId}')"><span class="insc-check"><svg class="insc-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 16l4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span class="insc-text">Pesquisar</span></button>${insc}</div>`;
   }
   if(!podeInscrever && !jaInscrito) return "";
   return `<button class="insc-toggle" data-insc-id="${itemId}" onclick="toggleInscrito('${itemId}')"><span class="insc-check"><svg class="insc-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/></svg></span><span class="insc-text">Marcar que já me inscrevi</span><span class="insc-undo">Desfazer</span></button>`;
@@ -4795,6 +4813,12 @@ function computeAlerts(){
     const entry = allItemsById[id];
     if(!entry) return;
     const shortTitle = entry.item.title.replace(/^Concurso\s*/i, "");
+    if(isencaoStatus[id] === "pedida"){
+      alerts.push({ itemId: id, tone: "sand",
+        title: `${shortTitle}: aguardando resultado da isenção`,
+        sub: "Confira no site da banca e marque aqui se foi deferida ou indeferida" });
+      return;
+    }
     alerts.push({ itemId: id, tone: "rose",
       title: `${shortTitle}: boleto pendente`,
       sub: "Marque como pago assim que quitar a taxa de inscrição" });
@@ -5014,6 +5038,8 @@ document.addEventListener("mousedown", (e)=>{
 let favIds = [];
 let olhoIds = [];
 let inscritoIds = [];
+let isencaoStatus = {}; // { [itemId]: 'pedida'|'deferida'|'indeferida' }
+let pendingIsencaoId = null;
 let boletoStatus = {}; // { [itemId]: true|false } — true = boleto pago, false = ainda não
 let seenItemIds = []; // ids de concursos que ela já abriu (usado pra sinalizar novidades)
 let seenSeeded = false; // evita marcar todo o catálogo atual como "novidade" na primeira renderização
@@ -5049,6 +5075,7 @@ async function loadFavorites(){
   favIds = Array.isArray(favIds) ? favIds : [];
   if(olhoIds.length){ favIds = [...new Set(favIds.concat(olhoIds))]; olhoIds = []; saveFavorites(); saveOlhoIds(); }
   await loadState('concursos-rj-inscritos', (v)=>inscritoIds=v);
+  await loadState('concursos-rj-isencao', (v)=>{ isencaoStatus = (v && typeof v === "object" && !Array.isArray(v)) ? v : {}; });
   await loadState('concursos-rj-boleto', (v)=>{ boletoStatus = (v && typeof v === "object" && !Array.isArray(v)) ? v : {}; });
   await loadState('concursos-rj-vistos', (v)=>seenItemIds=v);
   await loadState('concursos-rj-tema', (v)=>{ darkMode = v === true; });
@@ -5067,6 +5094,7 @@ async function loadFavorites(){
 function saveFavorites(){ saveState('concursos-rj-favoritos', favIds); }
 function saveOlhoIds(){ saveState('concursos-rj-olho-ids', olhoIds); }
 function saveInscritos(){ saveState('concursos-rj-inscritos', inscritoIds); }
+function saveIsencao(){ saveState('concursos-rj-isencao', isencaoStatus); }
 function saveBoletoStatus(){ saveState('concursos-rj-boleto', boletoStatus); }
 function saveSeenItems(){ saveState('concursos-rj-vistos', seenItemIds); }
 function saveDocChecklist(){ saveState('concursos-rj-doc-checklist', docChecklist); }
@@ -5155,7 +5183,7 @@ function refreshInscritoUI(){
     btn.classList.toggle("is-insc", isInsc);
     btn.setAttribute("aria-pressed", isInsc ? "true" : "false");
     btn.querySelector(".insc-check").innerHTML = isInsc ? INSC_ICO_ON : INSC_ICO_OFF;
-    btn.querySelector(".insc-text").textContent = isInsc ? "Inscrição marcada" : "Marcar que já me inscrevi";
+    btn.querySelector(".insc-text").textContent = isInsc ? "Inscrição marcada" : (btn.closest(".cta-duo") ? "Já me inscrevi" : "Marcar que já me inscrevi");
   });
   renderResumo();
   renderInicioInscritos();
@@ -5186,11 +5214,11 @@ function toggleInscrito(id){
     saveInscritos();
     refreshInscritoUI();
     renderNovidades();
-    pendingBoletoId = id;
-    document.getElementById("boleto-modal").classList.add("active");
+    pendingBoletoId = id; pendingIsencaoId = id;
+    document.getElementById("isencao-modal").classList.add("active");
   } else {
     inscritoIds.splice(idx,1);
-    delete boletoStatus[id];
+    delete boletoStatus[id]; delete isencaoStatus[id]; saveIsencao();
     saveBoletoStatus();
     saveInscritos();
     refreshInscritoUI();
@@ -5198,6 +5226,28 @@ function toggleInscrito(id){
   }
 }
 
+function closeIsencaoModal(){ document.getElementById("isencao-modal").classList.remove("active"); pendingIsencaoId = null; }
+["isencao-yes","isencao-no"].forEach(k=>{
+  const el = document.getElementById(k);
+  el.addEventListener("mousedown", e=>e.preventDefault());
+  el.addEventListener("click", ()=>{
+    const id = pendingIsencaoId; closeIsencaoModal();
+    if(k === "isencao-yes" && id){
+      isencaoStatus[id] = "pedida"; saveIsencao();
+      pendingBoletoId = null;
+      renderInicioInscritos(); renderAlertBox();
+      if(typeof toast === "function") toast("Vou te lembrar de conferir o resultado da isenção");
+    } else if(id){
+      pendingBoletoId = id;
+      document.getElementById("boleto-modal").classList.add("active");
+    }
+  });
+});
+function isencaoResultado(id, r){
+  isencaoStatus[id] = r; saveIsencao();
+  boletoStatus[id] = (r === "deferida") ? true : false; saveBoletoStatus();
+  renderInicioInscritos(); renderResumo(); renderAlertBox();
+}
 function closeBoletoModal(){
   document.getElementById("boleto-modal").classList.remove("active");
   pendingBoletoId = null;
@@ -5356,12 +5406,18 @@ function renderInicioInscritos(){
     const item = entry.item;
     const icon = (item.org.match(/^\S+/) || ["📄"])[0];
     const paid = boletoStatus[id];
-    const tagsHtml = paid === true
+    const iso = isencaoStatus[id];
+    const tagsHtml = iso === "pedida"
+      ? `<div class="item-tags"><span class="mini-chip warn">Isenção em análise</span></div>
+         <div class="iso-box">Já saiu o resultado do pedido de isenção?<br><button onmousedown="event.preventDefault();event.stopPropagation();" onclick="event.stopPropagation();isencaoResultado('${id}','deferida')">Deferida</button><button onmousedown="event.preventDefault();event.stopPropagation();" onclick="event.stopPropagation();isencaoResultado('${id}','indeferida')">Indeferida, pagar boleto</button></div>`
+      : iso === "deferida"
+      ? `<div class="item-tags"><span class="mini-chip ok">Inscrita, isenção deferida</span></div>`
+      : paid === true
       ? `<div class="item-tags"><span class="mini-chip ok">Inscrita</span></div>`
-      : `<div class="item-tags"><span class="mini-chip warn">⚠ Boleto pendente</span></div>
+      : `<div class="item-tags"><span class="mini-chip warn">${iso === "indeferida" ? "Isenção indeferida: pague o boleto" : "⚠ Boleto pendente"}</span></div>
          <button class="boleto-mark-btn" onmousedown="event.preventDefault(); event.stopPropagation();" onclick="event.stopPropagation(); markBoletoPaid('${id}')">Marcar boleto como pago</button>`;
     return `
-    <div class="list-item ${paid === true ? "" : "is-pending"}" onmousedown="event.preventDefault()" onclick="openDetail('${id}')">
+    <div class="list-item ${(paid === true || iso === "deferida" || iso === "pedida") ? "" : "is-pending"}" onmousedown="event.preventDefault()" onclick="openDetail('${id}')">
       <span class="item-icon ${entry.catClass}">${icon}</span>
       <div class="item-main">
         <div class="item-title">${item.title}</div>
@@ -8828,7 +8884,7 @@ function exportData(){
     version: 1,
     exportedAt: new Date().toISOString(),
     profile, study, routine,
-    favIds, watchlist, inscritoIds, boletoStatus, seenItemIds,
+    favIds, watchlist, inscritoIds, boletoStatus, isencaoStatus, seenItemIds,
     darkMode, docChecklist, examChecklist, prep, wiz, roteiro, ing
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
@@ -8954,6 +9010,7 @@ document.getElementById("import-data-file").addEventListener("change", (e)=>{
       if(Array.isArray(data.watchlist)) { watchlist = data.watchlist; saveState("concursos-rj-olho", watchlist); }
       if(Array.isArray(data.inscritoIds)) inscritoIds = data.inscritoIds;
       if(data.boletoStatus && typeof data.boletoStatus === "object") boletoStatus = data.boletoStatus;
+      if(data.isencaoStatus && typeof data.isencaoStatus === "object") isencaoStatus = data.isencaoStatus;
       if(Array.isArray(data.seenItemIds)) seenItemIds = data.seenItemIds;
       if(typeof data.darkMode === "boolean") darkMode = data.darkMode;
       if(data.docChecklist && typeof data.docChecklist === "object") docChecklist = data.docChecklist;
