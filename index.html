@@ -1769,6 +1769,9 @@
   .detail-sticky-cta .cta-duo .pesq-cta{background:#fff;color:#702A55;border:1.5px solid #D9B4C8;box-shadow:none}
   .iso-box{margin-top:8px;padding:10px 12px;border-radius:12px;background:#F3E4EC;color:#4a3340;font-size:12.5px}
   .iso-box button{margin:8px 8px 0 0;padding:8px 12px;border-radius:10px;border:1.5px solid #702A55;background:#fff;color:#702A55;font-weight:700;font-size:12.5px}
+
+  .mini-chip.sal,.chip.sal{background:#EAF3EE;color:#1F6B52}
+  .mini-chip.iso,.chip.iso{background:#F3E4EC;color:#702A55}
 </style>
 </head>
 <body data-tab="inicio">
@@ -3106,7 +3109,7 @@ window.__FED_ESFERA = {};
 // concursos que aparecem nas listas. Hoje só há dados de Administração no RJ (capital),
 // então com o perfil padrão nada muda; o filtro entra em ação de verdade quando outras
 // áreas/estados forem cadastrados no futuro. ----------
-let profile = { area: "Administração", estados: ["RJ"], niveis: ["Médio","Técnico","Superior"], salarioMin: 0, formacao: "adm", esferas: [], filtrar: true };
+let profile = { area: "Administração", estados: ["RJ"], niveis: ["Médio","Técnico","Superior"], salarioMin: 0, formacao: "adm", esferas: [], filtrar: true, isencao: ["medula","sangue"] };
 
 // ---------- Filtro "combina comigo": só concursos abertos, previstos ou em análise (nunca os encerrados) e que
 // servem para a formação e para as respostas do passo a passo. Regras simples sobre o texto dos cargos:
@@ -4236,7 +4239,8 @@ function renderPrazoFinal(item){
       </div>
     </div>`;
   }
-  return `<div class="prazos-grid">${boxGeral}${boxIsen}${boxBoleto}${boxProva}</div>`;
+  const notaDoa = (boxIsen && minhaIsencao().length) ? `<div class="iso-box" style="grid-column:1/-1">Você marcou: ${isencaoTexto()}. Confira no edital se vale como isenção e quais comprovantes pedem.</div>` : "";
+  return `<div class="prazos-grid">${boxGeral}${boxIsen}${notaDoa}${boxBoleto}${boxProva}</div>`;
 }
 
 function classifyConcorrencia(text){
@@ -4429,6 +4433,37 @@ function bancaTagInfo(item){
   if(/historicamente.*comiss/i.test(b)) return { label: "Última: Comissão própria", ultima:true, nome:"Comissão própria" };
   return { label: "Banca a definir", ultima:true, nome:"" };
 }
+
+// ---------- Tags de salário e de isenção ----------
+const WZ_ISENCAO = [
+  { id:"medula", ico:"🧬", nome:"Doadora de medula óssea", desc:"Cadastro no Redome. Vale em vários concursos, confira o edital" },
+  { id:"sangue", ico:"🩸", nome:"Doadora de sangue", desc:"Costuma pedir comprovante de doações recentes" },
+  { id:"cadunico", ico:"🧾", nome:"CadÚnico", desc:"Família de baixa renda inscrita no CadÚnico" }
+];
+function minhaIsencao(){ return Array.isArray(profile.isencao) ? profile.isencao : ["medula","sangue"]; }
+function isencaoTexto(){
+  const n = minhaIsencao().map(id => (WZ_ISENCAO.find(x => x.id === id) || {}).nome).filter(Boolean).map(x => x.toLowerCase());
+  return n.join(" e ");
+}
+function salarioChipLabel(item){
+  const t = String(item.salario || "");
+  const nums = (t.match(/R\$\s*([\d.]+(?:,\d{2})?)/g) || []).map(x => parseFloat(x.replace(/[^\d,]/g,"").replace(/\./g,"").replace(",","."))).filter(n => !isNaN(n) && n >= 500);
+  if(!nums.length) return "";
+  const mil = n => "R$ " + (n/1000).toFixed(1).replace(".",",").replace(",0","") + " mil";
+  if(/\+/.test(t)) return mil(nums[0]) + "+";
+  const mx0 = Math.max.apply(null, nums), ns = nums.filter(n => n >= mx0 * 0.1);
+  const mn = Math.min.apply(null, ns), mx = mx0;
+  return mn === mx ? mil(mx) : mil(mn) + " a " + mil(mx);
+}
+function salarioChipHtml(item, cls){
+  const l = salarioChipLabel(item);
+  return l ? `<span class="${cls || "mini-chip"} sal" title="Salário inicial">💰 ${l}</span>` : "";
+}
+function isencaoChipHtml(item, cls){
+  if(!minhaIsencao().length || !item.isencaoFim) return "";
+  if(new Date(item.isencaoFim + "T23:59:59") < new Date()) return "";
+  return `<span class="${cls || "mini-chip"} iso" title="Você marcou que tem direito a pedir isenção">🎟️ Pode ter isenção</span>`;
+}
 function bancaChipHtml(item){
   const t = bancaTagInfo(item);
   const fav = !t.ultima && typeof bancaEhFavorita === "function" && bancaEhFavorita(item);
@@ -4453,6 +4488,8 @@ function renderCardCompact(item, catClass, itemId){
           <span class="badge mini ${item.badgeType}">${item.badge}</span>
           <span class="mini-chip nivel">${nivelChipLabel(item.nivel)}</span>
           ${bancaChipHtml(item)}
+          ${salarioChipHtml(item)}
+          ${isencaoChipHtml(item)}
         </div>
       </div>
       <div class="item-side">
@@ -4544,6 +4581,8 @@ function renderDetailContent(item, itemId, catClass){
       <div class="chip-row">
         <span class="chip nivel">${item.nivel}</span>
         <span class="chip vagas">${vagasShort}</span>
+        ${salarioChipHtml(item,"chip")}
+        ${isencaoChipHtml(item,"chip")}
         ${concChip}
       </div>
       ${renderCountdown(item)}
@@ -5215,6 +5254,8 @@ function toggleInscrito(id){
     refreshInscritoUI();
     renderNovidades();
     pendingBoletoId = id; pendingIsencaoId = id;
+    const sub = document.querySelector("#isencao-modal .modal-sub");
+    if(sub) sub.textContent = minhaIsencao().length ? "Você marcou: " + isencaoTexto() + ". Se pediu, eu te aviso para acompanhar o resultado." : "Por doação de sangue ou medula, CadÚnico ou outra regra. Se pediu, eu te aviso para acompanhar o resultado.";
     document.getElementById("isencao-modal").classList.add("active");
   } else {
     inscritoIds.splice(idx,1);
@@ -7708,7 +7749,7 @@ const WZ_PASSOS = [
   "Revise em 24 horas, 7 dias e 30 dias, e faça um simulado por semana."
 ];
 const WZ_PASSOS_NOMES = ["Formação","Área","Nível","Esfera","Local","Cargo","Rotina","Plano"];
-function wizVazio(done){ return { v:2, step:1, formacao:"", areas:[], niveis:[], esferas:[], locais:[], ufs:[], cargos:[], horas:2, dias:5, prazo:"12", inicio:"zero", sel:[], verTodos:false, done:done || {} }; }
+function wizVazio(done){ return { v:2, step:1, formacao:"", areas:[], niveis:[], esferas:[], isencao:["medula","sangue"], locais:[], ufs:[], cargos:[], horas:2, dias:5, prazo:"12", inicio:"zero", sel:[], verTodos:false, done:done || {} }; }
 let wiz = wizVazio();
 function saveWiz(){ saveState("concursos-rj-wizard", wiz); }
 const wzFind = (arr, id) => arr.find(x => x.id === id);
@@ -7721,6 +7762,7 @@ function wzFit(area){
   return { cls: area.foraCls || "meio", txt: area.fora };
 }
 function wizToggle(k, v){
+  if(!Array.isArray(wiz[k])) wiz[k] = [];
   const a = wiz[k], i = a.indexOf(v);
   if(i >= 0) a.splice(i, 1); else a.push(v);
   if(k === "areas" || k === "niveis") wiz.cargos = [];
@@ -7835,7 +7877,7 @@ function wizAplicar(){
   if(!roteiro.horas){ roteiro.horas = wiz.horas; saveRoteiro(); }
   // Os concursos cadastrados hoje têm área "Administração": só filtro por área quando for só essa.
   profile.area = (wiz.areas.length === 1 && wiz.areas[0] === "adm") ? "Administração" : "";
-  profile.formacao = wiz.formacao || ""; profile.esferas = wiz.esferas.slice(); profile.filtrar = true;
+  profile.formacao = wiz.formacao || ""; profile.esferas = wiz.esferas.slice(); profile.filtrar = true; profile.isencao = (wiz.isencao || []).slice();
   const nv = [];
   if(wiz.niveis.includes("medio")) nv.push("Médio","Técnico");
   if(wiz.niveis.includes("superior")) nv.push("Superior");
@@ -8102,7 +8144,9 @@ function wizRender(rolar){
   } else if(step === 4){
     corpo = `<div class="wz-h">Para quem quer trabalhar?</div><p class="wz-sub">Esfera é o nível de governo do concurso. Marque uma ou mais.</p>
       ${why("Não sei qual escolher", "Se estiver em dúvida, marque as três. As matérias de base são as mesmas e você decide quando o edital abrir. A diferença está na banca, no salário e em onde você vai trabalhar.")}
-      <div class="wz-opts one">${WZ_ESFERAS.map(e => opt("esferas", e, wiz.esferas.includes(e.id), `<small>${escHtml(e.oque)}</small>`)).join("")}</div>${cta()}`;
+      <div class="wz-opts one">${WZ_ESFERAS.map(e => opt("esferas", e, wiz.esferas.includes(e.id), `<small>${escHtml(e.oque)}</small>`)).join("")}</div>
+      <div class="wz-h3">Você tem direito a isenção de taxa?</div><p class="wz-sub">Marque o que vale para você. Eu coloco uma tag nos concursos e te lembro de pedir.</p>
+      <div class="wz-opts one">${WZ_ISENCAO.map(e => opt("isencao", e, (wiz.isencao||[]).includes(e.id), `<small>${escHtml(e.desc)}</small>`)).join("")}</div>${cta()}`;
   } else if(step === 5){
     const outro = wiz.locais.includes("outro");
     corpo = `<div class="wz-h">Onde você aceita trabalhar?</div><p class="wz-sub">Pense em até onde você toparia ir. Pode marcar várias opções.</p>
