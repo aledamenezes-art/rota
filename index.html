@@ -3111,6 +3111,12 @@ const ESFERA_ITEM = {
   "concurso-tce-rj-auditor-de-controle-externo":"estadual", "concurso-tcm-rj":"municipal", "concurso-pedro-ii-tecnico-administrativo":"federal", "concurso-inea-rj":"estadual", "concurso-previrio":"municipal", "concurso-cedae":"estadual", "concurso-receita-federal":"federal", "concurso-ibc-edital-39-2026":"federal", "concurso-unirio-editais-avulsos":"federal", "concurso-transpetro-2026":"federal", "concurso-rjprev":"estadual", "concurso-der-rj":"estadual", "concurso-secec-rj":"estadual", "concurso-ieea-rj":"estadual", "concurso-emater-rio":"estadual", "concurso-iterj":"estadual", "concurso-pmerj-soldado":"estadual", "concurso-pmerj-oficial":"estadual", "concurso-pc-rj-peritos-e-piloto":"estadual", "concurso-bombeiros-rj-temporarios":"estadual"
 };
 Object.assign(ESFERA_ITEM, window.__FED_ESFERA||{});
+// Quem quer ficar no Rio capital: concurso nacional só vale se tem sede ou unidade no Rio.
+function soRioCapital(){ return (profile.estados||[]).length===1 && profile.estados[0]==="RJ"; }
+function itemTemRio(it){
+  if((it.estado||"RJ").toUpperCase()!=="NACIONAL") return true;
+  return /Rio de Janeiro|\(Capital\)|Sede no Rio/i.test(it.cidade||"") || /IBGE|BACEN|Banco Central|TCU:|EBSERH/i.test(it.title||"");
+}
 function itemFechado(it){ return it.badgeType === "encerrado"; }
 function itemServeFormacao(it, formacao){
   if(!formacao || it.destaque) return true;
@@ -3137,6 +3143,7 @@ function passesProfile(item){
   }
   if(profile.area && profile.area.trim() && item.area && item.area.toLowerCase() !== profile.area.trim().toLowerCase()) return false;
   if(profile.estados.length && item.estado && item.estado.toUpperCase()!=="NACIONAL" && !profile.estados.includes(item.estado.toUpperCase())) return false;
+  if(soRioCapital() && !itemTemRio(item) && !inscritoIds.includes(slugify(item.title)) && !favIds.includes(slugify(item.title))) return false;
   if(profile.niveis.length && item.nivel && !/^a definir/i.test(item.nivel)){
     const ok = profile.niveis.some(n => item.nivel.includes(n));
     if(!ok) return false;
@@ -7781,6 +7788,7 @@ function wizConcursos(todos){
     if(itemFechado(it)) return false;
     const uf = (it.estado || "RJ").toUpperCase();
     if(uf !== "NACIONAL" && !(uf === "RJ" ? temRJ : wiz.ufs.includes(uf))) return false;
+    if(uf === "NACIONAL" && temRJ && !wiz.ufs.length && !itemTemRio(it)) return false;
     if(!nvs.some(n => n.re.test(it.nivel || ""))) return false;
     if(!ars.some(a => !a.kw || a.kw.test((it.title || "") + " " + (it.cargos || "")))) return false;
     if(todos) return true;
@@ -8680,7 +8688,7 @@ function fitResumo(){
   var q=[].concat(filteredAbertos(),filteredEmAndamento(),filteredBanca(),filteredAnunciados()).length;
   var est=(profile.estados||[]).join(", ")||"todos os estados";
   var niv=(profile.niveis||[]).filter(function(n){return n!=="Técnico"}).join(" e ")||"todos os níveis";
-  el.innerHTML='<b>'+q+' concursos combinam com você</b><span>'+(profile.filtrar?'Filtro automático pelas suas respostas: ':'Filtro desligado. ')+'formação '+(profile.formacao==="adm"?"Administração":"da sua escolha")+', '+niv+', '+est+' e federais.</span><button onclick="document.querySelector(\'.tab-btn[data-tab=&quot;perfil&quot;]\').click()">Ajustar</button>';
+  el.innerHTML='<b>'+q+' concursos combinam com você</b><span>'+(profile.filtrar?'Filtro automático pelas suas respostas: ':'Filtro desligado. ')+'formação '+(profile.formacao==="adm"?"Administração":"da sua escolha")+', '+niv+', '+est+' e federais com vaga no Rio.</span><button onclick="document.querySelector(\'.tab-btn[data-tab=&quot;perfil&quot;]\').click()">Ajustar</button>';
 }
 function refreshStats(){
   try{fitResumo()}catch(e){}
