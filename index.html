@@ -1766,6 +1766,13 @@
   .cu-row{display:flex;gap:12px;align-items:flex-start;padding:9px 0;border-top:1px solid var(--line,#eee);width:100%;text-align:left;background:none;border-left:0;border-right:0;border-bottom:0;font:inherit;color:inherit}
   .cu-n{flex:0 0 26px;height:26px;border-radius:50%;background:#F3E4EC;color:#702A55;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:13px}
   .cu-row span{font-size:13px;line-height:1.35}.cu-row small{display:block;color:var(--ink-soft);font-size:12px;margin-top:2px}
+  .pb-card{margin:0 0 14px;padding:13px 14px;border-radius:16px;background:var(--card);border:1.5px solid var(--line)}
+  .pb-card.alerta{background:#FBF0D5;border-color:#E6C77A}
+  .pb-card b{font-size:14px;color:#2b2230}.pb-card p{font-size:12.5px;color:#4a3340;margin:4px 0 8px}
+  .pb-uf{margin-top:8px}.pb-uf b{font-size:12px;color:#7C2D3E}
+  .pb-links{display:flex;flex-wrap:wrap;gap:6px;margin-top:5px}
+  .pb-links a{padding:6px 10px;border-radius:999px;background:#fff;border:1.5px solid #D9B4C8;color:#702A55;font-weight:700;font-size:12px;text-decoration:none}
+  .pb-hint{font-size:12px;color:var(--ink-soft);margin-top:6px}
   .fit-resumo{display:flex;flex-wrap:wrap;align-items:center;gap:2px 10px;margin:0 0 12px;padding:11px 14px;border-radius:14px;background:#F3E4EC;color:#702A55;font-size:12.5px}
   .fit-resumo b{flex:1 1 100%;font-size:14px}.fit-resumo span{flex:1;color:#4a3340}.fit-resumo button{background:none;border:0;font-weight:700;color:#702A55;padding:6px 0}
 
@@ -1849,7 +1856,7 @@
 <header class="mast">
   <div class="mast-top">
     <span class="mast-brand"><svg class="mast-logo" aria-hidden="true" viewBox="0 0 100 100"><defs><linearGradient id="gl" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6E1F3A"/><stop offset=".5" stop-color="#4C3A5E"/><stop offset="1" stop-color="#17695F"/></linearGradient></defs><rect width="100" height="100" rx="24" fill="url(#gl)"/><path d="M50 12L59 41L88 50L59 59L50 88L41 59L12 50L41 41Z" fill="#fff"/></svg><span class="mast-brand-text"><b class="mast-name">Rota</b><span id="today-stamp">Atualizado em</span></span></span>
-    <span class="pill-loc">📍 Rio de Janeiro · Capital</span>
+    <span class="pill-loc" id="pill-loc">📍 Rio de Janeiro · Capital</span>
   </div>
   <h1 class="mast-title">Cada dia <span class="accent">mais perto</span><br>da aprovação</h1>
   <p class="mast-sub">Veja o que está aberto e saiba o que estudar hoje.</p>
@@ -1927,6 +1934,7 @@
     </div>
 
     <div id="fit-resumo" class="fit-resumo"></div>
+    <div id="perfil-busca"></div>
 
     <div class="section-label" id="abertos-heading">Inscrições abertas hoje</div>
     <div id="list-abertos"></div>
@@ -9156,15 +9164,52 @@ function zerarTudo(){
 
 // Contagens dos tiles do topo e a lista + o alerta de situação, tudo lido a partir do
 // filtro de perfil atual — chamado de novo sempre que o perfil muda.
+// Busca guiada pelo perfil: o painel só traz o que foi pesquisado, então para quem
+// tem outro estado, área ou formação o app monta buscas prontas nos principais sites.
+function perfilBuscaDados(){
+  const form = (typeof wzFind === "function" && typeof WZ_FORMACOES !== "undefined" && profile.formacao) ? (wzFind(WZ_FORMACOES, profile.formacao) || {}).nome : "";
+  const area = (profile.area || "").trim();
+  const ufs = (profile.estados && profile.estados.length) ? profile.estados : [];
+  const niv = (profile.niveis || []).filter(n => n !== "Técnico").join(" ou ");
+  return { form, area, ufs, niv };
+}
+function perfilBuscaPedido(){
+  const d = perfilBuscaDados();
+  return "Atualize o painel de concursos para o perfil desta pessoa: formação " + (d.form || "qualquer") + ", área " + (d.area || "qualquer") + ", estados " + (d.ufs.join(", ") || "todos") + ", nível " + (d.niv || "qualquer") + ". Pesquise a fundo em todos os sites (Estratégia, Gran, Direção, JC Concursos, Folha Dirigida/QConcursos, PCI Concursos e sites oficiais) todos os concursos abertos e previstos para esse perfil, inclusive federais e de outros estados, e coloque no painel.";
+}
+function copiarPerfilPedido(){
+  const t = perfilBuscaPedido(), hint = document.getElementById("pb-hint");
+  const ok = ()=>{ if(hint) hint.textContent = "Pedido copiado. Cole na conversa com o Claude."; };
+  const fb = ()=>{ const ta = document.createElement("textarea"); ta.value = t; document.body.appendChild(ta); ta.select(); try{ document.execCommand("copy"); ok(); }catch(e){ if(hint) hint.textContent = t; } ta.remove(); };
+  if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok, fb); else fb();
+}
+function perfilBuscaRender(q){
+  const el = document.getElementById("perfil-busca"); if(!el) return;
+  const d = perfilBuscaDados();
+  const base = ["concursos abertos", d.form || d.area, d.niv, "2026"].filter(Boolean).join(" ");
+  const sites = [["JC Concursos","jcconcursos.com.br"],["Estratégia","estrategiaconcursos.com.br"],["Gran Cursos","grancursosonline.com.br"],["PCI Concursos","pciconcursos.com.br"],["Folha Dirigida","folha.qconcursos.com"],["Direção","direcaoconcursos.com.br"]];
+  const locais = d.ufs.length ? d.ufs : ["Brasil"];
+  const blocos = locais.slice(0,4).map(uf=>`<div class="pb-uf"><b>${uf}</b><div class="pb-links">${sites.map(([n,h])=>`<a href="${escHtml(crGg(base + " " + (uf === "Brasil" ? "" : uf + " ") + "site:" + h))}" target="_blank" rel="noopener">${n}</a>`).join("")}</div></div>`).join("");
+  const pouco = q < 5;
+  el.innerHTML = `<div class="pb-card${pouco ? " alerta" : ""}">
+    <b>${pouco ? "Poucos concursos no painel para o seu perfil" : "Quer ver mais para o seu perfil?"}</b>
+    <p>${pouco ? "O painel é montado com o que o Claude pesquisa, e hoje ele cobre mais o Rio. Para " + escHtml([d.form || d.area, d.ufs.join(", ")].filter(Boolean).join(" em ") || "o seu perfil") + ", use as buscas abaixo ou peça uma atualização." : "Buscas prontas nos principais sites, com as suas respostas."}</p>
+    ${blocos}
+    <button class="btn primary" onmousedown="event.preventDefault()" onclick="copiarPerfilPedido()" style="width:100%;text-align:center;margin-top:10px">Copiar pedido de atualização para o meu perfil</button>
+    <div class="pb-hint" id="pb-hint"></div>
+  </div>`;
+}
 function fitResumo(){
+  var pl=document.getElementById("pill-loc"); if(pl) pl.textContent = "📍 " + (soRioCapital() ? "Rio de Janeiro · Capital" : ((profile.estados||[]).join(", ") || "Todo o Brasil"));
   var el=document.getElementById("fit-resumo"); if(!el) return;
   var q=[].concat(filteredAbertos(),filteredEmAndamento(),filteredBanca(),filteredAnunciados()).length;
   var est=(profile.estados||[]).join(", ")||"todos os estados";
   var niv=(profile.niveis||[]).filter(function(n){return n!=="Técnico"}).join(" e ")||"todos os níveis";
-  el.innerHTML='<b>'+q+' concursos combinam com você</b><span>'+(profile.filtrar?'Filtro automático pelas suas respostas: ':'Filtro desligado. ')+'formação '+(profile.formacao==="adm"?"Administração":"da sua escolha")+', '+niv+', '+est+' e federais com vaga no Rio.</span><button onclick="document.querySelector(\'.tab-btn[data-tab=&quot;perfil&quot;]\').click()">Ajustar</button>';
+  el.innerHTML='<b>'+q+' concursos combinam com você</b><span>'+(profile.filtrar?'Filtro automático pelas suas respostas: ':'Filtro desligado. ')+'formação '+(profile.formacao==="adm"?"Administração":"da sua escolha")+', '+niv+', '+est+(soRioCapital()?' e federais com vaga no Rio.':' e concursos nacionais.')+'</span><button onclick="document.querySelector(\'.tab-btn[data-tab=&quot;perfil&quot;]\').click()">Ajustar</button>';
 }
 function refreshStats(){
   try{fitResumo()}catch(e){}
+  try{ perfilBuscaRender([].concat(filteredAbertos(),filteredEmAndamento(),filteredBanca(),filteredAnunciados()).length); }catch(e){}
   const fa = filteredAbertos(), fe = filteredEmAndamento(), fb = filteredBanca(), fn = filteredAnunciados();
   // Cada card é um atalho de filtro, não uma contagem solta — por isso o número de
   // cada um bate exatamente com o que aparece no filtro pra onde ele leva (o
