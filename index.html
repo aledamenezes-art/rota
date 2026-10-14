@@ -4450,9 +4450,23 @@ function renderCardCompact(item, catClass, itemId){
 // rodapé da tela — só existe quando há de fato uma ação pra tomar (inscrições abertas
 // ou já inscrita); do contrário a barra fica escondida e o aviso informativo mora
 // inline no conteúdo (ver renderDetailContent).
+// Concurso com pouca informação (cargos ainda não divulgados): no lugar de "já me inscrevi",
+// o botão leva direto para uma pesquisa sobre ele.
+function poucaInfo(item){
+  const nd = v => !v || /^\s*a definir/i.test(v) || /n[ãa]o traz|sem informa/i.test(v);
+  return nd(item.cargos) || (nd(item.vagas) && nd(item.salario));
+}
+function pesquisarConcurso(itemId){
+  const e = allItemsById[itemId]; if(!e) return;
+  const q = e.item.title.replace(/^Concurso\s*/i,"") + " concurso edital cargos vagas 2026";
+  window.open("https://www.google.com/search?q=" + encodeURIComponent(q), "_blank", "noopener");
+}
 function renderInscCta(item, itemId, catClass){
   const podeInscrever = catClass === "cat-aberto";
   const jaInscrito = inscritoIds.includes(itemId);
+  if(poucaInfo(item) && !jaInscrito && catClass !== "cat-encerrado"){
+    return `<button class="insc-toggle pesq-cta" onclick="pesquisarConcurso('${itemId}')"><span class="insc-check"><svg class="insc-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 16l4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span class="insc-text">Pesquisar sobre este concurso</span></button>`;
+  }
   if(!podeInscrever && !jaInscrito) return "";
   return `<button class="insc-toggle" data-insc-id="${itemId}" onclick="toggleInscrito('${itemId}')"><span class="insc-check"><svg class="insc-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/></svg></span><span class="insc-text">Marcar que já me inscrevi</span><span class="insc-undo">Desfazer</span></button>`;
 }
@@ -5136,6 +5150,7 @@ const INSC_ICO_ON = '<svg class="insc-ico" viewBox="0 0 24 24" aria-hidden="true
 function refreshInscritoUI(){
   document.querySelectorAll(".insc-toggle").forEach(btn=>{
     const id = btn.getAttribute("data-insc-id");
+    if(!id) return;
     const isInsc = inscritoIds.includes(id);
     btn.classList.toggle("is-insc", isInsc);
     btn.setAttribute("aria-pressed", isInsc ? "true" : "false");
