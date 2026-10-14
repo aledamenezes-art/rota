@@ -9639,9 +9639,12 @@ function applyConcursoFilter(f){
   });
   applySearch();
   const pb = document.getElementById("perfil-busca"); if(pb) pb.style.display = (f === "all") ? "" : "none";
+  { const so = f === "inscritas";
+    ["stats","fit-resumo"].forEach(i=>{ const e = document.getElementById(i); if(e) e.style.display = so ? "none" : ""; });
+    const st = document.querySelector("#stats + .stats-hint, .stats-hint"); if(st) st.style.display = so ? "none" : ""; }
   if(f === "inscritas" && !searchInput.value.trim()){
-    const tem = [...document.querySelectorAll("#panel-concursos .card")].some(c => c.style.display !== "none");
-    document.getElementById("search-hint").textContent = tem ? "" : "Você ainda não marcou nenhuma inscrição. Abra um concurso aberto e toque em Já me inscrevi.";
+    const n = [...document.querySelectorAll("#panel-concursos .card.is-inscrita")].filter(c => c.style.display !== "none").length;
+    document.getElementById("search-hint").textContent = n ? (n + (n>1 ? " inscrições marcadas" : " inscrição marcada")) : "Você ainda não marcou nenhuma inscrição. Abra um concurso aberto e toque em Já me inscrevi.";
   }
 }
 
@@ -9973,9 +9976,9 @@ function focoCardHtml(){
   function visto(){try{return localStorage.getItem("rota-como-usar")==="1"}catch(e){return false}}
   window.renderComoUsar=function(){
     var el=document.getElementById("como-usar"); if(!el) return;
-    if(visto()){el.innerHTML='<div style="text-align:right;margin:-4px 0 10px"><button class="cu-x" onclick="try{localStorage.removeItem(\'rota-como-usar\')}catch(e){};renderComoUsar()">Como usar o Rota</button></div>';return;}
+    if(!window.__cuAberto){el.innerHTML='<div style="text-align:right;margin:-4px 0 10px"><button class="cu-x" onclick="window.__cuAberto=true;renderComoUsar()">Como usar o Rota</button></div>';return;}
     var go=function(t){return "document.querySelector('.tab-btn[data-tab=&quot;"+t+"&quot;]').click()"};
-    el.innerHTML='<div class="cu-card"><div class="cu-top"><b>Como usar o Rota</b><button class="cu-x" onclick="try{localStorage.setItem(\'rota-como-usar\',\'1\')}catch(e){};renderComoUsar()">Entendi, fechar</button></div>'+
+    el.innerHTML='<div class="cu-card"><div class="cu-top"><b>Como usar o Rota</b><button class="cu-x" onclick="window.__cuAberto=false;renderComoUsar()">Fechar</button></div>'+
     '<button class="cu-row" onclick="'+go("concursos")+'"><i class="cu-n">1</i><span><b>Concursos</b><small>Veja o que está aberto e o que vem aí. Toque na estrela para guardar.</small></span></button>'+
     '<button class="cu-row" onclick="'+go("favoritos")+'"><i class="cu-n">2</i><span><b>Favoritos</b><small>Seus guardados. Coloque em ordem de prioridade no Perfil.</small></span></button>'+
     '<button class="cu-row" onclick="'+go("estudos")+'"><i class="cu-n">3</i><span><b>Estudos</b><small>Cronograma, matérias do dia, questões e revisões.</small></span></button>'+
