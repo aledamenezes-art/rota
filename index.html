@@ -1715,6 +1715,10 @@
   .fbr-row b{ font-weight:800; } .fbr-row span{ color:var(--ink-soft); text-align:right; }
   .fbr-links{ display:flex; flex-wrap:wrap; gap:14px; margin-top:8px; font-size:13px; font-weight:800; }
   .fbr-links a{ color:var(--blue-deep); text-decoration:none; }
+
+  .rt-tap{ cursor:pointer; -webkit-tap-highlight-color:transparent; }
+  .rt-tap:active .rt-title{ color:var(--blue-deep); }
+  .rt-chev{ float:right; color:var(--ink-soft); font-size:18px; line-height:1; margin-left:8px; }
 </style>
 </head>
 <body data-tab="inicio">
@@ -5631,6 +5635,7 @@ function renderInicioStudyWidgets(){
 }
 
 function goToEstudosLog(){
+  closeSubScreen();
   document.querySelector('.tab-btn[data-tab="estudos"]').click();
   setTimeout(()=>{
     scrollToEstudos("study-log-list");
@@ -5638,6 +5643,7 @@ function goToEstudosLog(){
 }
 
 function goToEstudosSubjects(){
+  closeSubScreen();
   document.querySelector('.tab-btn[data-tab="estudos"]').click();
   setTimeout(()=>{
     scrollToEstudos("study-subjects-list");
@@ -5645,6 +5651,7 @@ function goToEstudosSubjects(){
 }
 
 function goToEstudosReviews(){
+  closeSubScreen();
   document.querySelector('.tab-btn[data-tab="estudos"]').click();
   setTimeout(()=>{
     scrollToEstudos("review-list");
@@ -6747,10 +6754,12 @@ function ingPode(step){
 // Plano: sorteio ponderado e suave (as habilidades de mais peso aparecem mais, sem repetir a mesma em dias seguidos).
 // Falar entra sempre. Os dias de aula de conversação aparecem na semana junto com o estudo por conta própria.
 function ingPlano(){
-  const focos = ingFocosUsados();
+  const temAula = ing.recursos.includes("aula") && ing.aulaDias.length > 0;
+  const todosFocos = ingFocosUsados();
+  const focos = temAula && todosFocos.length > 1 ? todosFocos.filter(h => h !== "speaking") : todosFocos;
   const peso = {};
   focos.forEach(h => { peso[h] = 0; ing.metas.forEach(id => { const m = wzFind(ING_METAS, id); if(m) peso[h] += m.pesos[h] || 0; }); if(!peso[h]) peso[h] = 1; });
-  peso.speaking = Math.max(peso.speaking || 0, 2);
+  if(focos.includes("speaking")) peso.speaking = Math.max(peso.speaking || 0, 2);
   const aulaDias = ing.recursos.includes("aula") ? DIAS_SEM.filter(d => ing.aulaDias.includes(d)) : [];
   const sel = (ing.diasSel && ing.diasSel.length) ? DIAS_SEM.filter(d => ing.diasSel.includes(d)) : DIAS_SEM.slice(0, ing.dias);
   const revisao = sel.length >= 4;
@@ -6842,6 +6851,7 @@ function ingCiclo(sil){
   if(sil) return n;
   alert(n ? n + " habilidade" + (n > 1 ? "s" : "") + " de inglês adicionada" + (n > 1 ? "s" : "") + " ao seu ciclo." : "Essas habilidades já estavam no seu ciclo.");
   renderRoteiroCard(); try{ renderEstudoHoje(); }catch(e){}
+  try{ if(document.getElementById("sub-screen").classList.contains("active") && document.getElementById("sub-topbar-title").textContent === "Trilha de inglês") abrirRoteiro(true); }catch(e){}
 }
 function ingHojeHtml(){
   if(objAtual() === "concurso" || !objAtual() || !ing.feito) return objAtual() === "ingles" || objAtual() === "ambos" ? `<div class="hj-card main"><div class="hj-tag">INGLÊS</div><div class="hj-title">Monte o seu plano de inglês</div><div class="hj-sub">Responda algumas perguntas e eu monto a sua semana.</div><div class="hj-actions"><button class="btn primary" onmousedown="event.preventDefault()" onclick="abrirIngles()">Começar</button></div></div>` : "";
@@ -6851,7 +6861,7 @@ function ingHojeHtml(){
   if(!dia) return `<div class="hj-card"><div class="hj-tag">INGLÊS</div><div class="hj-title">Dia livre</div><div class="hj-sub">Hoje não tem inglês no seu plano. Um áudio curto ainda ajuda.</div></div>`;
   const logs = study.logs.filter(l => l.date === iso);
   return dia.itens.map(it => {
-    if(it.h === "aula") return `<div class="hj-card main"><div class="hj-tag">AULA DE CONVERSAÇÃO · ${hjFmt(it.min)}</div><div class="hj-title">👩‍🏫 Aula de hoje${ing.aulaIni ? " às " + escHtml(ing.aulaIni) : ""}</div><div class="hj-sub">Depois da aula, anote frases novas e repita em voz alta.</div>${ing.aulaIni ? `<div class="hj-links">${gcalBtn({ titulo:"Aula de conversação de inglês", dia:isoOfDate(new Date()), ini:ing.aulaIni, fim:somaHhmm(ing.aulaIni, it.min), semanal:true, detalhes:"Criado pelo Rota." }, "📅 Agendar toda semana", "link")}</div>` : ""}</div>`;
+    if(it.h === "aula") return `<div class="hj-card main"><div class="hj-tag">AULA DE CONVERSAÇÃO · ${hjFmt(it.min)}</div><div class="hj-title">👩‍🏫 Aula de hoje${ing.aulaIni ? " às " + escHtml(ing.aulaIni) : ""}</div><div class="hj-sub">A aula é o seu speaking da semana. Depois dela, anote frases novas e repita em voz alta.</div>${ing.aulaIni ? `<div class="hj-links">${gcalBtn({ titulo:"Aula de conversação de inglês", dia:isoOfDate(new Date()), ini:ing.aulaIni, fim:somaHhmm(ing.aulaIni, it.min), semanal:true, detalhes:"Criado pelo Rota." }, "📅 Agendar toda semana", "link")}</div>` : ""}</div>`;
     if(it.h === "rev") return `<div class="hj-card main"><div class="hj-tag">INGLÊS · ${hjFmt(it.min)}</div><div class="hj-title">Revisão da semana</div><div class="hj-sub">Flashcards, erros e a revisão da semana. Sem conteúdo novo hoje.</div><div class="hj-actions"><button class="btn primary" onmousedown="event.preventDefault()" onclick="hojeIrPara('revisar')">Abrir revisões</button><button class="btn ghost" onmousedown="event.preventDefault()" onclick="roteiroRetro()">Revisão da semana</button></div></div>`;
     const feito = logs.filter(l => l.materia === it.n).reduce((a,l) => a + l.minutes, 0);
     const pc = Math.min(100, Math.round(feito / Math.max(1, it.min) * 100));
@@ -6957,7 +6967,7 @@ const ROTEIRO_FASES_ING = [
     { k:"i_listen", t:"Ouvir inglês todos os dias", d:"Podcast, vídeo ou música no seu nível. Comece com legenda em inglês.", auto:()=>study.logs.some(l => l.materia === "Inglês: Listening"), acao:["Buscar áudio","ingBuscar('listening')"] },
     { k:"i_vocab", t:"Vocabulário em flashcards", d:"Crie cartões com frases inteiras, não só palavras soltas.", auto:()=>study.flashcards.some(f => /ingl/i.test(f.materia || "")), acao:["Abrir Estudos","roteiroIr('estudos')"] },
     { k:"i_ler", t:"Ler um pouco por dia", d:"Textos curtos no seu nível. Anote só as palavras que aparecem mais de uma vez.", auto:()=>study.logs.some(l => l.materia === "Inglês: Leitura"), acao:["Buscar textos","ingBuscar('reading')"] },
-    { k:"i_falar", t:"Falar em voz alta", d:"Grave um áudio de 1 minuto sobre o seu dia e ouça. Repita toda semana.", auto:()=>study.logs.some(l => l.materia === "Inglês: Speaking"), acao:["Buscar exercícios","ingBuscar('speaking')"] },
+    { k:"i_falar", t:"Falar em voz alta", d:"Grave um áudio de 1 minuto sobre o seu dia e ouça. Repita toda semana.", dd:()=> ing.recursos.includes("aula") && ing.aulaDias.length ? "O seu speaking principal é a aula de conversação. Depois de cada aula, grave 1 minuto repetindo o que aprendeu e ouça." : "Grave um áudio de 1 minuto sobre o seu dia e ouça. Repita toda semana.", auto:()=>study.logs.some(l => l.materia === "Inglês: Speaking"), acao:["Buscar exercícios","ingBuscar('speaking')"] },
     { k:"i_shadow", t:"Shadowing de 1 minuto", d:"Ouça um trecho de 30 a 60 segundos e repita junto, de 3 a 5 vezes.", acao:["Buscar áudios","ingBuscar('speaking')"] },
     { k:"i_escrever", t:"Escrever um parágrafo", d:"Escreva sobre algo do seu dia e corrija com calma no dia seguinte.", auto:()=>study.logs.some(l => l.materia === "Inglês: Escrita"), acao:["Buscar exercícios","ingBuscar('writing')"] }
   ]},
@@ -7080,8 +7090,9 @@ function abrirRoteiro(manter, t){
       return `<div class="rt-step${ok ? " is-done" : ""}">
         <button class="rt-check" aria-label="${ok ? "Desmarcar" : "Marcar"} passo ${n}" aria-pressed="${ok}" onmousedown="event.preventDefault()" onclick="roteiroToggle('${p.k}')">${ok ? '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m6 12.5 4 4 8-9"/></svg>' : ""}</button>
         <div class="rt-body">
-          <div class="rt-title"><span class="rt-n">${n}</span>${escHtml(p.t)}</div>
-          <div class="rt-desc">${escHtml(p.dd ? p.dd() : p.d)}</div>
+          <div class="rt-tap"${p.acao ? ` role="button" tabindex="0" onmousedown="event.preventDefault()" onclick="${p.acao[1]}"` : (p.k === "horas" ? ` role="button" tabindex="0" onmousedown="event.preventDefault()" onclick="document.getElementById('rt-horas').focus()"` : "")}>
+          <div class="rt-title"><span class="rt-n">${n}</span>${escHtml(p.t)}${p.acao || p.k === "horas" ? '<span class="rt-chev">›</span>' : ""}</div>
+          <div class="rt-desc">${escHtml(p.dd ? p.dd() : p.d)}</div></div>
           ${p.alvo ? (roteiroAlvo() ? `<div class="rt-alvo">Seu concurso: <b>${escHtml(prepNomeCurto(roteiroAlvo()))}</b> <a href="#" style="color:var(--blue-deep);font-weight:800;margin-left:6px" onmousedown="event.preventDefault()" onclick="roteiroTrocarAlvo();return false">Trocar</a></div>` : `<div class="rt-alvo">Favorite um concurso para eu abrir direto aqui.</div>`) : ""}
           ${p.acao ? `<button class="rt-go" onmousedown="event.preventDefault()" onclick="${p.acao[1]}">${escHtml(p.acao[0])} ›</button>` : ""}
           ${calc}
@@ -9104,6 +9115,52 @@ function abrirRoteiroBanca(){
   document.getElementById("sub-screen").classList.add("active");
   document.getElementById("sub-scroll").scrollTop = 0;
 }
+
+// ---------- Roteiro funcional: cada passo leva ao lugar certo ----------
+function roteiroEstudos(id){
+  closeSubScreen();
+  document.querySelector('.tab-btn[data-tab="estudos"]').click();
+  setTimeout(() => { scrollToEstudos(id); }, 180);
+}
+function roteiroAgendar(t){
+  const ingles = t === "ingles";
+  const o = gcalProximoBloco(ingles ? "Estudar inglês" : "Estudar para concurso", ingles ? (ing.minutos || 45) : 60);
+  o.semanal = true; o.detalhes = "Bloco de estudo criado no Rota";
+  window.open(gcalUrl(o), "_blank", "noopener");
+}
+function ingFaseAbrir(i){
+  const f = ingTrilhaMeses()[i]; if(!f) return;
+  document.getElementById("sub-topbar-title").textContent = "Fase " + (i + 1) + ": " + f.nome;
+  document.getElementById("sub-content").innerHTML = `<div class="fbr-sec"><span class="fb-eyebrow">${escHtml(f.t)}</span><h3>${escHtml(f.nome)}</h3>
+    <p>Toque em Buscar para achar um material de cada item.</p>
+    ${f.itens.map(x => `<div class="fbr-row"><b style="font-weight:700;flex:1;text-align:left">${escHtml(x)}</b><a href="${crYt(x + " inglês")}" target="_blank" rel="noopener" style="color:var(--blue-deep);font-weight:800;text-decoration:none">Buscar</a></div>`).join("")}</div>
+    <button class="btn" style="width:100%;margin-top:6px" onmousedown="event.preventDefault()" onclick="abrirRoteiro(false,'ingles')">‹ Voltar à trilha</button>`;
+  document.getElementById("sub-screen").classList.add("active");
+  document.getElementById("sub-scroll").scrollTop = 0;
+}
+function ingAulaAcao(){
+  if(ing.recursos.includes("aula") && ing.aulaDias.length){
+    document.getElementById("sub-topbar-title").textContent = "Aula de conversação";
+    document.getElementById("sub-content").innerHTML = `<div class="fbr-sec"><span class="fb-eyebrow">Sua aula</span><h3>Todo ${escHtml(ing.aulaDias.join(" e "))}${ing.aulaIni ? " às " + escHtml(ing.aulaIni) : ""}</h3>
+      <p>A aula é o seu speaking da semana. Depois dela, anote frases novas e repita em voz alta.</p>
+      ${ing.aulaIni ? ing.aulaDias.map(d => `<div class="fbr-row"><b>${escHtml(d)} às ${escHtml(ing.aulaIni)}</b>${gcalBtn({ titulo:"Aula de conversação de inglês", dia:proxDiaIso(d), ini:ing.aulaIni, fim:somaHhmm(ing.aulaIni, ing.aulaMin || 60), semanal:true }, "＋ Google Agenda")}</div>`).join("") : `<p>Defina o horário da aula no questionário de inglês para agendar.</p><button class="btn primary" onclick="abrirIngles()">Abrir questionário</button>`}</div>
+      <button class="btn" style="width:100%;margin-top:6px" onmousedown="event.preventDefault()" onclick="abrirRoteiro(false,'ingles')">‹ Voltar à trilha</button>`;
+    document.getElementById("sub-screen").classList.add("active");
+    document.getElementById("sub-scroll").scrollTop = 0;
+  } else window.open(crGg("aula de conversação em inglês online professor particular"), "_blank", "noopener");
+}
+(function(){
+  const set = (arr, k, acao) => arr.forEach(f => f.passos.forEach(p => { if(p.k === k) p.acao = acao; }));
+  set(ROTEIRO_FASES_ING, "i_f1", ["Ver a fase", "ingFaseAbrir(0)"]);
+  set(ROTEIRO_FASES_ING, "i_f2", ["Ver a fase", "ingFaseAbrir(1)"]);
+  set(ROTEIRO_FASES_ING, "i_f3", ["Ver a fase", "ingFaseAbrir(2)"]);
+  set(ROTEIRO_FASES_ING, "i_aula", ["Ver minha aula", "ingAulaAcao()"]);
+  set(ROTEIRO_FASES_ING, "i_agenda", ["Agendar no Google Agenda", "roteiroAgendar('ingles')"]);
+  set(ROTEIRO_FASES_ING, "i_vocab", ["Criar cartões", "roteiroEstudos('flash-materia')"]);
+  set(ROTEIRO_FASES, "agenda", ["Agendar no Google Agenda", "roteiroAgendar('concurso')"]);
+  set(ROTEIRO_FASES, "questoes", ["Registrar questões", "roteiroEstudos('study-hoje-bottom')"]);
+  set(ROTEIRO_FASES, "flash", ["Criar cartões", "roteiroEstudos('flash-materia')"]);
+})();
 </script>
 </body>
 </html>
