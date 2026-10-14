@@ -1930,6 +1930,7 @@
   <section class="panel" id="panel-concursos">
     <div class="sort-row" id="sort-row">
       <span class="sort-chip active" data-filter="all">Todos</span>
+      <span class="sort-chip" data-filter="inscritas">Já me inscrevi</span>
       <span class="sort-chip" data-filter="abertos">Inscrição aberta</span>
       <span class="sort-chip" data-filter="emandamento">Prova ou resultado</span>
       <span class="sort-chip" data-filter="banca">Banca escolhida</span>
@@ -5478,6 +5479,7 @@ function refreshInscritoUI(){
   document.querySelectorAll(".card[data-id]").forEach(c=>c.classList.toggle("is-inscrita", inscritoIds.includes(c.getAttribute("data-id"))));
   renderResumo();
   renderInicioInscritos();
+  try{ const ac = document.querySelector(".sort-chip.active"); if(ac && ac.dataset.filter === "inscritas") applyConcursoFilter("inscritas"); }catch(e){}
 }
 
 function refreshOlhoUI(){}
@@ -9621,6 +9623,14 @@ function applyConcursoFilter(f){
     : [f];
   Object.keys(concursoSections).forEach(key=>{
     const s = concursoSections[key];
+    if(f === "inscritas"){
+      let alguma = false;
+      document.querySelectorAll(`#${s.list} .card`).forEach(c=>{ const ok = c.classList.contains("is-inscrita"); c.style.display = ok ? "" : "none"; if(ok) alguma = true; });
+      document.getElementById(s.heading).style.display = alguma ? "" : "none";
+      if(s.note) document.getElementById(s.note).style.display = alguma ? "" : "none";
+      if(s.fixedEmpty) document.getElementById(s.fixedEmpty).style.display = "none";
+      return;
+    }
     const visible = activeKeys.includes(key);
     document.querySelectorAll(`#${s.list} .card`).forEach(c=> c.style.display = visible ? "" : "none");
     document.getElementById(s.heading).style.display = visible ? "" : "none";
@@ -9628,6 +9638,11 @@ function applyConcursoFilter(f){
     if(s.fixedEmpty) document.getElementById(s.fixedEmpty).style.display = visible ? "" : "none";
   });
   applySearch();
+  const pb = document.getElementById("perfil-busca"); if(pb) pb.style.display = (f === "all") ? "" : "none";
+  if(f === "inscritas" && !searchInput.value.trim()){
+    const tem = [...document.querySelectorAll("#panel-concursos .card")].some(c => c.style.display !== "none");
+    document.getElementById("search-hint").textContent = tem ? "" : "Você ainda não marcou nenhuma inscrição. Abra um concurso aberto e toque em Já me inscrevi.";
+  }
 }
 
 document.querySelectorAll(".sort-chip").forEach(chip=>{
