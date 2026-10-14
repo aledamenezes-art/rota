@@ -291,6 +291,8 @@
   .alert-row.tone-sand .alert-bar{ background:var(--sand-deep); }
   .alert-row-title{ font-size:13.5px; font-weight:700; color:var(--ink); margin-bottom:2px; line-height:1.35; }
   .alert-row-sub{ font-size:12px; color:var(--ink-soft); }
+  .alert-x{ flex:none; width:32px; height:32px; margin:-6px -8px 0 0; border:0; background:transparent; color:var(--ink-soft); font-size:22px; line-height:1; cursor:pointer; border-radius:50%; }
+  .alert-x:active{ background:rgba(62,68,87,.1); }
   .alert-empty{ padding:0 15px 16px; font-size:12.5px; color:var(--ink-soft); line-height:1.5; }
   .alert-motiv{ margin:2px 15px 14px; padding:10px 12px; border-radius:12px; background:var(--blue-bg); color:var(--blue-deep); font-size:12px; font-weight:700; line-height:1.5; }
 
@@ -5086,6 +5088,13 @@ function mount(id, items, catClass){
 }
 // ---------- "Sua situação agora" — alerta dinâmico, calculado a partir das datas reais
 // (nada de reescrever um texto fixo toda vez que algo muda) ----------
+let alertasOff = [];
+function alertaChave(a){ return a.itemId + "|" + a.title; }
+function dispensarAlerta(i){
+  const a = computeAlerts()[i]; if(!a) return;
+  alertasOff.push(alertaChave(a)); saveState("concursos-rj-alertas-off", alertasOff); renderAlertBox();
+}
+function restaurarAlertas(){ alertasOff = []; saveState("concursos-rj-alertas-off", alertasOff); renderAlertBox(); }
 function computeAlerts(){
   const now = new Date();
   const alerts = [];
@@ -5180,7 +5189,7 @@ function computeAlerts(){
       sub: formatDatePt(e.item.provaData, false) + (cg ? " · " + cg : "") + " · " + provaHoraTxt(e.item).split(". ")[0].replace(/\.$/, "") });
   });
   const ordem = {rose:0, sand:1, mint:2};
-  return alerts.map((a,i)=>[a,i]).sort((x,y)=>(ordem[x[0].tone]-ordem[y[0].tone])||(x[1]-y[1])).map(x=>x[0]).slice(0,5);
+  return alerts.map((a,i)=>[a,i]).sort((x,y)=>(ordem[x[0].tone]-ordem[y[0].tone])||(x[1]-y[1])).map(x=>x[0]).filter(a=>!alertasOff.includes(alertaChave(a))).slice(0,5);
 }
 
 // Frase motivacional do dia: fixa por data (não muda a cada render), roda num banco
@@ -5234,18 +5243,19 @@ function renderAlertBox(){
   const alerts = computeAlerts();
   const box = document.getElementById("alert-box");
   renderFrase();
-  const motiv = "";
+  const motiv = alertasOff.length ? `<div style="text-align:right;padding:2px 15px 8px"><button class="cu-x" onmousedown="event.preventDefault()" onclick="restaurarAlertas()">Mostrar avisos dispensados</button></div>` : "";
   if(!alerts.length){
     box.innerHTML = `<div class="alert-box-title">📍 Sua situação agora</div><div class="alert-empty">Nada urgente por agora.</div>${motiv}`;
     return;
   }
-  box.innerHTML = `<div class="alert-box-title">📍 Sua situação agora</div>` + alerts.map(a => `
+  box.innerHTML = `<div class="alert-box-title">📍 Sua situação agora</div>` + alerts.map((a,i) => `
     <div class="alert-row tone-${a.tone}" onmousedown="event.preventDefault()" onclick="openDetail('${a.itemId}')">
       <span class="alert-bar"></span>
-      <div>
+      <div style="flex:1;min-width:0">
         <div class="alert-row-title">${a.title}</div>
         <div class="alert-row-sub">${a.sub}</div>
       </div>
+      <button class="alert-x" aria-label="Dispensar este aviso" onmousedown="event.stopPropagation();event.preventDefault()" onclick="event.stopPropagation();dispensarAlerta(${i})">×</button>
     </div>`).join("") + motiv;
 }
 
@@ -9603,6 +9613,7 @@ async function loadProfileAndStudy(){
   await loadState("concursos-rj-perfil", (v)=>{ if(v && typeof v === "object") profile = Object.assign({}, profile, v); });
   await loadState("concursos-rj-estudos", (v)=>{ if(v && typeof v === "object") study = Object.assign({}, study, v); });
   await loadState("concursos-rj-rotina", (v)=>{ if(Array.isArray(v)) routine = v; });
+  await loadState("concursos-rj-alertas-off", (v)=>{ if(Array.isArray(v)) alertasOff = v; });
   await loadState("concursos-rj-rotina-cores", (v)=>{ if(v && typeof v === "object" && !Array.isArray(v)) rotinaCores = v; });
   populateProfileForm();
   populateMateriaSelects();
