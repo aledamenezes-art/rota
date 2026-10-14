@@ -2236,6 +2236,17 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="conf-modal">
+  <div class="modal-card">
+    <div class="modal-emoji">✅</div>
+    <div class="modal-title" id="conf-title">Sua inscrição foi confirmada?</div>
+    <p class="modal-sub">Confira no site da banca se a inscrição foi aceita (homologada). Se ainda não, eu deixo em "Sua situação agora" para você acompanhar.</p>
+    <div class="modal-actions">
+      <button class="btn ghost" id="conf-no">Ainda não</button>
+      <button class="btn primary" id="conf-yes">Sim, confirmada</button>
+    </div>
+  </div>
+</div>
 <div class="modal-overlay" id="isoask-modal">
   <div class="modal-card">
     <div class="modal-emoji">🎟️</div>
@@ -4936,7 +4947,13 @@ function computeAlerts(){
   const now = new Date();
   const alerts = [];
   inscritoIds.forEach(id=>{
-    if(boletoStatus[id] === true) return; // já pago
+    if(boletoStatus[id] === true){ // já pago: falta só a confirmação da inscrição
+      const en = allItemsById[id];
+      if(en && inscConf[id] !== true) alerts.push({ itemId: id, tone: "sand",
+        title: `${en.item.title.replace(/^Concurso\s*/i, "")}: aguardando confirmação da inscrição`,
+        sub: "Confira no site da banca e marque aqui quando for confirmada" });
+      return;
+    }
     const entry = allItemsById[id];
     if(!entry) return;
     const shortTitle = entry.item.title.replace(/^Concurso\s*/i, "");
@@ -4964,6 +4981,7 @@ function computeAlerts(){
   const meu = id => inscritoIds.includes(id) || favIds.includes(id);
   filteredAbertos().forEach(item=>{
     const itemId = slugify(item.title);
+    if(inscritoIds.includes(itemId)) return; // já se inscreveu: prazos de inscrição deixam de avisar
     if(!meu(itemId) && /^\s*a definir/i.test(item.cargos||"")) return;
     const shortTitle = item.title.replace(/^Concurso\s*/i, "");
     if(item.inscricaoFim){
@@ -5212,6 +5230,9 @@ async function loadFavorites(){
   favIds = Array.isArray(favIds) ? favIds : [];
   if(olhoIds.length){ favIds = [...new Set(favIds.concat(olhoIds))]; olhoIds = []; saveFavorites(); saveOlhoIds(); }
   await loadState('concursos-rj-inscritos', (v)=>inscritoIds=v);
+  await loadState('concursos-rj-insc-conf', (v)=>{ inscConf = (v && typeof v === "object" && !Array.isArray(v)) ? v : {}; });
+  await loadState('concursos-rj-insc-asked', (v)=>{ inscAsked = (v && typeof v === "object" && !Array.isArray(v)) ? v : {}; });
+  await loadState('concursos-rj-inscrito-em', (v)=>{ inscritoEm = (v && typeof v === "object" && !Array.isArray(v)) ? v : {}; });
   await loadState('concursos-rj-isencao-asked', (v)=>{ isencaoAsked = (v && typeof v === "object" && !Array.isArray(v)) ? v : {}; });
   await loadState('concursos-rj-cargos-insc', (v)=>{ cargosInscritos = (v && typeof v === "object" && !Array.isArray(v)) ? v : {}; });
   await loadState('concursos-rj-isencao', (v)=>{ isencaoStatus = (v && typeof v === "object" && !Array.isArray(v)) ? v : {}; });
@@ -5355,9 +5376,10 @@ function toggleInscrito(id){
     refreshInscritoUI();
     renderNovidades();
     pendingBoletoId = id;
+    inscritoEm[id] = hojeISO(); saveInscritoEm();
     abrirCargoModal(id, true);
   } else {
-    delete cargosInscritos[id]; saveCargosInsc();
+    delete cargosInscritos[id]; saveCargosInsc(); delete inscConf[id]; saveInscConf();
     inscritoIds.splice(idx,1);
     delete boletoStatus[id]; delete isencaoStatus[id]; saveIsencao();
     saveBoletoStatus();
@@ -5558,9 +5580,9 @@ function renderInicioInscritos(){
       ? `<div class="item-tags"><span class="mini-chip warn">Isenção em análise</span></div>
          <div class="iso-box">Já saiu o resultado do pedido de isenção?<br><button onmousedown="event.preventDefault();event.stopPropagation();" onclick="event.stopPropagation();isencaoResultado('${id}','deferida')">Deferida</button><button onmousedown="event.preventDefault();event.stopPropagation();" onclick="event.stopPropagation();isencaoResultado('${id}','indeferida')">Indeferida, pagar boleto</button></div>`
       : iso === "deferida"
-      ? `<div class="item-tags"><span class="mini-chip ok">Inscrita, isenção deferida</span></div>`
+      ? (inscConf[id] === true ? `<div class="item-tags"><span class="mini-chip ok">Inscrição confirmada ✓</span></div>` : `<div class="item-tags"><span class="mini-chip ok">Isenção deferida</span><span class="mini-chip warn">Aguardando confirmação</span></div><button class="boleto-mark-btn" onmousedown="event.preventDefault(); event.stopPropagation();" onclick="event.stopPropagation(); confirmarInscricao('${id}')">Marcar inscrição como confirmada</button>`)
       : paid === true
-      ? `<div class="item-tags"><span class="mini-chip ok">Inscrita</span></div>`
+      ? (inscConf[id] === true ? `<div class="item-tags"><span class="mini-chip ok">Inscrição confirmada ✓</span></div>` : `<div class="item-tags"><span class="mini-chip warn">Aguardando confirmação</span></div><button class="boleto-mark-btn" onmousedown="event.preventDefault(); event.stopPropagation();" onclick="event.stopPropagation(); confirmarInscricao('${id}')">Marcar inscrição como confirmada</button>`)
       : `<div class="item-tags"><span class="mini-chip warn">${iso === "indeferida" ? "Isenção indeferida: pague o boleto" : "⚠ Boleto pendente"}</span></div>
          <button class="boleto-mark-btn" onmousedown="event.preventDefault(); event.stopPropagation();" onclick="event.stopPropagation(); markBoletoPaid('${id}')">Marcar boleto como pago</button>`;
     return `
@@ -9035,7 +9057,7 @@ function exportData(){
     version: 1,
     exportedAt: new Date().toISOString(),
     profile, study, routine,
-    favIds, watchlist, inscritoIds, boletoStatus, isencaoStatus, cargosInscritos, seenItemIds,
+    favIds, watchlist, inscritoIds, boletoStatus, isencaoStatus, cargosInscritos, inscConf, inscritoEm, seenItemIds,
     darkMode, docChecklist, examChecklist, prep, wiz, roteiro, ing
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
@@ -9163,6 +9185,8 @@ document.getElementById("import-data-file").addEventListener("change", (e)=>{
       if(data.boletoStatus && typeof data.boletoStatus === "object") boletoStatus = data.boletoStatus;
       if(data.isencaoStatus && typeof data.isencaoStatus === "object") isencaoStatus = data.isencaoStatus;
       if(data.cargosInscritos && typeof data.cargosInscritos === "object") cargosInscritos = data.cargosInscritos;
+      if(data.inscConf && typeof data.inscConf === "object") inscConf = data.inscConf;
+      if(data.inscritoEm && typeof data.inscritoEm === "object") inscritoEm = data.inscritoEm;
       if(Array.isArray(data.seenItemIds)) seenItemIds = data.seenItemIds;
       if(typeof data.darkMode === "boolean") darkMode = data.darkMode;
       if(data.docChecklist && typeof data.docChecklist === "object") docChecklist = data.docChecklist;
@@ -9783,6 +9807,40 @@ function isoAskFechar(r){
   el.addEventListener("mousedown", e => e.preventDefault());
   el.addEventListener("click", () => isoAskFechar(r));
 });
+
+// ---------- Confirmação da inscrição: pergunta se foi aceita; se não, fica na situação atual ----------
+let inscConf = {}, inscAsked = {}, inscritoEm = {};
+function saveInscConf(){ saveState('concursos-rj-insc-conf', inscConf); }
+function saveInscAsked(){ saveState('concursos-rj-insc-asked', inscAsked); }
+function saveInscritoEm(){ saveState('concursos-rj-inscrito-em', inscritoEm); }
+function inscSituacaoResolvida(id){ return boletoStatus[id] === true || isencaoStatus[id] === "deferida"; }
+let confId = null;
+function checarConfirmacao(){
+  try{
+    if(document.querySelector(".modal-overlay.active")) return;
+    const hoje = hojeISO();
+    const id = inscritoIds.find(i => allItemsById[i] && inscConf[i] !== true && inscSituacaoResolvida(i) && inscAsked[i] !== hoje && !(inscritoEm[i] && inscritoEm[i] >= hoje));
+    if(!id) return;
+    confId = id;
+    document.getElementById("conf-title").textContent = allItemsById[id].item.title.replace(/^Concurso\s*/i,"") + ": a inscrição foi confirmada?";
+    document.getElementById("conf-modal").classList.add("active");
+  }catch(e){}
+}
+function confResponder(sim){
+  const id = confId; document.getElementById("conf-modal").classList.remove("active"); confId = null;
+  if(!id) return;
+  if(sim){ inscConf[id] = true; saveInscConf(); }
+  else { inscAsked[id] = hojeISO(); saveInscAsked(); }
+  try{ renderInicioInscritos(); renderAlertBox(); }catch(e){}
+  setTimeout(checarConfirmacao, 300);
+}
+function confirmarInscricao(id){ inscConf[id] = true; saveInscConf(); renderInicioInscritos(); renderAlertBox(); }
+[["conf-yes",true],["conf-no",false]].forEach(([k,v]) => {
+  const el = document.getElementById(k);
+  el.addEventListener("mousedown", e => e.preventDefault());
+  el.addEventListener("click", () => confResponder(v));
+});
+setTimeout(checarConfirmacao, 2200);
 </script>
 </body>
 </html>
