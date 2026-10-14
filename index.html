@@ -1754,6 +1754,13 @@
   .foco-mats{ display:flex; flex-wrap:wrap; gap:6px; margin:8px 0 4px; }
   .foco-mats span{ font-size:12px; font-weight:700; background:var(--blue-bg); color:var(--blue-deep); padding:4px 10px; border-radius:999px; }
   .foco-card .btn{ width:100%; margin-top:8px; text-align:center; }
+  /* guia Como usar */
+  .cu-card{background:var(--card,#fff);border:1px solid var(--line,#e6ddd2);border-radius:18px;padding:16px;margin:0 0 14px}
+  .cu-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .cu-top b{font-size:15px}.cu-x{background:none;border:0;font-size:13px;color:var(--ink-soft);padding:6px}
+  .cu-row{display:flex;gap:12px;align-items:flex-start;padding:9px 0;border-top:1px solid var(--line,#eee);width:100%;text-align:left;background:none;border-left:0;border-right:0;border-bottom:0;font:inherit;color:inherit}
+  .cu-n{flex:0 0 26px;height:26px;border-radius:50%;background:#F3E4EC;color:#702A55;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:13px}
+  .cu-row span{font-size:13px;line-height:1.35}.cu-row small{display:block;color:var(--ink-soft);font-size:12px;margin-top:2px}
 </style>
 </head>
 <body data-tab="inicio">
@@ -1768,7 +1775,7 @@
 </header>
 
 <div class="stats" id="stats" style="display:none;"></div>
-<p class="stats-hint" id="stats-hint-text" style="display:none;">Toque pra filtrar</p>
+<p class="stats-hint" id="stats-hint-text" style="display:none;">Toque num cartão para filtrar a lista</p>
 
 <div class="search-wrap" id="search-wrap" style="display:none;">
   <div class="search-box">
@@ -1792,6 +1799,7 @@
 
   <section class="panel active" id="panel-inicio">
     <div class="ps ps-home" onmousedown="event.preventDefault()" onclick="openBusca()" role="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span class="ps-text">Concursos, bancas, matérias</span><span class="ps-sep"></span><span class="ps-go">Procurar</span></div>
+        <div id="como-usar"></div>
     <div class="inicio-greeting" id="inicio-greeting"></div>
     <div id="inicio-frase"></div>
 
@@ -1831,10 +1839,10 @@
   <section class="panel" id="panel-concursos">
     <div class="sort-row" id="sort-row">
       <span class="sort-chip active" data-filter="all">Todos</span>
-      <span class="sort-chip" data-filter="abertos">Abertos</span>
-      <span class="sort-chip" data-filter="emandamento">Em andamento</span>
-      <span class="sort-chip" data-filter="banca">Banca definida</span>
-      <span class="sort-chip" data-filter="anunciado">Anunciados</span>
+      <span class="sort-chip" data-filter="abertos">Inscrição aberta</span>
+      <span class="sort-chip" data-filter="emandamento">Prova ou resultado</span>
+      <span class="sort-chip" data-filter="banca">Banca escolhida</span>
+      <span class="sort-chip" data-filter="anunciado">Só anunciados</span>
     </div>
 
     <div class="section-label" id="abertos-heading">Inscrições abertas hoje</div>
@@ -1860,7 +1868,7 @@
     <div class="seg-bar" id="study-seg-bar">
       <button data-seg-btn="hoje" class="active" onmousedown="event.preventDefault()" onclick="setStudySeg('hoje')">Hoje</button>
       <button data-seg-btn="cronograma" onmousedown="event.preventDefault()" onclick="setStudySeg('cronograma')">Cronograma</button>
-      <button data-seg-btn="mais" onmousedown="event.preventDefault()" onclick="setStudySeg('mais')">Ver mais</button>
+      <button data-seg-btn="mais" onmousedown="event.preventDefault()" onclick="setStudySeg('mais')">Mais</button>
     </div>
 
     <div id="study-back"></div>
@@ -2894,7 +2902,10 @@ window.__FED_ESFERA = {};
   add("bd","⛽ Petrobras","Petrobras","MS","Vários cargos (médio, técnico e superior)","R$ 5.878,82 (Gran) a R$ 15.200,52 (Estratégia)","1.000 a 1.400 (as fontes divergem)","Cesgranrio","Banca definida. Confirme vagas e salário no edital");
   add("bd","📊 IBGE","IBGE: Recenseador","M","Recenseador (temporário)","Até R$ 4,2 mil","27.279","Cesgranrio","Banca definida (a Gran ainda marca em definição)");
   add("bd","🏥 EBSERH","EBSERH","MS","Assistencial, administrativa e médica","R$ 3.057,56 a R$ 19.107,31 (últimos editais)","A definir","FGV (concurso) e AOCP (processo seletivo)","Banca definida. Comissão formada");
-  add("bd","⚖️ TRT 8","TRT 8","S","Cargos de nível superior","Até R$ 16.040,85","A definir","FCC","Banca definida");
+  add("ab","⚖️ TRT 8: Tribunal Regional do Trabalho da 8ª Região (PA e AP)","TRT 8","S","Analista Judiciário (Administrativa, Administrativa Contabilidade, Judiciária e apoio especializado) e Técnico Judiciário (Administrativa e outros). Todos exigem nível superior","R$ 9.776,71 (técnico) e R$ 16.040,88 (analista)","Cadastro de reserva, sem vagas imediatas","FCC","Inscrições de 05/10 a 05/11/2026. Prova em 17/01/2027",
+    { inscricoes:"05/10 a 05/11/2026", inscricaoInicio:"2026-10-05", inscricaoFim:"2026-11-05", provaData:"2027-01-17", prova:"17/01/2027 (analistas de manhã, técnicos à tarde)", taxa:"R$ 90 (técnico) e R$ 110 (analista). Boleto até 06/11",
+      estado:"PA", cidade:"Belém (PA) e Amapá", fonteUrl:"https://folha.qconcursos.com/n/concurso-trt8-edital-2026", fonteLabel:"Folha Dirigida / QConcursos: TRT 8",
+      note:"As vagas são no Pará e no Amapá. A área Administrativa aceita qualquer graduação, tanto para Analista quanto para Técnico. Só cadastro de reserva." });
   add("bd","⚖️ TRT 4","TRT 4","S","Cargos de nível superior","Até R$ 16.040,85","A definir","A definir","Banca em definição, segundo a Gran");
   add("bd","⚖️ TRF 3","TRF 3","S","Cargos de nível superior","A definir","A definir","A definir","Banca em definição, segundo a Gran");
   add("bd","🩺 Cofen","Cofen","MS","A definir","A definir","A definir","Instituto Quadrix","Banca definida, edital iminente segundo a Gran");
@@ -2906,7 +2917,10 @@ window.__FED_ESFERA = {};
   // Autorizados
   add("au","🏦 BACEN: Banco Central","BACEN: Banco Central","MS","Técnico, Analista e Procurador","R$ 7.938,81 a R$ 20.924,80","170 (Estratégia) ou 560 (Gran, solicitado)","A definir","Autorizado. Edital previsto até 01/2027");
   add("au","🔐 ANPD","ANPD","S","Especialista em Regulação de Proteção de Dados","R$ 17.726,42 (Estratégia). A Gran traz outros valores","50","A definir","Autorizado. Edital previsto até 12/2026");
-  add("au","🔎 CGU","CGU: Controladoria-Geral da União","S","Cargos de nível superior","Até R$ 36 mil","60","A definir","Autorizado, segundo a Gran", {note:"Bom encaixe para Administração e Contábeis."});
+  add("ab","🔎 CGU: Controladoria-Geral da União","CGU: Controladoria-Geral da União","S","Auditor Federal de Finanças e Controle (Auditoria: 30 vagas; TI: 30 vagas)","R$ 20.000 mais auxílio alimentação de R$ 1.192","60 imediatas e cadastro de reserva de até 368 aprovados","Cebraspe","Inscrições de 10/10 a 04/11/2026. Prova em 13/12/2026, objetiva e discursiva, em 27 capitais",
+    { inscricoes:"10/10 a 04/11/2026", inscricaoInicio:"2026-10-10", inscricaoFim:"2026-11-04", provaData:"2026-12-13", prova:"13/12/2026, objetiva de manhã e discursiva à tarde", taxa:"R$ 170. GRU até 06/11",
+      cidade:"Brasília (DF) e cinco estados", fonteUrl:"https://folha.qconcursos.com/n/concurso-cgu-2026-edital-publicado", fonteLabel:"Folha Dirigida / QConcursos: CGU",
+      note:"Aceita graduação em qualquer área, então Administração serve. As 30 vagas de Auditoria são 20 no DF e 2 em cada um de AC, AP, MT, RO e RR. A prova é feita na sua capital." });
   add("au","🛡️ Ministério da Defesa (temporários)","Ministério da Defesa: temporários","MS","A definir","A definir","91","A definir","Autorizado, segundo a Gran",{area:"Segurança pública"});
   add("au","⚓ Marinha","Marinha: Juiz do Tribunal Marítimo","S","Juiz do Tribunal Marítimo","A definir","1","A definir","Autorizado, segundo a Gran",{area:"Direito"});
   add("au","📚 Ministério da Saúde","Ministério da Saúde","MS","A definir","A definir","7.027 (solicitado, Estratégia)","A definir","Aparece como autorizado e como solicitado nas fontes");
@@ -2920,7 +2934,10 @@ window.__FED_ESFERA = {};
   add("pv","⚖️ STF","STF","MS","A definir","R$ 9.052,51","40 (projeto de lei a ser votado)","A definir","Previsto");
   add("pv","🏛️ DPU","DPU: Defensoria Pública da União","MS","Servidores","R$ 2.171,03","210","A definir","Previsto");
   add("pv","⚖️ DPU Defensor","DPU: Defensor Público Federal","S","Defensor Público Federal","R$ 28.109,19","A definir","A definir","Previsto no PLOA",{area:"Direito"});
-  add("pv","🏛️ Câmara dos Deputados","Câmara dos Deputados","S","A definir","A definir","A definir","A definir","Anunciado");
+  add("ab","🏛️ Câmara dos Deputados","Câmara dos Deputados","S","Analista Legislativo (Comunicação Social, Documentação e Informação, Engenharia, Museologia, Registro e Redação). Não há área de Administração","R$ 32.070,88","184: 66 imediatas e 118 de cadastro de reserva","Cebraspe","Edital publicado. Inscrições de 15/10 a 17/11/2026. Prova em 17/01/2027",
+    { badge:"EDITAL PUBLICADO", inscricoes:"15/10 a 17/11/2026", inscricaoInicio:"2026-10-15", inscricaoFim:"2026-11-17", provaData:"2027-01-17", prova:"17/01/2027, com 180 questões objetivas e discursiva", taxa:"R$ 130",
+      cidade:"Brasília (DF)", editalUrl:"https://www.cebraspe.org.br/concursos/CD_26_ANALISTA", fonteUrl:"https://concursosnobrasil.com/concursos/df/2026/10/02/camara-dos-deputados-publica-edital-de-concurso-com-184-vagas-e-iniciais-de-r-32-mil/", fonteLabel:"Concursos no Brasil: Câmara dos Deputados",
+      note:"Lotação só em Brasília. Este edital não tem área de Administração, então serve a quem tem formação nas áreas listadas." });
   add("pv","🚚 Ministério dos Transportes","Ministério dos Transportes","MS","Diversos","A definir","411 a 472 (fontes divergem)","A definir","Solicitado e previsto");
   add("es","⚖️ TST","TST","D","A definir","Até R$ 21.013,03","A definir","A definir","Estudos em andamento");
   add("es","📺 EBC","EBC","D","A definir","Inicial de R$ 4,4 mil","A definir","A definir","Estudos em andamento");
@@ -2987,6 +3004,72 @@ window.__FED_ESFERA = {};
 [...abertos, ...emAndamento, ...banca, ...anunciados].forEach(it => {
   if(/TCU:|TSE:|TRE-RJ:|UFRJ|TCE RJ|TCM RJ|Receita Federal|CGU|BACEN|Dataprev/.test(it.title)) it.destaque = true;
 });
+
+
+// ---------- Atualização de 13/10/2026: mudanças de status, correções e concursos de outros estados ----------
+(function(){
+  const todos = () => [].concat(abertos, emAndamento, banca, anunciados);
+  const ach = re => todos().find(x => re.test(x.title));
+  const ajustar = (re, ov) => { const it = ach(re); if(it) Object.assign(it, ov); return it; };
+  const mover = (de, re, para, ov) => { const i = de.findIndex(x => re.test(x.title)); if(i < 0) return null; const it = de.splice(i, 1)[0]; Object.assign(it, ov); para.push(it); return it; };
+  // INB: edital publicado em 13/10, com Administrador
+  mover(banca, /INB/, abertos, { badge:"INSCRIÇÕES ABERTAS", badgeType:"aberto", nivel:"Médio, Técnico e Superior",
+    cargos:"Superior: Administrador, Advogado, Auditor, Contador, Economista, engenheiros e outros. Médio e técnico: Assistente Administrativo, Inspetor de Guarda e técnicos",
+    salario:"R$ 3.452 a R$ 8.374. Administrador: R$ 7.221", vagas:"Cadastro de reserva, sem vagas imediatas", banca:"FGV: Fundação Getulio Vargas",
+    situacao:"Edital publicado em 13/10/2026. Inscrições de 13/10 a 11/11/2026. Prova em 10/01/2027",
+    inscricoes:"13/10 a 11/11/2026", inscricaoInicio:"2026-10-13", inscricaoFim:"2026-11-11", isencaoInicio:"2026-10-13", isencaoFim:"2026-10-15",
+    provaData:"2027-01-10", prova:"10/01/2027, no Rio, em Resende, Caetité e Poços de Caldas", taxa:"R$ 100 (médio e técnico) e R$ 125 (superior). Pagamento até 12/11",
+    fonteUrl:"https://concursos.estrategia.com/portal/concurso-inb-2026-edital-publicado/", fonteLabel:"Estratégia Concursos: edital INB 2026",
+    note:"Tem o cargo de Administrador, com sede no Rio. Pedido de isenção só de 13 a 15/10. O link do edital que achei tem a palavra minuta no nome, então confirme a versão final no site da FGV." });
+  // Bombeiros RJ: o edital de verdade é de 192 vagas de saúde
+  mover(banca, /Bombeiros RJ: temp/, abertos, { badge:"EDITAL PUBLICADO", badgeType:"aberto", nivel:"Superior", cargos:"1º tenente temporário especialista (saúde)",
+    salario:"R$ 10.466,77 no estágio e R$ 12.279,71 depois", vagas:"192", banca:"AOCP",
+    situacao:"Edital publicado, com inscrições de 19/10 a 09/11/2026. Processo seletivo sem prova, segundo a Folha Dirigida. As fontes antigas falavam em 1.500 vagas, mas o edital é de 192",
+    inscricoes:"19/10 a 09/11/2026", inscricaoInicio:"2026-10-19", inscricaoFim:"2026-11-09", prova:"Sem prova, segundo a Folha Dirigida",
+    fonteUrl:"https://folha.qconcursos.com/n/concursos-rio-de-janeiro", fonteLabel:"Folha Dirigida / QConcursos: concursos RJ",
+    note:"Fora do perfil de Administração, só para a área da saúde. Entra para quem escolher Segurança pública." });
+  // Correções e divergências
+  ajustar(/IFRJ/, { banca:"IDECAN", vagas:"50 (Gran) ou 70 previstas no orçamento de 2027 (Folha Dirigida)",
+    situacao:"Banca definida: IDECAN, segundo a Estratégia (06/10) e a Gran (03/10). A Folha Dirigida citou Access em uma matéria de 24/09 e Idecan em outra. Sem edital" });
+  ajustar(/UFRJ/, { situacao:"Edital 583/2026 publicado no DOU em 22/05/2026. O Valor Final mostra nenhuma inscrição aberta no radar em 13/10, então ele provavelmente já encerrou. Confira no site da UFRJ se há edital novo" });
+  ajustar(/Detran RJ/, { badge:"COMISSÃO FORMADA", situacao:"Comissão formada, segundo a Estratégia (06/10), com 552 vagas e cadastro de reserva. A Gran (03/10) marca como anunciado. Sem banca nem edital" });
+  ajustar(/TCE RJ/, { situacao:"Previsto, com 40 vagas e cadastro de reserva. A Estratégia (06/10) marca comissão formada, a Gran (03/10) marca banca em definição e a Folha Dirigida diz que a banca IBFC foi rescindida. Sem edital" });
+  ajustar(/Receita Federal/, { vagas:"146 (Estratégia, 13/10)", situacao:"Autorizado, com edital previsto até 01/2027, segundo a Estratégia (13/10). Banca ainda não informada" });
+  ajustar(/TCU/, { situacao:"Autorizado e anunciado para 2026, com 100 vagas, segundo a Estratégia (13/10). A Folha Dirigida (24/09) fala em novo edital de auditor planejado para 2027. Confira o prazo" });
+  ajustar(/CPNU 3/, { situacao:"O governo disse que não haverá CPNU em 2026, por causa das eleições (matéria da Gran de 31/07/2026). 2027 é a janela mais provável, sem edital anunciado" });
+  ajustar(/Petrobras/, { situacao:"Banca definida: Cesgranrio, com contrato até 2028. Sem edital e sem data, segundo a Estratégia (19/08). Os números de vagas, de 1.000 a 1.400, não são oficiais" });
+  ajustar(/Banco do Brasil/, { situacao:"Em estudos, segundo a Estratégia (13/10). Sem edital. Em fevereiro o BB disse que a previsão era para este ano, mas depois disse não ter previsão. A banca ainda não foi escolhida" });
+  ajustar(/UNIRIO/, { note:"Editais de 1 vaga, de nível superior, com remuneração de R$ 6.157 a R$ 8.340. Os cargos não aparecem na fonte, então confira cada edital." });
+  // Outros estados: Administração, gestão e controle
+  const nv = o => { const it = _novo(o); abertos.push(it); window.__FED_ESFERA = window.__FED_ESFERA || {}; window.__FED_ESFERA[slugify(it.title)] = it.__esf; delete it.__esf; return it; };
+  nv({ org:"🏛️ Governo da Bahia: Secretaria da Administração", title:"Concurso EPPGG BA", badge:"EDITAL PUBLICADO", badgeType:"aberto", __esf:"estadual", estado:"BA", cidade:"Salvador (BA)",
+    nivel:"Superior", cargos:"Especialista em Políticas Públicas e Gestão Governamental (EPPGG)", salario:"R$ 10.860,62", vagas:"50 (33 ampla concorrência, 15 negros e 2 pessoas com deficiência)", banca:"Cesgranrio",
+    situacao:"Edital publicado. Inscrições de 16/10 a 11/11/2026. Prova em 10/01/2027, em Salvador",
+    inscricoes:"16/10 a 11/11/2026", inscricaoInicio:"2026-10-16", inscricaoFim:"2026-11-11", isencaoInicio:"2026-10-16", isencaoFim:"2026-10-23",
+    provaData:"2027-01-10", prova:"10/01/2027, em Salvador", taxa:"R$ 220. Isenção para CadÚnico de 16 a 23/10",
+    fonteUrl:"https://folha.qconcursos.com/n/concurso-eppgg-ba-edital-2026", fonteLabel:"Folha Dirigida / QConcursos: EPPGG BA",
+    note:"Aceita qualquer graduação, então Administração serve. É gestão pública, o encaixe mais direto, mas a prova é em Salvador." });
+  nv({ org:"🏛️ Governo do Amapá: Gestão Governamental", title:"Concurso Gestão Governamental AP", badge:"INSCRIÇÕES ABERTAS", badgeType:"aberto", __esf:"estadual", estado:"AP", cidade:"Macapá (AP)",
+    nivel:"Médio e Superior", cargos:"Analista (Administrativo: 46, Planejamento e Orçamento: 33, e outros) e Assistente Administrativo (185)", salario:"R$ 3.903,75 (assistente) e R$ 8.331,35 (analista)",
+    vagas:"358 de cadastro de reserva: 185 assistentes e 173 analistas", banca:"IDCAP",
+    situacao:"Inscrições de 08 a 29/10/2026. Provas em 22/11 (assistente) e 29/11 (analistas)",
+    inscricoes:"08 a 29/10/2026. Taxa até 30/10", inscricaoInicio:"2026-10-08", inscricaoFim:"2026-10-29", provaData:"2026-11-22", prova:"22/11 (assistente) e 29/11/2026 (analistas)", taxa:"R$ 90 (médio) e R$ 120 (superior)",
+    fonteUrl:"https://folha.qconcursos.com/n/concurso-gestao-ap-2026-edital", fonteLabel:"Folha Dirigida / QConcursos: Gestão AP",
+    note:"Analista administrativo aceita qualquer graduação. Planejamento e Orçamento aceita Administração. Só cadastro de reserva, e as vagas são no Amapá." });
+  nv({ org:"🏛️ Tribunal de Contas do Estado de Goiás", title:"Concurso TCE GO: Técnico de Controle Externo", badge:"INSCRIÇÕES ABERTAS", badgeType:"aberto", __esf:"estadual", estado:"GO", cidade:"Goiânia (GO)",
+    nivel:"Médio", cargos:"Técnico de Controle Externo: Técnico Administrativo (6 vagas) e Tecnologia da Informação (10)", salario:"R$ 11.862,19", vagas:"16 imediatas e cadastro de reserva", banca:"FCC",
+    situacao:"Inscrições de 05/10 a 06/11/2026. Prova em 17/01/2027, em Goiânia",
+    inscricoes:"05/10 a 06/11/2026", inscricaoInicio:"2026-10-05", inscricaoFim:"2026-11-06", provaData:"2027-01-17", prova:"17/01/2027, objetiva e discursiva, em Goiânia", taxa:"R$ 100. Boleto até 09/11",
+    fonteUrl:"https://www.direcaoconcursos.com.br/noticias/concurso-tce-go-cargos-vagas-salarios", fonteLabel:"Direção Concursos: TCE GO",
+    note:"Exige nível médio, com salário alto. Quem tem Administração também pode prestar. A matéria que li é de 27/08, e as datas bateram com as da Estratégia (12/10)." });
+  nv({ org:"🏛️ Assembleia Legislativa do Pará (ALEPA)", title:"Concurso ALEPA 2026", badge:"INSCRIÇÕES ABERTAS", badgeType:"aberto", __esf:"estadual", estado:"PA", cidade:"Belém (PA)",
+    nivel:"Médio e Superior", cargos:"Analista Legislativo (Administração: 2 vagas; Assistência Legislativa: 44, qualquer graduação), Técnico Legislativo, Assessor, Consultor e Auxiliar Técnico (Assistência Administrativa: 14)",
+    salario:"R$ 4.131,40 (médio) e R$ 10.353,64 (superior)", vagas:"135 imediatas", banca:"Fundação CETAP",
+    situacao:"Inscrições de 01/10 a 04/11/2026. Prova em 13/12/2026, em Belém",
+    inscricoes:"01/10 a 04/11/2026", inscricaoInicio:"2026-10-01", inscricaoFim:"2026-11-04", provaData:"2026-12-13", prova:"13/12/2026, em Belém", taxa:"R$ 98 (médio) e R$ 118 (superior)",
+    fonteUrl:"https://noticias.focusconcursos.com.br/noticias/concurso-alepa-editais-abrem-135-vagas-para-niveis-medio-e-superior", fonteLabel:"Focus Concursos: ALEPA",
+    note:"Tem vaga específica de Administração e vários cargos de qualquer graduação. As vagas são em Belém." });
+})();
 
 // Tags genéricas de área/estado/cidade em cada concurso, usadas pelo filtro de perfil.
 // Hoje todo o conteúdo cadastrado é de Administração no Rio de Janeiro (capital); ao
@@ -7264,7 +7347,7 @@ const BANCAS_FAMA = [
   { id:"IADES", nome:"IADES", fama:"Média", tom:"mid", fato:"Muito presente em conselhos profissionais.", estilo:"Múltipla escolha, em alguns editais com discursiva.", pros:["Conhecida de quem acompanha conselhos de classe","Banca do CRA-RJ, que está no seu painel"], atencao:"Confira se o edital traz discursiva, como no CRA-RJ." },
   { id:"IBDO", nome:"IBDO", fama:"Sem dado suficiente", tom:"none", fato:"Banca do concurso da SES RJ.", estilo:"Veja o edital de cada concurso.", pros:["Atua em concursos de saúde do RJ"], atencao:"As fontes consultadas trazem pouco material público de provas anteriores." },
   { id:"Avalia", nome:"Instituto Avalia", fama:"Sem dado suficiente", tom:"none", fato:"Banca mais nova no mercado.", estilo:"Veja o edital de cada concurso.", pros:["Banca do Theatro Municipal RJ, do seu painel"], atencao:"Ainda tem pouco histórico de provas para treinar." },
-  { id:"Access", nome:"Instituto Access", fama:"Sem dado suficiente", tom:"none", fato:"Banca do concurso do IFRJ, que está no seu painel.", estilo:"Veja o edital de cada concurso.", pros:["Atua em concursos de institutos federais e prefeituras"], atencao:"Poucas informações públicas sobre dificuldade nas fontes consultadas." },
+  { id:"Access", nome:"Instituto Access", fama:"Sem dado suficiente", tom:"none", fato:"Banca que a Folha Dirigida citou para o IFRJ em uma matéria, mas as outras fontes apontam a Idecan.", estilo:"Veja o edital de cada concurso.", pros:["Atua em concursos de institutos federais e prefeituras"], atencao:"Poucas informações públicas sobre dificuldade nas fontes consultadas." },
   { id:"IBAM", nome:"IBAM", fama:"Sem dado suficiente", tom:"none", fato:"Especializada em prefeituras e câmaras municipais.", estilo:"Veja o edital de cada concurso.", pros:["Foco em concursos municipais"], atencao:"Poucas informações públicas sobre dificuldade nas fontes consultadas." }
 ];
 function bancaMatchItem(item, b){ return String(item.banca || "").toLowerCase().includes(b.id.toLowerCase()); }
@@ -8049,7 +8132,7 @@ function dayTimelineBlocks(dow){
 // mais confiáveis, e copia o pedido pronto pra colar no Claude, que confere e devolve
 // o painel atualizado. ----------
 const DATA_CHECKED = "13/10/2026";
-const DATA_CHECKED_HORA = "21:40";
+const DATA_CHECKED_HORA = "22:30";
 const UPDATE_SOURCES = [
   { name:"JC Concursos: abertos no RJ", url:"https://jcconcursos.com.br/concursos/inscricoes-abertas/rj" },
   { name:"PCI Concursos: Rio de Janeiro", url:"https://www.pciconcursos.com.br/concursos/rj/rio-de-janeiro" },
@@ -8593,10 +8676,10 @@ function refreshStats(){
   // "Todos os previstos" soma só banca + anunciados; os concursos Ativos somam
   // abertos + em andamento).
   const statsData = [
-    { n: fa.length + fe.length, label: "Ativos", ico:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2" fill="currentColor"/><circle cx="12" cy="12" r="8"/></svg>`, goFilter:"abertos" },
-    { n: fb.length, label: "Banca definida", ico:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/></svg>`, goFilter:"banca" },
-    { n: fn.length, label: "Anunciados", ico:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg>`, goFilter:"anunciado" },
-    { n: fb.length + fn.length, label: "Todos os previstos", ico:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12.3 2.8 2.8L16.2 9.5"/></svg>`, goFilter:"previstos" }
+    { n: fa.length + fe.length, label: "Inscrição aberta", ico:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2" fill="currentColor"/><circle cx="12" cy="12" r="8"/></svg>`, goFilter:"abertos" },
+    { n: fb.length, label: "Banca escolhida", ico:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/></svg>`, goFilter:"banca" },
+    { n: fn.length, label: "Só anunciados", ico:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg>`, goFilter:"anunciado" },
+    { n: fb.length + fn.length, label: "Previstos no total", ico:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12.3 2.8 2.8L16.2 9.5"/></svg>`, goFilter:"previstos" }
   ];
   document.getElementById("stats").innerHTML = statsData.map((s,i) => `<div class="stat st-${s.goFilter}" data-go-filter="${s.goFilter}" role="button" tabindex="0"><span class="stat-ico">${s.ico}</span><b>${s.n}</b><span class="stat-lbl">${s.label}</span><span class="stat-arrow">›</span></div>`).join("");
 
@@ -9265,6 +9348,22 @@ function focoCardHtml(){
     <div class="foco-l"><b>${escHtml(origem)}.</b></div><div class="foco-mats">${top || "<span>Sem matérias cadastradas</span>"}</div>
     <button class="btn" onmousedown="event.preventDefault()" onclick="goPerfil('pf-prio-label')">Mudar a ordem de prioridade</button></div>`;
 }
+
+// Guia "Como usar o Rota" (Início), some depois de dispensado
+(function(){
+  function visto(){try{return localStorage.getItem("rota-como-usar")==="1"}catch(e){return false}}
+  window.renderComoUsar=function(){
+    var el=document.getElementById("como-usar"); if(!el) return;
+    if(visto()){el.innerHTML='<div style="text-align:right;margin:-4px 0 10px"><button class="cu-x" onclick="try{localStorage.removeItem(\'rota-como-usar\')}catch(e){};renderComoUsar()">Como usar o Rota</button></div>';return;}
+    var go=function(t){return "document.querySelector('.tab-btn[data-tab=&quot;"+t+"&quot;]').click()"};
+    el.innerHTML='<div class="cu-card"><div class="cu-top"><b>Como usar o Rota</b><button class="cu-x" onclick="try{localStorage.setItem(\'rota-como-usar\',\'1\')}catch(e){};renderComoUsar()">Entendi, fechar</button></div>'+
+    '<button class="cu-row" onclick="'+go("concursos")+'"><i class="cu-n">1</i><span><b>Concursos</b><small>Veja o que está aberto e o que vem aí. Toque na estrela para guardar.</small></span></button>'+
+    '<button class="cu-row" onclick="'+go("favoritos")+'"><i class="cu-n">2</i><span><b>Favoritos</b><small>Seus guardados. Coloque em ordem de prioridade no Perfil.</small></span></button>'+
+    '<button class="cu-row" onclick="'+go("estudos")+'"><i class="cu-n">3</i><span><b>Estudos</b><small>Cronograma, matérias do dia, questões e revisões.</small></span></button>'+
+    '<button class="cu-row" onclick="'+go("perfil")+'"><i class="cu-n">4</i><span><b>Perfil</b><small>Sua área, rotina e prioridades. O Rota monta o resto.</small></span></button></div>';
+  };
+  document.addEventListener("DOMContentLoaded",renderComoUsar); try{renderComoUsar()}catch(e){}
+})();
 </script>
 </body>
 </html>
