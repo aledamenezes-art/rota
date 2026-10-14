@@ -134,6 +134,9 @@
   /* Modal simples pra perguntar sobre o boleto assim que marca "já me inscrevi" */
   .modal-overlay{ position:fixed; inset:0; z-index:300; background:rgba(62,68,87,.45); display:none; align-items:flex-end; justify-content:center; padding:0; }
   .modal-overlay.active{ display:flex; }
+  .modal-card.has-x{ position:relative; }
+  .modal-x{ position:absolute; top:12px; right:12px; width:34px; height:34px; border-radius:50%; border:0; background:#F1ECE6; color:#4a3340; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:2; }
+  .modal-x:active{ transform:scale(.9); }
   .modal-card{ background:var(--card); border-radius:20px 20px 0 0; padding:24px 20px calc(20px + env(safe-area-inset-bottom)); width:100%; max-width:480px; text-align:center; animation:modalUp .25s ease; }
   @keyframes modalUp{ from{ transform:translateY(24px); opacity:0; } to{ transform:translateY(0); opacity:1; } }
   .modal-emoji{ font-size:26px; margin-bottom:8px; }
@@ -2332,7 +2335,8 @@
   </div>
 </div>
 <div class="modal-overlay" id="cargo-modal">
-  <div class="modal-card" style="max-height:86vh;overflow:auto;text-align:left">
+  <div class="modal-card has-x" style="max-height:86vh;overflow:auto;text-align:left">
+    <button type="button" class="modal-x" aria-label="Fechar e desmarcar a inscrição" onmousedown="event.preventDefault()" onclick="cancelarFluxoInscricao()"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none"/></svg></button>
     <div class="modal-emoji" style="text-align:center">🎯</div>
     <div class="modal-title" style="text-align:center">Em qual cargo você se inscreveu?</div>
     <p class="modal-sub" id="cargo-sub" style="text-align:center">Marque um ou mais. Assim eu te aviso da data e do horário da prova.</p>
@@ -2345,7 +2349,8 @@
   </div>
 </div>
 <div class="modal-overlay" id="isencao-modal">
-  <div class="modal-card">
+  <div class="modal-card has-x">
+    <button type="button" class="modal-x" aria-label="Fechar e desmarcar a inscrição" onmousedown="event.preventDefault()" onclick="cancelarFluxoInscricao()"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none"/></svg></button>
     <div class="modal-emoji">🩸</div>
     <div class="modal-title">Você pediu isenção da taxa?</div>
     <p class="modal-sub">Por doação de sangue ou medula, CadÚnico ou outra regra. Se pediu, eu te aviso para acompanhar o resultado.</p>
@@ -2356,7 +2361,8 @@
   </div>
 </div>
 <div class="modal-overlay" id="boleto-modal">
-  <div class="modal-card">
+  <div class="modal-card has-x">
+    <button type="button" class="modal-x" aria-label="Fechar e desmarcar a inscrição" onmousedown="event.preventDefault()" onclick="cancelarFluxoInscricao()"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none"/></svg></button>
     <div class="modal-emoji">🧾</div>
     <div class="modal-title">Você já pagou o boleto da inscrição?</div>
     <p class="modal-sub">Ajuda a acompanhar o que falta em cada inscrição.</p>
@@ -5457,7 +5463,7 @@ function toggleInscrito(id){
     saveInscritos();
     refreshInscritoUI();
     renderNovidades();
-    pendingBoletoId = id;
+    pendingBoletoId = id; inscFluxoId = id;
     inscritoEm[id] = hojeISO(); saveInscritoEm();
     abrirCargoModal(id, true);
   } else {
@@ -5485,7 +5491,7 @@ function closeIsencaoModal(){ document.getElementById("isencao-modal").classList
     const id = pendingIsencaoId; closeIsencaoModal();
     if(k === "isencao-yes" && id){
       isencaoStatus[id] = "pedida"; saveIsencao();
-      pendingBoletoId = null;
+      pendingBoletoId = null; inscFluxoId = null;
       renderInicioInscritos(); renderAlertBox();
       if(typeof toast === "function") toast("Vou te lembrar de conferir o resultado da isenção");
     } else if(id){
@@ -5501,7 +5507,7 @@ function isencaoResultado(id, r){
 }
 function closeBoletoModal(){
   document.getElementById("boleto-modal").classList.remove("active");
-  pendingBoletoId = null;
+  pendingBoletoId = null; inscFluxoId = null;
 }
 document.getElementById("boleto-yes").addEventListener("mousedown", (e)=>e.preventDefault());
 document.getElementById("boleto-no").addEventListener("mousedown", (e)=>e.preventDefault());
@@ -10008,6 +10014,16 @@ function saveCargosInsc(){ saveState('concursos-rj-cargos-insc', cargosInscritos
 function cargosDoItem(id){
   const e = allItemsById[id]; if(!e) return [];
   return (typeof CARGOS_FIT !== "undefined" ? CARGOS_FIT : []).filter(c => c.re.test(e.item.title));
+}
+// Fluxo de inscrição (cargo, isenção, boleto): o X fecha tudo e desmarca a inscrição,
+// para quem tocou em "Já me inscrevi" sem querer.
+let inscFluxoId = null;
+function cancelarFluxoInscricao(){
+  const id = inscFluxoId || pendingCargoId || pendingIsencaoId || pendingBoletoId;
+  ["cargo-modal","isencao-modal","boleto-modal"].forEach(m => document.getElementById(m).classList.remove("active"));
+  pendingCargoId = null; pendingIsencaoId = null; pendingBoletoId = null; cargoFluxo = false; inscFluxoId = null;
+  if(id && inscritoIds.includes(id)) toggleInscrito(id);
+  if(typeof toast === "function") toast("Inscrição desmarcada");
 }
 function abrirCargoModal(id, fluxo){
   pendingCargoId = id; cargoFluxo = !!fluxo;
