@@ -1719,6 +1719,41 @@
   .rt-tap{ cursor:pointer; -webkit-tap-highlight-color:transparent; }
   .rt-tap:active .rt-title{ color:var(--blue-deep); }
   .rt-chev{ float:right; color:var(--ink-soft); font-size:18px; line-height:1; margin-left:8px; }
+
+  /* ====== Mais bordô e roxo (13/10): ação em ameixa, verde só para "ok" ====== */
+  :root{ --blue:#D9B4C8; --blue-deep:#702A55; --blue-bg:#F3E4EC; --btn-primary-bg:#702A55;
+    --grad-ag:linear-gradient(90deg,#702A55,#8B3F6E);
+    --grad-hero:linear-gradient(135deg,#6E1F3A 0%,#702A55 55%,#4F3A82 100%); }
+  html[data-theme="dark"]{ --blue:#7A2F5E; --blue-deep:#E8B0CD; --blue-bg:#3A1D2F; --btn-primary-bg:#E8B0CD;
+    --grad-ag:linear-gradient(90deg,#E8B0CD,#D493B8);
+    --grad-hero:linear-gradient(135deg,#8E3050 0%,#7A3A80 55%,#5A4AA0 100%); }
+  .detail-sticky-cta .insc-toggle{ box-shadow:0 10px 24px rgba(112,42,85,.28); }
+  .cr-banner{ background:linear-gradient(140deg,#4A1A36,#241E20); }
+  .hj-bar i{ background:linear-gradient(90deg,var(--blue),var(--blue-deep)); }
+
+  /* ====== Prioridade das provas e foco ====== */
+  .pr-card{ background:var(--card); border:1px solid var(--line); border-radius:16px; padding:6px 14px 14px; box-shadow:var(--shadow-sm); }
+  .pr-note{ font-size:12.5px; line-height:1.5; color:var(--ink-soft); margin:10px 0 4px; }
+  .pr-row{ display:flex; align-items:center; gap:11px; padding:11px 0; border-top:1px solid var(--line); }
+  .pr-row:first-of-type{ border-top:0; }
+  .pr-n{ flex:none; width:30px; height:30px; border-radius:50%; background:var(--blue-bg); color:var(--blue-deep); font-weight:900; font-size:13px; display:flex; align-items:center; justify-content:center; }
+  .pr-row.foco .pr-n{ background:var(--grad-ag); color:#fff; }
+  .pr-t{ flex:1; min-width:0; }
+  .pr-t b{ display:block; font-size:14px; font-weight:800; line-height:1.25; }
+  .pr-t small{ display:block; font-size:12px; color:var(--ink-soft); margin-top:2px; }
+  .pr-chip{ display:inline-block; font-size:10px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; background:var(--blue-bg); color:var(--blue-deep); padding:2px 7px; border-radius:999px; margin-left:6px; vertical-align:2px; }
+  .pr-btns{ display:flex; gap:6px; flex:none; }
+  .pr-btns button{ width:34px; height:34px; border-radius:50%; border:1px solid var(--line); background:var(--card); color:var(--ink); cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; }
+  .pr-btns button:disabled{ opacity:.3; cursor:default; }
+  .pr-btns svg{ width:16px; height:16px; }
+  .pr-card .btn{ width:100%; margin-top:10px; text-align:center; }
+  .foco-card{ background:var(--card); border:1px solid var(--line); border-left:4px solid var(--blue-deep); border-radius:16px; padding:14px 15px; margin:0 0 12px; box-shadow:var(--shadow-sm); }
+  .foco-card h3{ font-family:var(--serif); font-size:19px; line-height:1.2; margin:3px 0 8px; }
+  .foco-l{ font-size:13px; line-height:1.5; margin:4px 0; }
+  .foco-l b{ font-weight:800; }
+  .foco-mats{ display:flex; flex-wrap:wrap; gap:6px; margin:8px 0 4px; }
+  .foco-mats span{ font-size:12px; font-weight:700; background:var(--blue-bg); color:var(--blue-deep); padding:4px 10px; border-radius:999px; }
+  .foco-card .btn{ width:100%; margin-top:8px; text-align:center; }
 </style>
 </head>
 <body data-tab="inicio">
@@ -2131,6 +2166,9 @@
     <div id="pf-banca"></div>
 
     <div class="insight-strip" style="margin-top:16px">📊 Administração é a <b>3ª carreira mais buscada</b> em concursos no Brasil, com <b>64,6%</b> de aproveitamento médio.</div>
+
+    <div class="pf-label" id="pf-prio-label">Prioridade das provas</div>
+    <div id="pf-prio"></div>
   </section>
 
 </main>
@@ -6206,12 +6244,13 @@ function prepGeral(){
     fimDe[id] = fim;
     if(fim > fimMax) fimMax = fim;
     const lista = prepMateriasGeral(id).filter(m => !p.fora.includes(m.nome));
+    const pfat = prioFator(id);
     const tot = lista.reduce((a,m) => a + (m.questoes || m.peso || 1), 0) || 1;
     lista.forEach(m => {
       const esp = /^conhecimentos especificos/.test(prepNorm(m.nome));
       const k = esp ? prepNorm(m.nome) + "|" + id : prepNorm(m.nome);
       const o = mats[k] || (mats[k] = { k, nome: esp ? "Específicos de " + prepNomeCurto(id) : m.nome, w:0, ids:[] });
-      o.w += (m.questoes || m.peso || 1) / tot * urg * (p.fraca.includes(m.nome) ? 1.6 : 1) * (p.forte.includes(m.nome) ? 0.7 : 1);
+      o.w += (m.questoes || m.peso || 1) / tot * urg * pfat * (p.fraca.includes(m.nome) ? 1.6 : 1) * (p.forte.includes(m.nome) ? 0.7 : 1);
       if(!o.ids.includes(id)) o.ids.push(id);
     });
   });
@@ -6506,6 +6545,7 @@ function roteiroTrilhasAtivas(){ const o = objAtual() || "concurso"; return o ==
 function roteiroFases(t){ return (t || roteiroTri) === "ingles" ? ROTEIRO_FASES_ING : ROTEIRO_FASES; }
 function saveRoteiro(){ saveState('concursos-rj-roteiro', roteiro); }
 function roteiroAlvo(){
+  if(prioridadeAtiva()){ const p = prioridadeIds()[0]; if(p) return p; }
   if(profile.alvoId && allItemsById[profile.alvoId]) return profile.alvoId;
   return [].concat(inscritoIds, favIds).find(i => allItemsById[i]) || null;
 }
@@ -6513,7 +6553,9 @@ function roteiroTrocarAlvo(){
   const l = [].concat(inscritoIds, favIds).filter((x, k, a) => allItemsById[x] && a.indexOf(x) === k);
   if(l.length < 2) return;
   const i = l.indexOf(roteiroAlvo());
-  profile.alvoId = l[(i + 1) % l.length]; saveState("concursos-rj-perfil", profile);
+  profile.alvoId = l[(i + 1) % l.length];
+  if(prioridadeAtiva()){ const o = prioridadeIds().filter(x => x !== profile.alvoId); profile.prioridade = [profile.alvoId].concat(o); }
+  saveState("concursos-rj-perfil", profile);
   try{ renderRoteiroCard(); if(document.getElementById("sub-screen").classList.contains("active")) abrirRoteiro(false, roteiroTri); }catch(e){}
 }
 function roteiroAbrir(tipo){
@@ -7105,6 +7147,7 @@ function abrirRoteiro(manter, t){
   const sc = document.getElementById("sub-scroll"); const top = sc.scrollTop;
   document.getElementById("sub-content").innerHTML = `
     ${roteiroTrilhasAtivas().length > 1 ? `<div class="rt-seg"><button class="${roteiroTri === "concurso" ? "on" : ""}" onclick="roteiroTroca('concurso')">Concurso</button><button class="${roteiroTri === "ingles" ? "on" : ""}" onclick="roteiroTroca('ingles')">Inglês</button></div>` : ""}
+    ${roteiroTri === "concurso" ? focoCardHtml() : ""}
     <div class="rt-hero"><div class="rt-hero-n">${pr.feitos}<small> de ${pr.total}</small></div><div class="rt-hero-t">passos concluídos</div><div class="hj-bar"><i style="width:${pct}%"></i></div></div>
     ${fases}`;
   document.getElementById("sub-screen").classList.add("active");
@@ -7260,6 +7303,7 @@ function renderPerfilHub(){
   const head = document.getElementById("pf-head"), plano = document.getElementById("pf-plano");
   if(!head || !plano) return;
   renderBancaFav();
+  try{ renderPrioridade(); }catch(e){}
   const form = wzFind(WZ_FORMACOES, profile.formacao);
   const nivs = (profile.niveis || []).filter(n => n !== "Técnico" || !(profile.niveis || []).includes("Médio")).join(" e ");
   const ocP = profile.vida ? wzFind(OCUP, profile.vida.ocup) : null;
@@ -9001,15 +9045,18 @@ function bancaChaveInfo(item){
 }
 function bancasDosFavoritos(){
   const m = {};
-  favIds.forEach(id => {
+  const porPrio = prioridadeAtiva();
+  (porPrio ? prioridadeIds() : favIds).forEach(id => {
     const rec = allItemsById[id]; if(!rec) return;
     const b = bancaChaveInfo(rec.item); if(!b) return;
-    const o = m[b.chave] || (m[b.chave] = { chave:b.chave, label:b.label, fama:b.fama, n:0, confirmadas:0, ids:[] });
+    const o = m[b.chave] || (m[b.chave] = { chave:b.chave, label:b.label, fama:b.fama, n:0, confirmadas:0, ids:[], primeiro:id, ord:Object.keys(m).length });
     o.n++; if(!b.ultima) o.confirmadas++; o.ids.push(id);
   });
-  const lista = Object.values(m).sort((a, b) => b.n - a.n || b.confirmadas - a.confirmadas || a.label.localeCompare(b.label, "pt-BR"));
-  const semBanca = favIds.filter(id => allItemsById[id] && !bancaChaveInfo(allItemsById[id].item)).length;
-  return { lista, semBanca, empate: lista.length > 1 && lista[0].n === lista[1].n };
+  const lista = Object.values(m).sort(porPrio ? ((a, b) => a.ord - b.ord) : ((a, b) => b.n - a.n || b.confirmadas - a.confirmadas || a.label.localeCompare(b.label, "pt-BR")));
+  const pool = porPrio ? prioridadeIds() : favIds;
+  const semBanca = pool.filter(id => allItemsById[id] && !bancaChaveInfo(allItemsById[id].item)).length;
+  const focoSemBanca = porPrio && !!pool[0] && allItemsById[pool[0]] && !bancaChaveInfo(allItemsById[pool[0]].item);
+  return { lista, semBanca, porPrio, focoSemBanca, empate: !porPrio && lista.length > 1 && lista[0].n === lista[1].n };
 }
 function renderFavBancas(){
   const box = document.getElementById("fav-bancas"); if(!box) return;
@@ -9020,14 +9067,15 @@ function renderFavBancas(){
     box.innerHTML = `<div class="fb-card"><div class="fb-eyebrow">Suas bancas</div><p class="fb-note">Os concursos favoritados ainda não têm banca conhecida. Quando o edital sair, a banca aparece aqui.</p></div>`;
     return;
   }
-  const lin = (o, i) => `<div class="fb-row ${i ? "seg" : ""}"><span class="fb-pos">${i + 1}ª</span><div><b>${escHtml(o.label)}</b><small>${o.n} de ${favs} favorito${favs > 1 ? "s" : ""}${o.fama ? " · " + escHtml(o.fama.fama) : ""}</small></div></div>`;
+  const lin = (o, i) => `<div class="fb-row ${i ? "seg" : ""}"><span class="fb-pos">${i + 1}ª</span><div><b>${escHtml(o.label)}</b><small>${r.porPrio ? (i ? "Do seu próximo na prioridade: " : "Do seu concurso em foco: ") + escHtml(prepNomeCurto(o.primeiro)) : o.n + " de " + favs + " favorito" + (favs > 1 ? "s" : "")}${o.fama ? " · " + escHtml(o.fama.fama) : ""}</small></div></div>`;
   const usaUltima = r.lista.slice(0, 2).some(o => o.confirmadas < o.n);
   const notas = [];
   if(r.empate) notas.push("Empate no primeiro lugar. Desempatei pela banca já confirmada em edital.");
+  if(r.porPrio) notas.push("A ordem vem da sua lista em Perfil, Prioridade das provas." + (r.focoSemBanca ? " O concurso em foco ainda não tem banca, então usei o próximo." : ""));
   if(usaUltima) notas.push("Alguns favoritos ainda sem edital entram pela última banca conhecida.");
   if(r.semBanca) notas.push(r.semBanca + " favorito" + (r.semBanca > 1 ? "s" : "") + " sem banca conhecida não entra" + (r.semBanca > 1 ? "m" : "") + " na conta.");
   box.innerHTML = `<div class="fb-card">
-    <div class="fb-eyebrow">Banca que mais selecionei</div>
+    <div class="fb-eyebrow">${r.porPrio ? "Bancas da sua prioridade" : "Banca que mais selecionei"}</div>
     ${r.lista.slice(0, 2).map(lin).join("")}
     ${notas.length ? `<p class="fb-note">${notas.join(" ")}</p>` : ""}
     <button class="btn" onmousedown="event.preventDefault()" onclick="abrirRoteiroBanca()">Ver roteiro dessas bancas ›</button>
@@ -9105,7 +9153,7 @@ function abrirRoteiroBanca(){
         <p><b>Formato.</b> ${escHtml(m.formato)}</p>
         <p><b>Como treinar</b></p><ol>${m.passos.map(p => "<li>" + escHtml(p) + "</li>").join("")}</ol>
         <p><b>Atenção.</b> ${escHtml(m.atencao)}</p>
-        <p><b>Nos seus favoritos.</b> ${escHtml(nos.join(", "))}</p>
+        <p><b>Nos seus concursos.</b> ${escHtml(nos.join(", "))}</p>
         <div class="fbr-links"><a href="${crGg("provas anteriores " + o.label + " administração")}" target="_blank" rel="noopener">Buscar provas anteriores</a><a href="${crYt(o.label + " como estudar para a banca")}" target="_blank" rel="noopener">Buscar aula sobre a banca</a></div></div>`;
     }).join("");
     html += `<div class="fbr-sec"><span class="fb-eyebrow">Modelo de semana</span>${plano.map(([d, t]) => `<div class="fbr-row"><b>${d}</b><span>${escHtml(t)}</span></div>`).join("")}
@@ -9161,6 +9209,62 @@ function ingAulaAcao(){
   set(ROTEIRO_FASES, "questoes", ["Registrar questões", "roteiroEstudos('study-hoje-bottom')"]);
   set(ROTEIRO_FASES, "flash", ["Criar cartões", "roteiroEstudos('flash-materia')"]);
 })();
+
+// ---------- Prioridade das provas: o 1º é o concurso em foco; banca, matérias e cronograma seguem essa ordem ----------
+function prioridadeAtiva(){ return Array.isArray(profile.prioridade) && profile.prioridade.length > 0; }
+function prioridadePool(){ return [...new Set([].concat(favIds, inscritoIds))].filter(id => allItemsById[id] && prepDisponivel(allItemsById[id].item)); }
+function prioridadeIds(){
+  const pool = prioridadePool();
+  const salvo = (profile.prioridade || []).filter(id => pool.includes(id));
+  const resto = pool.filter(id => !salvo.includes(id));
+  if(!prioridadeAtiva() && profile.alvoId && resto.includes(profile.alvoId)){ resto.splice(resto.indexOf(profile.alvoId), 1); resto.unshift(profile.alvoId); }
+  return salvo.concat(resto);
+}
+function prioFator(id){
+  if(!prioridadeAtiva()) return 1;
+  const k = prioridadeIds().indexOf(id);
+  return k === 0 ? 2.2 : k === 1 ? 1.5 : k === 2 ? 1.2 : 1;
+}
+function prioSalvar(ids){
+  profile.prioridade = ids.slice(); profile.alvoId = ids[0] || profile.alvoId;
+  saveState("concursos-rj-perfil", profile);
+  try{ renderPrioridade(); renderRoteiroCard(); renderEstudoCronograma(geralOpenWeeks()); renderEstudoHoje(); renderInicioHoje(); renderFavBancas(); }catch(e){}
+}
+function prioMover(id, dir){
+  const l = prioridadeIds(), i = l.indexOf(id), j = i + dir;
+  if(i < 0 || j < 0 || j >= l.length) return;
+  l.splice(i, 1); l.splice(j, 0, id);
+  prioSalvar(l);
+}
+function renderPrioridade(){
+  const box = document.getElementById("pf-prio"); if(!box) return;
+  const l = prioridadeIds();
+  if(!l.length){ box.innerHTML = `<div class="pr-card"><p class="pr-note">Favorite ou marque como inscrita as provas que você quer fazer. Depois é só colocar em ordem aqui.</p></div>`; return; }
+  const up = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 15 6-6 6 6"/></svg>';
+  const dn = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
+  const rows = l.map((id, i) => {
+    const it = allItemsById[id].item, b = bancaTagInfo(it);
+    const prova = it.provaData ? "Prova em " + formatDatePt(it.provaData, false) : "Sem prova marcada";
+    return `<div class="pr-row${i === 0 ? " foco" : ""}"><span class="pr-n">${i + 1}</span><div class="pr-t"><b>${escHtml(prepNomeCurto(id))}${i === 0 ? '<span class="pr-chip">Em foco</span>' : ""}</b><small>${escHtml(b.label)} · ${escHtml(prova)}</small></div>
+      <div class="pr-btns"><button aria-label="Subir" ${i === 0 ? "disabled" : ""} onmousedown="event.preventDefault()" onclick="prioMover('${id}',-1)">${up}</button><button aria-label="Descer" ${i === l.length - 1 ? "disabled" : ""} onmousedown="event.preventDefault()" onclick="prioMover('${id}',1)">${dn}</button></div></div>`;
+  }).join("");
+  const foco = l[0], temMat = !!(allItemsById[foco].item.materias && allItemsById[foco].item.materias.length);
+  box.innerHTML = `<div class="pr-card"><p class="pr-note">O primeiro é o seu concurso em foco. A banca, as matérias e o cronograma seguem essa ordem, e o segundo entra como reforço. Provas que já passaram saem da lista.</p>${rows}
+    <button class="btn primary" onmousedown="event.preventDefault()" onclick="${temMat ? "openPlanoSugestao('" + foco + "')" : "roteiroAbrir('materias')"}">${temMat ? "Montar ciclo com o edital em foco" : "Ver matérias do concurso em foco"}</button></div>`;
+}
+function focoCardHtml(){
+  const id = roteiroAlvo(); if(!id || !allItemsById[id]) return "";
+  const it = allItemsById[id].item, b = bancaTagInfo(it), modo = prepModo(it);
+  let mats = [];
+  try{ mats = prepMateriasGeral(id).slice().sort((x, y) => (y.questoes || y.peso || 0) - (x.questoes || x.peso || 0)); }catch(e){}
+  const origem = modo === "edital" ? "Matérias do edital" : (modo === "ref" ? "Matérias do último edital, até o novo sair" : "Matérias comuns, até o edital sair");
+  const top = mats.slice(0, 8).map(m => `<span>${escHtml(m.nome)}${m.questoes ? " · " + m.questoes : ""}</span>`).join("");
+  return `<div class="foco-card"><div class="fb-eyebrow">Concurso em foco</div><h3>${escHtml(prepNomeCurto(id))}</h3>
+    <div class="foco-l"><b>Banca.</b> ${escHtml(b.label)}</div>
+    <div class="foco-l"><b>Prova.</b> ${it.provaData ? escHtml(formatDatePt(it.provaData, false)) : escHtml(it.prova || "a definir")}</div>
+    <div class="foco-l"><b>${escHtml(origem)}.</b></div><div class="foco-mats">${top || "<span>Sem matérias cadastradas</span>"}</div>
+    <button class="btn" onmousedown="event.preventDefault()" onclick="goPerfil('pf-prio-label')">Mudar a ordem de prioridade</button></div>`;
+}
 </script>
 </body>
 </html>
