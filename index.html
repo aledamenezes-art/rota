@@ -2792,10 +2792,22 @@ window.__FED_ESFERA = {};
   add("au","🏛️ TCU: Tribunal de Contas da União","TCU: Auditor Federal de Controle Externo","S","Auditor Federal de Controle Externo (área geral)","R$ 27.633,10","100 autorizadas (Estratégia). PLOA 2027 cita 43","A definir",
     "Autorizado para 2026, banca ainda não informada. O concurso anterior (Auditor de TI e Técnico) já foi homologado. Confira o edital para vagas e data",
     { note:"Muito alinhado a Administração, Contábeis e Direito: exige nível superior em qualquer área para a área geral (confirme no edital). Salário inicial entre os mais altos do país." });
-  add("au","⚖️ TSE: Tribunal Superior Eleitoral","TSE: Unificado e TRE-RJ","MS","Analista e Técnico Judiciário (TSE e TREs)","A definir","412 + cadastro de reserva no último concurso","Cebraspe",
-    "Último concurso homologado, com nomeações em andamento e validade até 02/07/2027. Não achei novo edital confirmado. No TRE-RJ foram 17 vagas + cadastro de reserva",
-    { badge:"VIGENTE", fonteUrl:"https://concursos.estrategia.com/portal/concurso-tse/", fonteLabel:"Estratégia Concursos: TSE",
-      note:"Quem passou no último concurso ainda pode ser chamado até a validade. Para um novo edital, acompanhe os pedidos de provimento do TSE e dos TREs." });
+  add("au","⚖️ TSE: Tribunal Superior Eleitoral","TSE: Tribunal Superior Eleitoral","MS","Analista e Técnico Judiciário (TSE)","A definir","412 + cadastro de reserva no concurso unificado (TSE e TREs), segundo a Estratégia","Cebraspe",
+    "Concurso unificado homologado, com nomeações em andamento e validade até 02/07/2027. Não achei novo edital confirmado",
+    { badge:"VIGENTE", cidade:"Sede em Brasília", fonteUrl:"https://concursos.estrategia.com/portal/concurso-tse/", fonteLabel:"Estratégia Concursos: TSE",
+      note:"Quem passou no último concurso ainda pode ser chamado até a validade. Para um novo edital, acompanhe os pedidos de provimento do TSE." });
+  add("au","⚖️ TRE-RJ: Tribunal Regional Eleitoral do Rio de Janeiro","TRE-RJ: Tribunal Regional Eleitoral","MS","Técnico Judiciário (área administrativa) e Analista Judiciário (áreas judiciária, administrativa e especializadas)","A definir","17 + cadastro de reserva (8 + CR de Técnico e 9 + CR de Analista), segundo a Gran Cursos","Cebraspe",
+    "Faz parte do concurso unificado dos TREs, com nomeações em andamento. Não achei novo edital confirmado",
+    { badge:"VIGENTE", estado:"RJ", cidade:"Rio de Janeiro (Capital)", fonteUrl:"https://www.estrategiaconcursos.com.br/blog/concurso-tre-rj/", fonteLabel:"Estratégia Concursos: TRE-RJ",
+      note:"Sede no Rio. A área administrativa é a que mais combina com Administração. Quem passou no último concurso pode ser chamado até a validade." });
+  add("pv","🎓 UFRJ: Universidade Federal do Rio de Janeiro","UFRJ: técnico administrativos","MS","Cargos técnico administrativos de nível médio e superior. No edital anterior havia Administrador (6 vagas, nível superior)","R$ 3.029,90 (médio) e R$ 4.967,04 (superior) no edital anterior","243 no edital anterior (dezembro de 2025)","Selecon (edital anterior)",
+    "Edital 583/2026 publicado no DOU em 22/05/2026. Não consegui ler cargos, vagas e datas dele: confira no site da UFRJ. O edital anterior teve prova em março de 2026",
+    { badge:"EDITAL A CONFERIR", estado:"RJ", cidade:"Rio de Janeiro (Capital)", fonteUrl:"https://valorfinal.com.br/concursos/edital/universidade-federal-do-rio-de-janeiro__583-2026", fonteLabel:"Valor Final: edital 583/2026",
+      note:"Cargo de Administrador existiu no edital anterior, com vagas no Rio, Duque de Caxias e Macaé. Confirme se o edital novo repete o cargo." });
+  add("so","📊 IBGE","IBGE: Analista e Técnico (efetivo)","MS","Técnico (médio), Analista de planejamento, gestão e infraestrutura e Tecnologista (superior)","R$ 3.752,92 (técnico) e R$ 8.558,13 (superior)","900 solicitadas (300 de nível médio e 600 de nível superior)","A definir",
+    "Pedido enviado em junho de 2026 e ainda sem autorização. Depende do fim da validade do CNU (6 de março de 2027), segundo a página",
+    { fonteUrl:"https://portaldeprefeitura.com.br/oportunidades/concurso-do-ibge-orgao-solicita-ao-governo-novo-edital-com-900-vagas/623983/", fonteLabel:"Portal de Prefeitura",
+      note:"Analista de planejamento, gestão e infraestrutura combina com Administração. O IBGE tem sede no Rio." });
   // Aberto / em andamento: dados da Gran
   add("ab","🧪 AgSUS","AgSUS","S","A definir","R$ 8.800,00","Cadastro de reserva","A definir","Inscrições até 16/10/2026. Prova em 22/11/2026",
     { inscricoes:"Até 16/10/2026", inscricaoFim:"2026-10-16", provaData:"2026-11-22", prova:"22/11/2026", fonteUrl:_urlFedG, fonteLabel:_FEDG, area:"Saúde" });
@@ -2884,10 +2896,19 @@ window.__FED_ESFERA = {};
     ["🔒 Senappen","Senappen","S","Policial, Especialista e Técnico","R$ 4.142,00 a R$ 6.681,70","11 + cadastro de reserva"],
     ["🔒 DEPEN","DEPEN","MS","Diversos","R$ 4.337,36 a R$ 17.632,85","A definir"]
   ].forEach(r=>add("so",r[0],r[1],r[2],r[3],r[4],r[5],"A definir","Solicitado em 2026, ainda sem autorização confirmada",{area:"Segurança pública"}));
+  // Órgãos federais com sede no Rio: a vaga pode ser em outro lugar, então o edital diz a lotação
+  const RIO = ["Petrobras","BNDES","CVM","SUSEP","ANP","ANS","INPI","INCA","INTO","INC","Fiocruz"].map(n => "Concurso " + n);
+  [...abertos, ...emAndamento, ...banca, ...anunciados].forEach(it => {
+    if(!RIO.includes(it.title)) return;
+    it.cidade = "Sede no Rio de Janeiro";
+    it.note = "Órgão com sede no Rio. A vaga pode ser em outro lugar: confirme a lotação no edital.";
+    if(it.title === "Concurso Petrobras") it.note = "Sede no Rio. No edital anterior havia ênfase em Administração, com diploma e registro no conselho de classe. Confirme no edital novo.";
+    if(it.title === "Concurso BNDES") it.note = "Sede no Rio. No edital de 2024 (Cesgranrio) havia Analista com especialidade em Administração, salário inicial de R$ 20.900. Hoje consta em estudo.";
+  });
 })();
 
 [...abertos, ...emAndamento, ...banca, ...anunciados].forEach(it => {
-  if(/TCU:|TSE:|TCE RJ|TCM RJ|Receita Federal|CGU|BACEN|Dataprev/.test(it.title)) it.destaque = true;
+  if(/TCU:|TSE:|TRE-RJ:|UFRJ|TCE RJ|TCM RJ|Receita Federal|CGU|BACEN|Dataprev/.test(it.title)) it.destaque = true;
 });
 
 // Tags genéricas de área/estado/cidade em cada concurso, usadas pelo filtro de perfil.
@@ -7937,7 +7958,7 @@ function dayTimelineBlocks(dow){
 // mais confiáveis, e copia o pedido pronto pra colar no Claude, que confere e devolve
 // o painel atualizado. ----------
 const DATA_CHECKED = "13/10/2026";
-const DATA_CHECKED_HORA = "19:10";
+const DATA_CHECKED_HORA = "21:40";
 const UPDATE_SOURCES = [
   { name:"JC Concursos: abertos no RJ", url:"https://jcconcursos.com.br/concursos/inscricoes-abertas/rj" },
   { name:"PCI Concursos: Rio de Janeiro", url:"https://www.pciconcursos.com.br/concursos/rj/rio-de-janeiro" },
