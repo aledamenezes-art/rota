@@ -1806,6 +1806,39 @@
   .rg-dias span{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:rgba(255,255,255,.7);color:var(--ink-soft)}
   .rg-dias span.on{color:#fff}
   .rg-rep{font-size:11.5px;color:var(--ink-soft);margin-top:7px}
+  .rv-seg{display:flex;gap:4px;background:#F1ECE6;border-radius:999px;padding:4px;margin:4px 0 12px}
+  .rv-seg button{flex:1;border:0;background:transparent;border-radius:999px;padding:8px 0;font-weight:700;font-size:13px;color:#6b5f66}
+  .rv-seg button.on{background:#fff;color:#7C2D3E;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+  .rv-nav{display:flex;align-items:center;gap:6px;margin-bottom:10px}
+  .rv-nav button{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--line);background:var(--card);font-size:18px;line-height:1;color:var(--ink)}
+  .rv-nav .rv-hoje{width:auto;padding:0 12px;border-radius:999px;font-size:12px;font-weight:700;color:#7C2D3E}
+  .rv-tit{flex:1;text-align:center;font-weight:800;font-size:14px;color:var(--ink)}
+  .rw-head,.rw-body{display:grid;grid-template-columns:28px repeat(7,1fr);gap:2px}
+  .rw-h{text-align:center;font-size:10px;color:var(--ink-soft);padding:2px 0 6px}
+  .rw-h b{display:block;font-size:13px;color:var(--ink);margin-top:1px}
+  .rw-h.hoje b{background:#7C2D3E;color:#fff;border-radius:999px;width:22px;height:22px;line-height:22px;margin:1px auto 0}
+  .rw-eixo div{font-size:9px;color:var(--ink-soft);text-align:right;padding-right:3px;box-sizing:border-box;transform:translateY(-5px)}
+  .rw-col{position:relative;border-radius:6px;background:repeating-linear-gradient(to bottom,rgba(0,0,0,.06) 0,rgba(0,0,0,.06) 1px,transparent 1px,transparent var(--rwH));background-color:rgba(0,0,0,.015)}
+  .rw-b{position:absolute;left:1px;right:1px;border-left:3px solid;border-radius:5px;overflow:hidden;box-sizing:border-box}
+  .rw-b span{display:block;font-size:8.5px;line-height:1.1;font-weight:700;color:#2b2230;padding:2px 2px;word-break:break-word}
+  .rl-leg{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:12px;font-size:11.5px;color:var(--ink-soft)}
+  .rl-leg i,.ra-chip i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}
+  .rd-bloco{display:flex;gap:12px;align-items:center;padding:11px 12px;border-radius:14px;border-left:5px solid;margin-bottom:8px}
+  .rd-t{font-size:13px;font-weight:800;color:#2b2230;width:44px;font-variant-numeric:tabular-nums}
+  .rd-t small{display:block;font-weight:600;color:#6b5f66;font-size:11px}
+  .rd-n{font-size:14.5px;font-weight:800;color:#2b2230}
+  .rd-a{font-size:11.5px;font-weight:700;margin-top:1px}
+  .rd-livre{border:1.5px dashed var(--line);border-radius:14px;padding:10px 12px;margin-bottom:8px;font-size:12.5px;color:var(--ink-soft)}
+  .rd-livre span{display:block;font-weight:800;color:var(--ink);font-size:12.5px;font-variant-numeric:tabular-nums}
+  .rd-presets .ra-chip{background:#fff;color:#2b2230;border:1.5px solid}
+  .rd-presets .ra-chip.on{color:#fff}
+  .ra-chip{padding:7px 11px;border-radius:999px;border:1.5px solid;background:#fff;font-weight:700;font-size:12px;color:#2b2230}
+  .rc-row{display:flex;flex-direction:column;gap:6px;padding:10px 0}
+  .rc-row + .rc-row{border-top:1px solid var(--line)}
+  .rc-nome{font-weight:800;font-size:13px}
+  .rc-sw{display:flex;flex-wrap:wrap;gap:8px}
+  .rc-sw button{width:30px;height:30px;border-radius:50%;border:2px solid transparent;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+  .rc-sw button.on{border-color:#2b2230}
   .rd-presets{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
   .rd-presets button.on{background:#702A55;color:#fff;border-color:#702A55}
   .rd-presets button{padding:7px 11px;border-radius:999px;border:1.5px solid #D9B4C8;background:#F3E4EC;color:#702A55;font-weight:700;font-size:12px}
@@ -2174,7 +2207,9 @@
     <div class="pf-label" id="rotina-section-label">Minha rotina fixa</div>
     <div class="pf-card">
       <p class="pf-note">Trabalho, aulas e outros horários fixos. Com eles eu calculo seus horários livres para estudar.</p>
+      <div class="rv-seg" id="rotina-seg"><button data-m="dia" onmousedown="event.preventDefault()" onclick="rotinaSetModo('dia')">Dia</button><button data-m="semana" class="on" onmousedown="event.preventDefault()" onclick="rotinaSetModo('semana')">Semana</button><button data-m="lista" onmousedown="event.preventDefault()" onclick="rotinaSetModo('lista')">Lista</button></div>
       <div id="rotina-list"></div>
+      <details class="pf-det"><summary>Cores das áreas</summary><div id="rotina-cores"></div></details>
       <div class="empty-state compact" id="rotina-empty"><p>Nenhum horário cadastrado ainda.</p></div>
       <details class="pf-det">
         <summary>＋ Adicionar horário</summary>
@@ -2196,6 +2231,8 @@
           <div class="rd-label" id="rotina-ini-label">Começa em</div>
           <input class="field-input" id="rotina-ini" type="date">
         </div>
+        <div class="rd-label">Área</div>
+        <div class="rd-presets" id="rotina-area"></div>
         <input class="field-input" id="rotina-label" type="text" placeholder="Ex.: Trabalho, Inglês" style="margin-top:10px;">
         <button class="btn primary" id="rotina-add" style="margin-top:12px; width:100%; text-align:center;">Adicionar horário</button>
       </details>
@@ -8700,42 +8737,143 @@ function openDayScreen(dow, dateObj){
   document.getElementById("sub-scroll").scrollTop = 0;
 }
 
-function renderRotinaList(){
-  const container = document.getElementById("rotina-list");
-  const empty = document.getElementById("rotina-empty");
-  if(!container || !empty) return;
-  if(!routine.length){
-    container.innerHTML = "";
-    empty.classList.remove("hidden");
-    return;
-  }
-  empty.classList.add("hidden");
+const ROTINA_AREAS = [
+  {id:"trabalho",nome:"Trabalho",cor:"slate"},{id:"aulas",nome:"Aulas",cor:"amber"},{id:"freela",nome:"Freelas",cor:"terra"},
+  {id:"concurso",nome:"Estudo concurso",cor:"bordo"},{id:"ingles",nome:"Estudo inglês",cor:"agua"},{id:"outros",nome:"Outros",cor:"cinza"}
+];
+const ROTINA_CORES = {
+  bordo:["Bordô","#7C2D3E","#F3E4E8"], ameixa:["Ameixa","#7A3B69","#F1E4EE"], agua:["Verde água","#2F8F83","#DFF1EE"],
+  petroleo:["Petróleo","#2D5F5D","#E0ECEB"], terra:["Terracota","#C4673F","#F9E6DB"], slate:["Ardósia","#5B6FB0","#E6EAF5"],
+  amber:["Âmbar","#B9851F","#FBF0D5"], rosa:["Rosa","#C77A9B","#F8E6EE"], cinza:["Cinza","#8A8580","#EEEBE6"]
+};
+let rotinaCores = {}, rotinaModo = "semana", rotinaOff = 0, rotinaAreaSel = "trabalho";
+function rotinaAreaDe(r){
+  if(r.area && ROTINA_AREAS.some(a=>a.id === r.area)) return r.area;
+  const t = (r.label || "").toLowerCase();
+  if(/ingl/.test(t)) return "ingles";
+  if(/freela/.test(t)) return "freela";
+  if(/concurso|estud/.test(t)) return "concurso";
+  if(/aula/.test(t)) return "aulas";
+  if(/trabalho|mei|empresa|escrit/.test(t)) return "trabalho";
+  return "outros";
+}
+function rotinaCorDe(areaId){
+  const a = ROTINA_AREAS.find(x=>x.id === areaId) || ROTINA_AREAS[5];
+  const c = ROTINA_CORES[rotinaCores[a.id]] || ROTINA_CORES[a.cor];
+  return { nome:a.nome, bar:c[1], tint:c[2] };
+}
+function rotinaSetModo(m){ rotinaModo = m; renderRotinaList(); }
+function rotinaNav(d){ rotinaOff += d; renderRotinaList(); }
+function rotinaHoje(){ rotinaOff = 0; renderRotinaList(); }
+function rotinaSetArea(id){ rotinaAreaSel = id; renderRotinaAreaChips(); }
+function setAreaCor(a, c){ rotinaCores[a] = c; saveState("concursos-rj-rotina-cores", rotinaCores); renderRotinaList(); }
+function renderRotinaAreaChips(){
+  const el = document.getElementById("rotina-area"); if(!el) return;
+  el.innerHTML = ROTINA_AREAS.map(a=>{
+    const c = rotinaCorDe(a.id), on = a.id === rotinaAreaSel;
+    return `<button type="button" class="ra-chip${on ? " on" : ""}" style="${on ? "background:" + c.bar + ";border-color:" + c.bar + ";color:#fff" : "border-color:" + c.bar}" onmousedown="event.preventDefault()" onclick="rotinaSetArea('${a.id}')"><i style="background:${on ? "#fff" : c.bar}"></i>${a.nome}</button>`;
+  }).join("");
+}
+function renderRotinaCores(){
+  const el = document.getElementById("rotina-cores"); if(!el) return;
+  el.innerHTML = ROTINA_AREAS.map(a=>{
+    const cur = rotinaCores[a.id] || a.cor;
+    return `<div class="rc-row"><div class="rc-nome">${a.nome}</div><div class="rc-sw">${Object.keys(ROTINA_CORES).map(k=>`<button type="button" class="${k === cur ? "on" : ""}" title="${ROTINA_CORES[k][0]}" style="background:${ROTINA_CORES[k][1]}" onmousedown="event.preventDefault()" onclick="setAreaCor('${a.id}','${k}')"></button>`).join("")}</div></div>`;
+  }).join("");
+}
+function rotinaLegenda(){
+  const usadas = [...new Set(routine.map(rotinaAreaDe))];
+  return `<div class="rl-leg">${usadas.map(id=>{ const c = rotinaCorDe(id); return `<span><i style="background:${c.bar}"></i>${c.nome}</span>`; }).join("")}</div>`;
+}
+function rotinaBlocosDoDia(d){
+  return routine.filter(r=>rotinaOcorre(r, d)).sort((a,b)=>minutesOf(a.inicio) - minutesOf(b.inicio));
+}
+const RV_MES = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
+const RV_DIA = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
+function rotinaNavHtml(titulo){
+  return `<div class="rv-nav"><button onmousedown="event.preventDefault()" onclick="rotinaNav(-1)" aria-label="Anterior">‹</button><div class="rv-tit">${titulo}</div><button onmousedown="event.preventDefault()" onclick="rotinaNav(1)" aria-label="Próximo">›</button>${rotinaOff !== 0 ? `<button class="rv-hoje" onmousedown="event.preventDefault()" onclick="rotinaHoje()">Hoje</button>` : ""}</div>`;
+}
+function rotinaSemanaHtml(){
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const seg = new Date(hoje); seg.setDate(hoje.getDate() - ((hoje.getDay() + 6) % 7) + rotinaOff * 7);
+  const dias = [0,1,2,3,4,5,6].map(i=>{ const d = new Date(seg); d.setDate(seg.getDate() + i); return d; });
+  let lo = 7*60, hi = 22*60;
+  dias.forEach(d=>rotinaBlocosDoDia(d).forEach(r=>{ lo = Math.min(lo, Math.floor(minutesOf(r.inicio)/60)*60); hi = Math.max(hi, Math.ceil(minutesOf(r.fim)/60)*60); }));
+  const H = 30, altura = (hi - lo) / 60 * H;
+  const horas = []; for(let m = lo; m < hi; m += 60) horas.push(m);
+  const fim = dias[6];
+  const titulo = `${seg.getDate()} ${RV_MES[seg.getMonth()]} a ${fim.getDate()} ${RV_MES[fim.getMonth()]}`;
+  const head = dias.map(d=>`<div class="rw-h${d.getTime() === hoje.getTime() ? " hoje" : ""}"><span>${RV_DIA[d.getDay()]}</span><b>${d.getDate()}</b></div>`).join("");
+  const cols = dias.map(d=>{
+    const blocos = rotinaBlocosDoDia(d).map(r=>{
+      const c = rotinaCorDe(rotinaAreaDe(r));
+      const a = Math.max(minutesOf(r.inicio), lo), b = Math.min(minutesOf(r.fim), hi);
+      const top = (a - lo) / 60 * H, h = Math.max((b - a) / 60 * H - 2, 8);
+      return `<div class="rw-b" style="top:${top}px;height:${h}px;background:${c.tint};border-left-color:${c.bar}" title="${escHtml(r.label || c.nome)} ${r.inicio} às ${r.fim}"><span>${h >= 22 ? escHtml(r.label || c.nome) : ""}</span></div>`;
+    }).join("");
+    return `<div class="rw-col" style="height:${altura}px">${blocos}</div>`;
+  }).join("");
+  const eixo = horas.map(m=>`<div style="height:${H}px">${String(m/60).padStart(2,"0")}h</div>`).join("");
+  return rotinaNavHtml(titulo) + `<div class="rw-wrap"><div class="rw-head"><div></div>${head}</div><div class="rw-body" style="--rwH:${H}px"><div class="rw-eixo">${eixo}</div>${cols}</div></div>` + rotinaLegenda();
+}
+function rotinaDiaHtml(){
+  const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate() + rotinaOff);
+  const blocos = rotinaBlocosDoDia(d);
+  const nome = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"][d.getDay()];
+  const titulo = (rotinaOff === 0 ? "Hoje, " : (rotinaOff === 1 ? "Amanhã, " : "")) + nome + ", " + d.getDate() + " " + RV_MES[d.getMonth()];
+  let cursor = 7*60, html = "";
+  const livre = (a, b)=> b - a >= 30 ? `<div class="rd-livre"><span>${hhmmOf(a)} às ${hhmmOf(b)}</span>Livre para estudar</div>` : "";
+  blocos.forEach(r=>{
+    const a = minutesOf(r.inicio), b = minutesOf(r.fim), c = rotinaCorDe(rotinaAreaDe(r));
+    html += livre(cursor, a);
+    html += `<div class="rd-bloco" style="background:${c.tint};border-left-color:${c.bar}"><div class="rd-t">${r.inicio}<small>${r.fim}</small></div><div><div class="rd-n">${escHtml(r.label || c.nome)}</div><div class="rd-a" style="color:${c.bar}">${c.nome}</div></div></div>`;
+    cursor = Math.max(cursor, b);
+  });
+  html += livre(cursor, 22*60);
+  if(!blocos.length) html = `<div class="rd-livre"><span>07:00 às 22:00</span>Dia livre, sem compromissos fixos</div>`;
+  return rotinaNavHtml(titulo) + html + rotinaLegenda();
+}
+function rotinaListaHtml(){
   const groups = {};
   routine.forEach(r=>{
-    const k = [r.label || "", r.inicio, r.fim, r.rep || "sem", r.ini || ""].join("|");
+    const k = [r.label || "", r.inicio, r.fim, r.rep || "sem", r.ini || "", rotinaAreaDe(r)].join("|");
     (groups[k] = groups[k] || { r, dias: [], ids: [] });
     groups[k].dias.push(r.dia); groups[k].ids.push(r.id);
   });
   const list = Object.values(groups).sort((a,b)=> minutesOf(a.r.inicio) - minutesOf(b.r.inicio) || (a.r.label||"").localeCompare(b.r.label||""));
-  const tints = ["#F3E4EC","#E3F1EC","#E6EAF5","#FBEBDD","#EEE9F6"];
-  const bars = ["#9A4A73","#3F9C77","#5B6FB0","#D08A4E","#7E62A8"];
   const nomes = [["S",1],["T",2],["Q",3],["Q",4],["S",5],["S",6],["D",0]];
-  const hashOf = s => { let h = 0; for(const c of s) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h % tints.length; };
-  container.innerHTML = list.map(g=>{
-    const r = g.r, i = hashOf(r.label || "");
+  return list.map(g=>{
+    const r = g.r, c = rotinaCorDe(rotinaAreaDe(r));
     const mensal = r.rep === "m";
-    const dots = mensal ? "" : `<div class="rg-dias">${nomes.map(([n,d])=>`<span class="${g.dias.indexOf(d) >= 0 ? "on" : ""}" style="${g.dias.indexOf(d) >= 0 ? "background:" + bars[i] : ""}">${n}</span>`).join("")}</div>`;
+    const dots = mensal ? "" : `<div class="rg-dias">${nomes.map(([n,d])=>`<span class="${g.dias.indexOf(d) >= 0 ? "on" : ""}" style="${g.dias.indexOf(d) >= 0 ? "background:" + c.bar : ""}">${n}</span>`).join("")}</div>`;
     return `
-    <div class="rg-card" style="background:${tints[i]};border-left-color:${bars[i]}">
+    <div class="rg-card" style="background:${c.tint};border-left-color:${c.bar}">
       <div class="rg-main">
         <div class="rg-title">${escHtml(r.label || "Compromisso fixo")}</div>
         <div class="rg-hora">${r.inicio} às ${r.fim}</div>
         ${dots}
-        <div class="rg-rep">${mensal ? "Todo mês, dia " + new Date(r.ini + "T00:00:00").getDate() : (r.rep === "q" ? "A cada 15 dias" : "Toda semana")}</div>
+        <div class="rg-rep"><b style="color:${c.bar}">${c.nome}</b> · ${mensal ? "Todo mês, dia " + new Date(r.ini + "T00:00:00").getDate() : (r.rep === "q" ? "A cada 15 dias" : "Toda semana")}</div>
       </div>
       <button class="rotina-del-btn" onmousedown="event.preventDefault()" onclick="removeRotinaGrupo('${g.ids.join(",")}')" aria-label="Remover">✕</button>
     </div>`;
   }).join("");
+}
+function renderRotinaList(){
+  const container = document.getElementById("rotina-list");
+  const empty = document.getElementById("rotina-empty");
+  if(!container || !empty) return;
+  renderRotinaAreaChips(); renderRotinaCores();
+  const seg = document.getElementById("rotina-seg");
+  if(seg) seg.querySelectorAll("button").forEach(b=>b.classList.toggle("on", b.dataset.m === rotinaModo));
+  if(!routine.length){
+    container.innerHTML = "";
+    if(seg) seg.classList.add("hidden");
+    empty.classList.remove("hidden");
+    return;
+  }
+  if(seg) seg.classList.remove("hidden");
+  empty.classList.add("hidden");
+  container.innerHTML = rotinaModo === "semana" ? rotinaSemanaHtml() : (rotinaModo === "dia" ? rotinaDiaHtml() : rotinaListaHtml());
 }
 
 function removeRotinaGrupo(ids){
@@ -8774,7 +8912,7 @@ document.getElementById("rotina-add").addEventListener("click", ()=>{
   const fim = document.getElementById("rotina-fim").value;
   const label = document.getElementById("rotina-label").value.trim();
   if(!inicio || !fim || minutesOf(fim) <= minutesOf(inicio)) return;
-  dias.forEach(dia => routine.push(Object.assign({ id: Date.now() + "-" + dia + "-" + Math.random().toString(36).slice(2,7), dia, inicio, fim, label }, rotinaRep === "sem" ? {} : { rep: rotinaRep, ini: iniDate })));
+  dias.forEach(dia => routine.push(Object.assign({ id: Date.now() + "-" + dia + "-" + Math.random().toString(36).slice(2,7), dia, inicio, fim, label, area: rotinaAreaSel }, rotinaRep === "sem" ? {} : { rep: rotinaRep, ini: iniDate })));
   document.querySelectorAll("#rotina-dias button.on").forEach(b => b.classList.remove("on"));
   saveState("concursos-rj-rotina", routine);
   document.getElementById("rotina-label").value = "";
@@ -9141,7 +9279,7 @@ function exportData(){
   const payload = {
     version: 1,
     exportedAt: new Date().toISOString(),
-    profile, study, routine,
+    profile, study, routine, rotinaCores,
     favIds, watchlist, inscritoIds, boletoStatus, isencaoStatus, cargosInscritos, inscConf, inscritoEm, seenItemIds,
     darkMode, docChecklist, examChecklist, prep, wiz, roteiro, ing
   };
@@ -9265,6 +9403,7 @@ document.getElementById("import-data-file").addEventListener("change", (e)=>{
       if(data.profile) profile = Object.assign({}, profile, data.profile);
       if(data.study) study = Object.assign({}, study, data.study);
       if(Array.isArray(data.routine)) routine = data.routine;
+      if(data.rotinaCores && typeof data.rotinaCores === "object") rotinaCores = data.rotinaCores;
       if(Array.isArray(data.favIds)) favIds = data.favIds;
       if(Array.isArray(data.olhoIds)) { favIds = [...new Set(favIds.concat(data.olhoIds))]; saveFavorites(); }
       if(Array.isArray(data.watchlist)) { watchlist = data.watchlist; saveState("concursos-rj-olho", watchlist); }
@@ -9285,7 +9424,7 @@ document.getElementById("import-data-file").addEventListener("change", (e)=>{
 
       saveState("concursos-rj-perfil", profile);
       saveState("concursos-rj-estudos", study);
-      saveState("concursos-rj-rotina", routine);
+      saveState("concursos-rj-rotina", routine); saveState("concursos-rj-rotina-cores", rotinaCores);
       saveFavorites(); saveInscritos(); saveBoletoStatus(); saveSeenItems();
       saveState("concursos-rj-tema", darkMode);
       saveDocChecklist(); saveExamChecklist();
@@ -9346,6 +9485,7 @@ async function loadProfileAndStudy(){
   await loadState("concursos-rj-perfil", (v)=>{ if(v && typeof v === "object") profile = Object.assign({}, profile, v); });
   await loadState("concursos-rj-estudos", (v)=>{ if(v && typeof v === "object") study = Object.assign({}, study, v); });
   await loadState("concursos-rj-rotina", (v)=>{ if(Array.isArray(v)) routine = v; });
+  await loadState("concursos-rj-rotina-cores", (v)=>{ if(v && typeof v === "object" && !Array.isArray(v)) rotinaCores = v; });
   populateProfileForm();
   populateMateriaSelects();
   renderStudyProgress();
