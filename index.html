@@ -1772,6 +1772,14 @@
 
   .mini-chip.sal,.chip.sal{background:#EAF3EE;color:#1F6B52}
   .mini-chip.iso,.chip.iso{background:#F3E4EC;color:#702A55}
+
+  .cg-atalho{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;text-align:left;margin:0 0 14px;padding:14px 16px;border-radius:16px;border:1.5px solid #D9B4C8;background:linear-gradient(135deg,#F3E4EC,#fff);color:#702A55;font:inherit}
+  .cg-atalho b{display:block;font-size:14.5px}.cg-atalho small{display:block;color:#4a3340;font-size:12px;margin-top:2px}.cg-atalho i{font-style:normal;font-size:22px}
+  .cg-tabs{display:flex;gap:8px}.cg-tab{flex:1;padding:9px;border-radius:999px;border:1.5px solid #D9B4C8;background:#fff;color:#702A55;font-weight:700;font-size:13px}.cg-tab.on{background:#702A55;color:#fff;border-color:#702A55}
+  .cg-row{display:block;width:100%;text-align:left;margin:0 0 10px;padding:13px 14px;border-radius:14px;border:1px solid var(--line,#e6ddd2);background:var(--card,#fff);color:inherit;font:inherit}
+  .cg-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.cg-top b{font-size:14.5px;flex:1}.cg-sal{font-weight:800;color:#1F6B52;font-size:13.5px;text-align:right;max-width:46%}
+  .cg-org{font-size:12px;color:var(--ink-soft);margin-top:3px}.cg-dates{display:flex;justify-content:space-between;gap:8px;margin-top:8px;font-size:12px;font-weight:700;color:#702A55}.cg-dates .ok{color:#1F6B52}
+  .cg-nota{margin-top:6px;font-size:11.5px;color:var(--ink-soft)}
 </style>
 </head>
 <body data-tab="inicio">
@@ -1811,6 +1819,7 @@
   <section class="panel active" id="panel-inicio">
     <div class="ps ps-home" onmousedown="event.preventDefault()" onclick="openBusca()" role="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span class="ps-text">Concursos, bancas, matérias</span><span class="ps-sep"></span><span class="ps-go">Procurar</span></div>
         <div id="como-usar"></div>
+    <div id="cargos-atalho"></div>
     <div class="inicio-greeting" id="inicio-greeting"></div>
     <div id="inicio-frase"></div>
 
@@ -1856,6 +1865,7 @@
       <span class="sort-chip" data-filter="anunciado">Só anunciados</span>
     </div>
 
+    <div id="cargos-atalho2"></div>
     <div id="fit-resumo" class="fit-resumo"></div>
 
     <div class="section-label" id="abertos-heading">Inscrições abertas hoje</div>
@@ -9508,6 +9518,85 @@ function focoCardHtml(){
   };
   document.addEventListener("DOMContentLoaded",renderComoUsar); try{renderComoUsar()}catch(e){}
 })();
+
+// ---------- Cargos que servem para ela: salário e data da prova lado a lado ----------
+// Valores copiados dos cartões do próprio app (edital quando há, senão "último edital").
+const CARGOS_FIT = [
+  { re:/Cremerj/i, cargo:"Analista de Operações", nivel:"Superior", sal:"R$ 6.084,46", vagas:"11 vagas + CR", nota:"Perfil mais próximo de Administração" },
+  { re:/Cremerj/i, cargo:"Assistente de Operações", nivel:"Médio", sal:"R$ 3.010,00", vagas:"Só cadastro de reserva" },
+  { re:/INB/i, cargo:"Administrador", nivel:"Superior", sal:"R$ 7.221", vagas:"Cadastro de reserva" },
+  { re:/INB/i, cargo:"Assistente Administrativo", nivel:"Médio", sal:"A partir de R$ 3.452", vagas:"Cadastro de reserva", nota:"Valor exato do cargo no edital" },
+  { re:/UNIRIO/i, cargo:"Cargos dos editais 221 a 229/2026", nivel:"Superior", sal:"R$ 6.157 a R$ 8.340", vagas:"1 vaga em cada edital", nota:"Confira qual edital é de Administração" },
+  { re:/CRF-RJ/i, cargo:"Administrador Júnior", nivel:"Superior", sal:"R$ 4.076,13", vagas:"Edital novo ainda não saiu", nota:"Valor do último edital" },
+  { re:/CRF-RJ/i, cargo:"Agente Administrativo", nivel:"Médio", sal:"R$ 3.144,52", vagas:"Edital novo ainda não saiu", nota:"Valor do último edital" },
+  { re:/CRO-RJ/i, cargo:"Analista técnico executivo", nivel:"Superior", sal:"Até R$ 5.450", vagas:"5 imediatas + CR (total)", nota:"Mais vale alimentação e plano de saúde" },
+  { re:/CRO-RJ/i, cargo:"Auxiliar administrativo", nivel:"Médio", sal:"A partir de R$ 2.750", vagas:"5 imediatas + CR (total)" },
+  { re:/Theatro/i, cargo:"Técnico de Nível Superior", nivel:"Superior", sal:"Faixa R$ 1.077,73 a R$ 3.790,43", vagas:"110 (total)" },
+  { re:/Theatro/i, cargo:"Assistente Administrativo", nivel:"Médio", sal:"Faixa R$ 1.077,73 a R$ 3.790,43", vagas:"110 (total)" },
+  { re:/UFRJ/i, cargo:"Administrador", nivel:"Superior", sal:"R$ 4.967,04", vagas:"6 no edital anterior", nota:"Valor do último edital" },
+  { re:/UFRJ/i, cargo:"Técnico administrativo", nivel:"Médio", sal:"R$ 3.029,90", vagas:"Edital a conferir", nota:"Valor do último edital" },
+  { re:/Pedro II/i, cargo:"Assistente em Administração", nivel:"Médio", sal:"R$ 3 mil a R$ 5 mil", vagas:"Em estudo", nota:"Valor de 2023" },
+  { re:/IBGE/i, cargo:"Analista de planejamento, gestão e infraestrutura", nivel:"Superior", sal:"R$ 8.558,13", vagas:"Solicitado" },
+  { re:/IBGE/i, cargo:"Técnico", nivel:"Médio", sal:"R$ 3.752,92", vagas:"Solicitado" },
+  { re:/PGE RJ/i, cargo:"Analista (Sistemas e Métodos)", nivel:"Superior", sal:"Até R$ 6.824,04", vagas:"Autorizado" },
+  { re:/TCE RJ/i, cargo:"Auditor de Controle Externo", nivel:"Superior", sal:"R$ 18,7 mil a R$ 19,7 mil", vagas:"Previsto", nota:"Confira a formação aceita no edital" },
+  { re:/ANP/i, cargo:"Analista e Técnico Administrativo", nivel:"Médio e Superior", sal:"R$ 7.648,17 a R$ 16.413,35", vagas:"Solicitado", nota:"Faixa do órgão" },
+  { re:/TRE-RJ/i, cargo:"Técnico e Analista Judiciário (administrativa)", nivel:"Médio e Superior", sal:"A definir", vagas:"Vigente", nota:"Sem edital novo" }
+];
+let cargosAba = "Todos";
+function cargosLista(){
+  const todos = [].concat(abertos, emAndamento, banca, anunciados);
+  const out = [];
+  CARGOS_FIT.forEach(c => {
+    const it = todos.find(x => c.re.test(x.title));
+    if(!it) return;
+    if(!passesProfile(it)) return;
+    const id = slugify(it.title);
+    const aberto = it.badgeType === "aberto";
+    out.push({ c, it, id, aberto });
+  });
+  out.sort((a,b) => (b.aberto - a.aberto) || ((a.it.inscricaoFim||"9999") < (b.it.inscricaoFim||"9999") ? -1 : 1));
+  return out;
+}
+function abrirCargos(aba){
+  if(aba) cargosAba = aba;
+  const L = cargosLista().filter(x => cargosAba === "Todos" || x.c.nivel.indexOf(cargosAba) >= 0);
+  const chip = n => `<button class="cg-tab ${cargosAba===n?"on":""}" onclick="abrirCargos('${n}')">${n}</button>`;
+  const row = x => {
+    const it = x.it;
+    const prova = it.provaData ? formatDatePt(it.provaData, false) : "A definir";
+    const insc = x.aberto ? (it.inscricaoFim ? "Inscreva até " + formatDatePt(it.inscricaoFim, false) : "Inscrições abertas") : "Ainda sem edital";
+    return `<button class="cg-row" onclick="closeSubScreen();openDetail('${x.id}')">
+      <div class="cg-top"><b>${escHtml(x.c.cargo)}</b><span class="cg-sal">${escHtml(x.c.sal)}</span></div>
+      <div class="cg-org">${escHtml(it.title.replace(/^Concurso\s*/i,""))} · ${escHtml(x.c.nivel)}${x.c.vagas ? " · " + escHtml(x.c.vagas) : ""}</div>
+      <div class="cg-dates"><span class="${x.aberto?"ok":""}">${insc}</span><span>Prova: ${prova}</span></div>
+      ${x.c.nota ? `<div class="cg-nota">${escHtml(x.c.nota)}</div>` : ""}
+    </button>`;
+  };
+  const ab = L.filter(x => x.aberto), pv = L.filter(x => !x.aberto);
+  document.getElementById("sub-topbar-title").textContent = "Cargos para você";
+  document.getElementById("sub-content").innerHTML = `
+    <p class="section-note" style="margin:0 0 10px">Cargos de Administração e afins no Rio capital, com salário e data da prova. Para fazer um de médio e um de superior, veja as datas lado a lado.</p>
+    <div class="cg-tabs">${chip("Todos")}${chip("Médio")}${chip("Superior")}</div>
+    <div class="section-label" style="margin-top:14px">Inscrições abertas (${ab.length})</div>
+    ${ab.length ? ab.map(row).join("") : '<p class="section-note">Nenhum cargo aberto neste nível agora.</p>'}
+    <div class="section-label" style="margin-top:18px">Previstos (${pv.length})</div>
+    <p class="section-note" style="margin:0 0 8px">Valores do último edital, até o novo sair.</p>
+    ${pv.map(row).join("")}`;
+  document.getElementById("sub-screen").classList.add("active");
+  document.getElementById("sub-scroll").scrollTop = 0;
+}
+(function(){
+  function atalho(){
+    var el = document.getElementById("cargos-atalho"); if(!el) return;
+    el.innerHTML = '<button class="cg-atalho" onclick="abrirCargos()"><span><b>Cargos que servem para você</b><small>Com salário e data da prova, de médio e de superior</small></span><i>›</i></button>';
+  }
+  window.renderCargosAtalho = atalho;
+  document.addEventListener("DOMContentLoaded", atalho); try{ atalho(); }catch(e){}
+})();
+
+document.addEventListener("DOMContentLoaded",function(){var e=document.getElementById("cargos-atalho2");if(e)e.innerHTML=document.getElementById("cargos-atalho")?document.getElementById("cargos-atalho").innerHTML:""});
+try{var e2=document.getElementById("cargos-atalho2");if(e2&&document.getElementById("cargos-atalho"))e2.innerHTML=document.getElementById("cargos-atalho").innerHTML}catch(e){}
 </script>
 </body>
 </html>
