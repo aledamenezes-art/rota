@@ -1783,6 +1783,11 @@
   .cg-in{cursor:default}.cg-in.serve{border-color:#D9B4C8}.cg-serve{margin-top:6px;font-size:11.5px;font-weight:700;color:#702A55}
   .cg-outros{margin-top:16px;font-size:12.5px;color:var(--ink-soft)}.cg-outros summary{font-weight:700;color:#702A55;padding:6px 0}
   .cg-hora{margin-top:6px;font-size:12px;color:var(--ink)}
+
+  .cg-pick{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;margin:0 0 8px;padding:11px 12px;border-radius:12px;border:1.5px solid var(--line,#e6ddd2);background:#fff;color:inherit;font:inherit}
+  .cg-pick.on{border-color:#702A55;background:#F3E4EC}.cg-pick .ck{flex:0 0 22px;height:22px;border-radius:50%;border:1.5px solid #702A55;color:#fff;background:transparent;display:flex;align-items:center;justify-content:center;font-size:13px}
+  .cg-pick.on .ck{background:#702A55}.cg-pick b{display:block;font-size:13.5px}.cg-pick small{display:block;color:var(--ink-soft);font-size:12px}
+  .cg-input{width:100%;box-sizing:border-box;margin:4px 0 12px;padding:11px 12px;border-radius:12px;border:1.5px solid var(--line,#e6ddd2);font:inherit;font-size:14px}
 </style>
 </head>
 <body data-tab="inicio">
@@ -2231,6 +2236,19 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="cargo-modal">
+  <div class="modal-card" style="max-height:86vh;overflow:auto;text-align:left">
+    <div class="modal-emoji" style="text-align:center">🎯</div>
+    <div class="modal-title" style="text-align:center">Em qual cargo você se inscreveu?</div>
+    <p class="modal-sub" id="cargo-sub" style="text-align:center">Marque um ou mais. Assim eu te aviso da data e do horário da prova.</p>
+    <div id="cargo-opts"></div>
+    <input id="cargo-outro" class="cg-input" type="text" placeholder="Outro cargo (opcional)" autocomplete="off">
+    <div class="modal-actions">
+      <button class="btn ghost" id="cargo-pular">Depois</button>
+      <button class="btn primary" id="cargo-salvar">Salvar</button>
+    </div>
+  </div>
+</div>
 <div class="modal-overlay" id="isencao-modal">
   <div class="modal-card">
     <div class="modal-emoji">🩸</div>
@@ -4981,6 +4999,16 @@ function computeAlerts(){
       }
     }
   });
+  inscritoIds.forEach(id => {
+    const e = allItemsById[id]; if(!e || !e.item.provaData) return;
+    if(alerts.some(a => a.itemId === id && /prova/i.test(a.title))) return;
+    const days = Math.ceil((new Date(e.item.provaData + "T00:00:00") - now) / 86400000);
+    if(days < 0 || days > 21) return;
+    const cg = cargosInscritos[id] && cargosInscritos[id].length ? cargosInscritos[id].join(" e ") : "";
+    alerts.push({ itemId: id, tone: days <= 7 ? "rose" : "sand",
+      title: `${e.item.title.replace(/^Concurso\s*/i, "")}: prova ${days === 0 ? "hoje" : "em " + days + " dia" + (days > 1 ? "s" : "")}`,
+      sub: formatDatePt(e.item.provaData, false) + (cg ? " · " + cg : "") + " · " + provaHoraTxt(e.item).split(". ")[0].replace(/\.$/, "") });
+  });
   const ordem = {rose:0, sand:1, mint:2};
   return alerts.map((a,i)=>[a,i]).sort((x,y)=>(ordem[x[0].tone]-ordem[y[0].tone])||(x[1]-y[1])).map(x=>x[0]).slice(0,5);
 }
@@ -5175,6 +5203,7 @@ async function loadFavorites(){
   favIds = Array.isArray(favIds) ? favIds : [];
   if(olhoIds.length){ favIds = [...new Set(favIds.concat(olhoIds))]; olhoIds = []; saveFavorites(); saveOlhoIds(); }
   await loadState('concursos-rj-inscritos', (v)=>inscritoIds=v);
+  await loadState('concursos-rj-cargos-insc', (v)=>{ cargosInscritos = (v && typeof v === "object" && !Array.isArray(v)) ? v : {}; });
   await loadState('concursos-rj-isencao', (v)=>{ isencaoStatus = (v && typeof v === "object" && !Array.isArray(v)) ? v : {}; });
   await loadState('concursos-rj-boleto', (v)=>{ boletoStatus = (v && typeof v === "object" && !Array.isArray(v)) ? v : {}; });
   await loadState('concursos-rj-vistos', (v)=>seenItemIds=v);
@@ -5314,11 +5343,10 @@ function toggleInscrito(id){
     saveInscritos();
     refreshInscritoUI();
     renderNovidades();
-    pendingBoletoId = id; pendingIsencaoId = id;
-    const sub = document.querySelector("#isencao-modal .modal-sub");
-    if(sub) sub.textContent = minhaIsencao().length ? "Você marcou: " + isencaoTexto() + ". Se pediu, eu te aviso para acompanhar o resultado." : "Por doação de sangue ou medula, CadÚnico ou outra regra. Se pediu, eu te aviso para acompanhar o resultado.";
-    document.getElementById("isencao-modal").classList.add("active");
+    pendingBoletoId = id;
+    abrirCargoModal(id, true);
   } else {
+    delete cargosInscritos[id]; saveCargosInsc();
     inscritoIds.splice(idx,1);
     delete boletoStatus[id]; delete isencaoStatus[id]; saveIsencao();
     saveBoletoStatus();
@@ -5328,6 +5356,12 @@ function toggleInscrito(id){
   }
 }
 
+function abrirIsencaoModal(id){
+  pendingBoletoId = id; pendingIsencaoId = id;
+  const sub = document.querySelector("#isencao-modal .modal-sub");
+  if(sub) sub.textContent = minhaIsencao().length ? "Você marcou: " + isencaoTexto() + ". Se pediu, eu te aviso para acompanhar o resultado." : "Por doação de sangue ou medula, CadÚnico ou outra regra. Se pediu, eu te aviso para acompanhar o resultado.";
+  document.getElementById("isencao-modal").classList.add("active");
+}
 function closeIsencaoModal(){ document.getElementById("isencao-modal").classList.remove("active"); pendingIsencaoId = null; }
 ["isencao-yes","isencao-no"].forEach(k=>{
   const el = document.getElementById(k);
@@ -5523,6 +5557,7 @@ function renderInicioInscritos(){
       <span class="item-icon ${entry.catClass}">${icon}</span>
       <div class="item-main">
         <div class="item-title">${item.title}</div>
+        ${cargosInscritos[id] && cargosInscritos[id].length ? `<div class="item-sub">Cargo: ${escHtml(cargosInscritos[id].join(" e "))}${item.provaData ? " · Prova " + formatDatePt(item.provaData, false) : ""}</div>` : `<button class="boleto-mark-btn" onmousedown="event.preventDefault(); event.stopPropagation();" onclick="event.stopPropagation(); abrirCargoModal('${id}', false)">Marcar o cargo em que me inscrevi</button>`}
         ${tagsHtml}
       </div>
       <div class="item-side"><span class="nav-arrow">›</span></div>
@@ -8989,7 +9024,7 @@ function exportData(){
     version: 1,
     exportedAt: new Date().toISOString(),
     profile, study, routine,
-    favIds, watchlist, inscritoIds, boletoStatus, isencaoStatus, seenItemIds,
+    favIds, watchlist, inscritoIds, boletoStatus, isencaoStatus, cargosInscritos, seenItemIds,
     darkMode, docChecklist, examChecklist, prep, wiz, roteiro, ing
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
@@ -9116,6 +9151,7 @@ document.getElementById("import-data-file").addEventListener("change", (e)=>{
       if(Array.isArray(data.inscritoIds)) inscritoIds = data.inscritoIds;
       if(data.boletoStatus && typeof data.boletoStatus === "object") boletoStatus = data.boletoStatus;
       if(data.isencaoStatus && typeof data.isencaoStatus === "object") isencaoStatus = data.isencaoStatus;
+      if(data.cargosInscritos && typeof data.cargosInscritos === "object") cargosInscritos = data.cargosInscritos;
       if(Array.isArray(data.seenItemIds)) seenItemIds = data.seenItemIds;
       if(typeof data.darkMode === "boolean") darkMode = data.darkMode;
       if(data.docChecklist && typeof data.docChecklist === "object") docChecklist = data.docChecklist;
@@ -9648,6 +9684,60 @@ function abrirCargos(aba){
 
 document.addEventListener("DOMContentLoaded",function(){var e=document.getElementById("cargos-atalho2");if(e)e.innerHTML=document.getElementById("cargos-atalho")?document.getElementById("cargos-atalho").innerHTML:""});
 try{var e2=document.getElementById("cargos-atalho2");if(e2&&document.getElementById("cargos-atalho"))e2.innerHTML=document.getElementById("cargos-atalho").innerHTML}catch(e){}
+
+// ---------- Cargo(s) em que ela se inscreveu: base dos avisos de data e horário da prova ----------
+let cargosInscritos = {}; // { [itemId]: ["Analista de Operações", ...] }
+let pendingCargoId = null, cargoFluxo = false, cargoSel = [];
+function saveCargosInsc(){ saveState('concursos-rj-cargos-insc', cargosInscritos); }
+function cargosDoItem(id){
+  const e = allItemsById[id]; if(!e) return [];
+  return (typeof CARGOS_FIT !== "undefined" ? CARGOS_FIT : []).filter(c => c.re.test(e.item.title));
+}
+function abrirCargoModal(id, fluxo){
+  pendingCargoId = id; cargoFluxo = !!fluxo;
+  cargoSel = (cargosInscritos[id] || []).slice();
+  const lista = cargosDoItem(id);
+  const e = allItemsById[id];
+  const aviso = e && /Cremerj/i.test(e.item.title) ? " No Cremerj dá para escolher 2 cargos, se as provas forem em turnos diferentes." : "";
+  document.getElementById("cargo-sub").textContent = "Marque um ou mais. Assim eu te aviso da data e do horário da prova." + aviso;
+  const known = lista.map(c => c.cargo);
+  const extra = cargoSel.filter(x => known.indexOf(x) < 0);
+  document.getElementById("cargo-outro").value = extra.join(", ");
+  document.getElementById("cargo-opts").innerHTML = lista.map((c,i) => `<button class="cg-pick ${cargoSel.indexOf(c.cargo) >= 0 ? "on" : ""}" data-i="${i}"><span class="ck">${cargoSel.indexOf(c.cargo) >= 0 ? "✓" : ""}</span><span><b>${escHtml(c.cargo)}</b><small>${escHtml(c.nivel)} · ${escHtml(c.sal)}</small></span></button>`).join("");
+  document.querySelectorAll("#cargo-opts .cg-pick").forEach(b => {
+    b.addEventListener("mousedown", ev => ev.preventDefault());
+    b.addEventListener("click", () => {
+      const nome = lista[+b.dataset.i].cargo, k = cargoSel.indexOf(nome);
+      if(k >= 0) cargoSel.splice(k,1); else cargoSel.push(nome);
+      b.classList.toggle("on", k < 0); b.querySelector(".ck").textContent = k < 0 ? "✓" : "";
+    });
+  });
+  document.getElementById("cargo-modal").classList.add("active");
+}
+function fecharCargoModal(salvar){
+  const id = pendingCargoId;
+  document.getElementById("cargo-modal").classList.remove("active");
+  if(id && salvar){
+    const lista = cargosDoItem(id).map(c => c.cargo);
+    let sel = cargoSel.filter(x => lista.indexOf(x) >= 0);
+    const o = document.getElementById("cargo-outro").value.split(",").map(x => x.trim()).filter(Boolean);
+    sel = sel.concat(o);
+    if(sel.length){ cargosInscritos[id] = sel; } else { delete cargosInscritos[id]; }
+    saveCargosInsc();
+  }
+  pendingCargoId = null;
+  if(cargoFluxo && id){ cargoFluxo = false; abrirIsencaoModal(id); }
+  else { try{ renderInicioInscritos(); renderAlertBox(); }catch(e){} }
+}
+["cargo-salvar","cargo-pular"].forEach(k => {
+  const el = document.getElementById(k);
+  el.addEventListener("mousedown", e => e.preventDefault());
+  el.addEventListener("click", () => fecharCargoModal(k === "cargo-salvar"));
+});
+function cargoLinha(id){
+  const c = cargosInscritos[id];
+  return c && c.length ? c.join(" e ") : "";
+}
 </script>
 </body>
 </html>
