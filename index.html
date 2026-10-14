@@ -2077,6 +2077,7 @@
     <p class="section-note">Toque na ⭐ de um card para guardar aqui. Os favoritos entram no seu cronograma de estudos e no calendário.</p>
     <button class="btn ghost" id="compare-open-btn" onmousedown="event.preventDefault()" onclick="openCompareScreen()" style="width:100%; text-align:center; margin-bottom:14px;">⚖️ Comparar concursos</button>
     <div id="list-favoritos"></div>
+    <div style="text-align:center;margin:-4px 0 14px"><button class="btn ghost" id="fav-limpar" onmousedown="event.preventDefault()" onclick="limparFavoritos()" style="font-size:12.5px">Limpar todos os favoritos</button></div>
     <div class="empty-state" id="empty-favoritos"><span class="emoji">⭐</span><p>Nenhum favorito ainda. Toque na ⭐ de um concurso para acompanhar aqui.</p></div>
 
     <div class="section-label">Fora do painel</div>
@@ -8050,8 +8051,8 @@ function wizAutoSel(){
   wiz.sel = wizConcursos().filter(id => prepDisponivel(T[id])).sort((a, b) => (rank(T[a]) - rank(T[b])) || (fim(T[a]) < fim(T[b]) ? -1 : fim(T[a]) > fim(T[b]) ? 1 : 0)).slice(0, 6);
   profile.alvoId = wiz.sel[0] || ""; saveState("concursos-rj-perfil", profile);
   saveWiz();
-  wiz.sel.forEach(id => { if(!favIds.includes(id)) favIds.push(id); });
-  saveFavorites(); rebuildLists();
+  // As respostas do questionário NÃO viram favoritos: quem marca a estrela é ela.
+  rebuildLists();
 }
 function wizPronto(){
   profile.planoNovo = true; saveState("concursos-rj-perfil", profile);
@@ -9841,6 +9842,13 @@ function confirmarInscricao(id){ inscConf[id] = true; saveInscConf(); renderInic
   el.addEventListener("click", () => confResponder(v));
 });
 setTimeout(checarConfirmacao, 2200);
+
+function limparFavoritos(){
+  if(!favIds.length){ if(typeof toast === "function") toast("Você não tem favoritos"); return; }
+  if(!confirm("Remover todos os " + favIds.length + " favoritos? As inscrições e o resto ficam como estão.")) return;
+  favIds.length = 0; saveFavorites();
+  try{ refreshFavoriteUI(); rebuildLists(); }catch(e){}
+}
 </script>
 </body>
 </html>
