@@ -2236,6 +2236,18 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="isoask-modal">
+  <div class="modal-card">
+    <div class="modal-emoji">🎟️</div>
+    <div class="modal-title" id="isoask-title">O pedido de isenção foi aceito?</div>
+    <p class="modal-sub" id="isoask-sub">Hoje é o último dia da janela de isenção. Se já saiu o resultado, me conta.</p>
+    <div class="modal-actions" style="flex-direction:column;gap:8px">
+      <button class="btn primary" id="isoask-ok">Sim, foi deferida</button>
+      <button class="btn ghost" id="isoask-no">Não, foi indeferida (pagar boleto)</button>
+      <button class="btn ghost" id="isoask-later">Ainda não saiu</button>
+    </div>
+  </div>
+</div>
 <div class="modal-overlay" id="cargo-modal">
   <div class="modal-card" style="max-height:86vh;overflow:auto;text-align:left">
     <div class="modal-emoji" style="text-align:center">🎯</div>
@@ -2317,11 +2329,8 @@
   try{
     const V = "2026-10-13-zero";
     if(localStorage.getItem("rota-zerado") !== V){
-      const bk = {};
-      Object.keys(localStorage).forEach(k => { if(k.indexOf("concursos-rj") === 0){ bk[k] = localStorage.getItem(k); localStorage.removeItem(k); } });
-      if(Object.keys(bk).length) localStorage.setItem("rota-backup-antes-de-zerar", JSON.stringify(bk));
+      // Não apaga mais nada: os dados dela ficam sempre. Só marca que este ajuste já passou.
       localStorage.setItem("rota-zerado", V);
-      window.__rotaZerado = true;
     }
     if(sessionStorage.getItem("rota-abrir-wizard")){ sessionStorage.removeItem("rota-abrir-wizard"); window.__rotaZerado = true; }
   }catch(e){}
@@ -4269,7 +4278,7 @@ function renderPrazoFinal(item){
     </div>`;
   }
   const notaDoa = (boxIsen && minhaIsencao().length) ? `<div class="iso-box" style="grid-column:1/-1">Você marcou: ${isencaoTexto()}. Confira no edital se vale como isenção e quais comprovantes pedem.</div>` : "";
-  return `<div class="prazos-grid">${boxGeral}${boxIsen}${notaDoa}${boxBoleto}${boxProva}</div>`;
+  return `<div class="prazos-grid">${boxGeral}${boxIsen}${boxBoleto}${boxProva}</div>`;
 }
 
 function classifyConcorrencia(text){
@@ -5203,6 +5212,7 @@ async function loadFavorites(){
   favIds = Array.isArray(favIds) ? favIds : [];
   if(olhoIds.length){ favIds = [...new Set(favIds.concat(olhoIds))]; olhoIds = []; saveFavorites(); saveOlhoIds(); }
   await loadState('concursos-rj-inscritos', (v)=>inscritoIds=v);
+  await loadState('concursos-rj-isencao-asked', (v)=>{ isencaoAsked = (v && typeof v === "object" && !Array.isArray(v)) ? v : {}; });
   await loadState('concursos-rj-cargos-insc', (v)=>{ cargosInscritos = (v && typeof v === "object" && !Array.isArray(v)) ? v : {}; });
   await loadState('concursos-rj-isencao', (v)=>{ isencaoStatus = (v && typeof v === "object" && !Array.isArray(v)) ? v : {}; });
   await loadState('concursos-rj-boleto', (v)=>{ boletoStatus = (v && typeof v === "object" && !Array.isArray(v)) ? v : {}; });
@@ -5218,6 +5228,7 @@ async function loadFavorites(){
   refreshFavoriteUI();
   refreshInscritoUI();
   applyTheme();
+  setTimeout(() => { try{ checarIsencaoPergunta(); }catch(e){} }, 900);
 }
 
 function saveFavorites(){ saveState('concursos-rj-favoritos', favIds); }
@@ -8363,7 +8374,7 @@ function dayTimelineBlocks(dow){
 // mais confiáveis, e copia o pedido pronto pra colar no Claude, que confere e devolve
 // o painel atualizado. ----------
 const DATA_CHECKED = "13/10/2026";
-const DATA_CHECKED_HORA = "22:30";
+const DATA_CHECKED_HORA = "23:45";
 const UPDATE_SOURCES = [
   { name:"JC Concursos: abertos no RJ", url:"https://jcconcursos.com.br/concursos/inscricoes-abertas/rj" },
   { name:"PCI Concursos: Rio de Janeiro", url:"https://www.pciconcursos.com.br/concursos/rj/rio-de-janeiro" },
@@ -9738,6 +9749,40 @@ function cargoLinha(id){
   const c = cargosInscritos[id];
   return c && c.length ? c.join(" e ") : "";
 }
+
+// ---------- Lembrete: na última data da isenção, pergunta se a isenção rolou ----------
+let isencaoAsked = {}; // { [itemId]: "AAAA-MM-DD" do último dia em que perguntei }
+function hojeISO(){ const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); }
+let isoAskId = null;
+function checarIsencaoPergunta(){
+  try{
+    const hoje = hojeISO();
+    const id = inscritoIds.find(i => {
+      const e = allItemsById[i];
+      return isencaoStatus[i] === "pedida" && e && e.item.isencaoFim && e.item.isencaoFim <= hoje && isencaoAsked[i] !== hoje;
+    });
+    if(!id) return;
+    const it = allItemsById[id].item;
+    isoAskId = id;
+    document.getElementById("isoask-title").textContent = it.title.replace(/^Concurso\s*/i,"") + ": a isenção rolou?";
+    document.getElementById("isoask-sub").textContent = it.isencaoFim === hoje
+      ? "Hoje é o último dia do pedido de isenção. Se já saiu o resultado, me conta."
+      : "O prazo do pedido de isenção terminou em " + formatDatePt(it.isencaoFim, false) + ". Já saiu o resultado?";
+    document.getElementById("isoask-modal").classList.add("active");
+  }catch(e){}
+}
+function isoAskFechar(r){
+  const id = isoAskId; document.getElementById("isoask-modal").classList.remove("active"); isoAskId = null;
+  if(!id) return;
+  if(r){ isencaoResultado(id, r); }
+  else { isencaoAsked[id] = hojeISO(); saveState('concursos-rj-isencao-asked', isencaoAsked); }
+  setTimeout(checarIsencaoPergunta, 300);
+}
+[["isoask-ok","deferida"],["isoask-no","indeferida"],["isoask-later",null]].forEach(([k,r]) => {
+  const el = document.getElementById(k);
+  el.addEventListener("mousedown", e => e.preventDefault());
+  el.addEventListener("click", () => isoAskFechar(r));
+});
 </script>
 </body>
 </html>
