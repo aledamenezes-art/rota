@@ -1935,6 +1935,7 @@
       <span class="sort-chip" data-filter="emandamento">Prova ou resultado</span>
       <span class="sort-chip" data-filter="banca">Banca escolhida</span>
       <span class="sort-chip" data-filter="anunciado">Só anunciados</span>
+      <span class="sort-chip" data-filter="encerrados">Encerrados</span>
     </div>
 
     <div id="fit-resumo" class="fit-resumo"></div>
@@ -1955,6 +1956,10 @@
     <div class="section-label" id="anunciados-heading">Anunciados: banca ainda a definir</div>
     <p class="section-note" id="anunciados-note">Confirmado, banca ainda não definida.</p>
     <div id="list-anunciados"></div>
+
+    <div class="section-label" id="encerrados-heading" style="display:none">Inscrição encerrada</div>
+    <p class="section-note" id="encerrados-note" style="display:none">Concursos em que você não se inscreveu. Só aparecem aqui, fora da lista principal.</p>
+    <div id="list-encerrados" style="display:none"></div>
 
     <div class="empty-state hidden" id="empty-concursos"><span class="emoji">🌊</span><p>Nenhum resultado. Tenta outro termo ou filtro.</p></div>
   </section>
@@ -3330,11 +3335,11 @@ function itemServeEsfera(id, esferas){
   return !e || esferas.includes(e);
 }
 
-function passesProfile(item){
+function passesProfile(item, soEncerrados){
+  if(itemFechado(item) && !soEncerrados && !inscritoIds.includes(slugify(item.title))) return false;
   if(profile.filtrar){
     const id = slugify(item.title);
     if(!inscritoIds.includes(id) && !favIds.includes(id)){
-      if(itemFechado(item)) return false;
       if(!itemServeFormacao(item, profile.formacao)) return false;
       if(!itemServeEsfera(id, profile.esferas)) return false;
     }
@@ -3356,6 +3361,14 @@ function filteredAbertos(){ return abertos.filter(passesProfile); }
 function filteredEmAndamento(){ return emAndamento.filter(passesProfile); }
 function filteredBanca(){ return banca.filter(passesProfile); }
 function filteredAnunciados(){ return anunciados.filter(passesProfile); }
+function filteredEncerrados(){
+  const vistos = new Set();
+  return [].concat(abertos, emAndamento, banca, anunciados).filter(it=>{
+    const id = slugify(it.title);
+    if(vistos.has(id) || !itemFechado(it) || inscritoIds.includes(id)) return false;
+    vistos.add(id); return passesProfile(it, true);
+  });
+}
 
 function populateProfileForm(){
   const sf = document.getElementById("profile-formacao");
@@ -9307,6 +9320,8 @@ function rebuildLists(){
     const chip = document.querySelector('.sort-chip[data-filter="emandamento"]'); if(chip) chip.style.display = vazio ? "none" : ""; }
   mount("list-banca", filteredBanca(), "cat-banca");
   mount("list-anunciados", filteredAnunciados(), "cat-anunciado");
+  mount("list-encerrados", filteredEncerrados(), "cat-encerrado");
+  { const chip = document.querySelector('.sort-chip[data-filter="encerrados"]'); if(chip) chip.style.display = filteredEncerrados().length ? "" : "none"; }
   renderNovidades();
   renderAlertBox();
   refreshStats();
@@ -9613,14 +9628,17 @@ const concursoSections = {
   abertos:     { list:"list-abertos", heading:"abertos-heading", note:null, fixedEmpty:"empty-abertos-fixo" },
   emandamento: { list:"list-emandamento", heading:"emandamento-heading", note:"emandamento-note", fixedEmpty:null },
   banca:       { list:"list-banca", heading:"banca-heading", note:"banca-note", fixedEmpty:null },
-  anunciado:   { list:"list-anunciados", heading:"anunciados-heading", note:"anunciados-note", fixedEmpty:null }
+  anunciado:   { list:"list-anunciados", heading:"anunciados-heading", note:"anunciados-note", fixedEmpty:null },
+  encerrado:   { list:"list-encerrados", heading:"encerrados-heading", note:"encerrados-note", fixedEmpty:null }
 };
 
 function applyConcursoFilter(f){
   document.querySelectorAll(".sort-chip").forEach(c=>c.classList.toggle("active", c.dataset.filter === f));
-  const activeKeys = f === "all" ? Object.keys(concursoSections)
+  const activeKeys = f === "all" ? ["abertos","emandamento","banca","anunciado"]
     : f === "previstos" ? ["banca","anunciado"]
+    : f === "encerrados" ? ["encerrado"]
     : [f];
+  { const le = document.getElementById("list-encerrados"); if(le) le.style.display = f === "encerrados" ? "" : "none"; }
   Object.keys(concursoSections).forEach(key=>{
     const s = concursoSections[key];
     if(f === "inscritas"){
@@ -9639,7 +9657,7 @@ function applyConcursoFilter(f){
   });
   applySearch();
   const pb = document.getElementById("perfil-busca"); if(pb) pb.style.display = (f === "all") ? "" : "none";
-  { const so = f === "inscritas";
+  { const so = f === "inscritas" || f === "encerrados";
     ["stats","fit-resumo"].forEach(i=>{ const e = document.getElementById(i); if(e) e.style.display = so ? "none" : ""; });
     const st = document.querySelector("#stats + .stats-hint, .stats-hint"); if(st) st.style.display = so ? "none" : ""; }
   if(f === "inscritas" && !searchInput.value.trim()){
