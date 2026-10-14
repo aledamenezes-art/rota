@@ -1761,6 +1761,8 @@
   .cu-row{display:flex;gap:12px;align-items:flex-start;padding:9px 0;border-top:1px solid var(--line,#eee);width:100%;text-align:left;background:none;border-left:0;border-right:0;border-bottom:0;font:inherit;color:inherit}
   .cu-n{flex:0 0 26px;height:26px;border-radius:50%;background:#F3E4EC;color:#702A55;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:13px}
   .cu-row span{font-size:13px;line-height:1.35}.cu-row small{display:block;color:var(--ink-soft);font-size:12px;margin-top:2px}
+  .fit-resumo{display:flex;flex-wrap:wrap;align-items:center;gap:2px 10px;margin:0 0 12px;padding:11px 14px;border-radius:14px;background:#F3E4EC;color:#702A55;font-size:12.5px}
+  .fit-resumo b{flex:1 1 100%;font-size:14px}.fit-resumo span{flex:1;color:#4a3340}.fit-resumo button{background:none;border:0;font-weight:700;color:#702A55;padding:6px 0}
 </style>
 </head>
 <body data-tab="inicio">
@@ -1844,6 +1846,8 @@
       <span class="sort-chip" data-filter="banca">Banca escolhida</span>
       <span class="sort-chip" data-filter="anunciado">Só anunciados</span>
     </div>
+
+    <div id="fit-resumo" class="fit-resumo"></div>
 
     <div class="section-label" id="abertos-heading">Inscrições abertas hoje</div>
     <div id="list-abertos"></div>
@@ -3085,7 +3089,7 @@ window.__FED_ESFERA = {};
 // concursos que aparecem nas listas. Hoje só há dados de Administração no RJ (capital),
 // então com o perfil padrão nada muda; o filtro entra em ação de verdade quando outras
 // áreas/estados forem cadastrados no futuro. ----------
-let profile = { area: "Administração", estados: ["RJ"], niveis: ["Médio","Técnico","Superior"], salarioMin: 0, formacao: "", esferas: [], filtrar: false };
+let profile = { area: "Administração", estados: ["RJ"], niveis: ["Médio","Técnico","Superior"], salarioMin: 0, formacao: "adm", esferas: [], filtrar: true };
 
 // ---------- Filtro "combina comigo": só concursos abertos, previstos ou em análise (nunca os encerrados) e que
 // servem para a formação e para as respostas do passo a passo. Regras simples sobre o texto dos cargos:
@@ -3110,6 +3114,8 @@ Object.assign(ESFERA_ITEM, window.__FED_ESFERA||{});
 function itemFechado(it){ return it.badgeType === "encerrado"; }
 function itemServeFormacao(it, formacao){
   if(!formacao || it.destaque) return true;
+  if(/qualquer (gradua|forma)/i.test((it.cargos||"")+" "+(it.note||""))) return true;
+  if(/^\s*a definir/i.test(it.cargos||"") && (it.estado||"RJ").toUpperCase()==="RJ") return true;
   if(formacao === "medio") return /m[ée]dio|fundamental/i.test(it.nivel || "");
   const re = FIT_FORMACAO[formacao];
   return re ? re.test((it.cargos || "") + " " + (it.title || "")) : true;
@@ -8669,7 +8675,15 @@ function zerarTudo(){
 
 // Contagens dos tiles do topo e a lista + o alerta de situação, tudo lido a partir do
 // filtro de perfil atual — chamado de novo sempre que o perfil muda.
+function fitResumo(){
+  var el=document.getElementById("fit-resumo"); if(!el) return;
+  var q=[].concat(filteredAbertos(),filteredEmAndamento(),filteredBanca(),filteredAnunciados()).length;
+  var est=(profile.estados||[]).join(", ")||"todos os estados";
+  var niv=(profile.niveis||[]).filter(function(n){return n!=="Técnico"}).join(" e ")||"todos os níveis";
+  el.innerHTML='<b>'+q+' concursos combinam com você</b><span>'+(profile.filtrar?'Filtro automático pelas suas respostas: ':'Filtro desligado. ')+'formação '+(profile.formacao==="adm"?"Administração":"da sua escolha")+', '+niv+', '+est+' e federais.</span><button onclick="document.querySelector(\'.tab-btn[data-tab=&quot;perfil&quot;]\').click()">Ajustar</button>';
+}
 function refreshStats(){
+  try{fitResumo()}catch(e){}
   const fa = filteredAbertos(), fe = filteredEmAndamento(), fb = filteredBanca(), fn = filteredAnunciados();
   // Cada card é um atalho de filtro, não uma contagem solta — por isso o número de
   // cada um bate exatamente com o que aparece no filtro pra onde ele leva (o
