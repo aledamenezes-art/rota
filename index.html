@@ -1780,6 +1780,8 @@
   .cg-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.cg-top b{font-size:14.5px;flex:1}.cg-sal{font-weight:800;color:#1F6B52;font-size:13.5px;text-align:right;max-width:46%}
   .cg-org{font-size:12px;color:var(--ink-soft);margin-top:3px}.cg-dates{display:flex;justify-content:space-between;gap:8px;margin-top:8px;font-size:12px;font-weight:700;color:#702A55}.cg-dates .ok{color:#1F6B52}
   .cg-nota{margin-top:6px;font-size:11.5px;color:var(--ink-soft)}
+  .cg-in{cursor:default}.cg-in.serve{border-color:#D9B4C8}.cg-serve{margin-top:6px;font-size:11.5px;font-weight:700;color:#702A55}
+  .cg-outros{margin-top:16px;font-size:12.5px;color:var(--ink-soft)}.cg-outros summary{font-weight:700;color:#702A55;padding:6px 0}
 </style>
 </head>
 <body data-tab="inicio">
@@ -1819,7 +1821,6 @@
   <section class="panel active" id="panel-inicio">
     <div class="ps ps-home" onmousedown="event.preventDefault()" onclick="openBusca()" role="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span class="ps-text">Concursos, bancas, matérias</span><span class="ps-sep"></span><span class="ps-go">Procurar</span></div>
         <div id="como-usar"></div>
-    <div id="cargos-atalho"></div>
     <div class="inicio-greeting" id="inicio-greeting"></div>
     <div id="inicio-frase"></div>
 
@@ -1865,7 +1866,6 @@
       <span class="sort-chip" data-filter="anunciado">Só anunciados</span>
     </div>
 
-    <div id="cargos-atalho2"></div>
     <div id="fit-resumo" class="fit-resumo"></div>
 
     <div class="section-label" id="abertos-heading">Inscrições abertas hoje</div>
@@ -4621,14 +4621,43 @@ function renderDetailContent(item, itemId, catClass){
 }
 
 // ---------- Sub-telas do detalhe: cada bloco de informação isolado na sua própria tela ----------
+function cargoCardHtml(c, item){
+  const aberto = item.badgeType === "aberto";
+  const prova = item.provaData ? formatDatePt(item.provaData, false) : "A definir";
+  const insc = aberto && item.inscricaoFim ? "Inscreva até " + formatDatePt(item.inscricaoFim, false) : (aberto ? "Inscrições abertas" : "Sem edital ainda");
+  return `<div class="cg-row cg-in${c.serve ? " serve" : ""}">
+    <div class="cg-top"><b>${escHtml(c.cargo)}</b><span class="cg-sal">${escHtml(c.sal)}</span></div>
+    <div class="cg-org">${escHtml(c.vagas || "")}${c.taxa ? " · Taxa " + escHtml(c.taxa) : ""}</div>
+    <div class="cg-dates"><span class="${aberto ? "ok" : ""}">${insc}</span><span>Prova: ${prova}</span></div>
+    ${c.serve ? `<div class="cg-serve">Combina com Administração</div>` : ""}
+    ${c.nota ? `<div class="cg-nota">${escHtml(c.nota)}</div>` : ""}
+  </div>`;
+}
 function renderSubGeral(item){
-  return `
+  const cg = (typeof CARGOS_FIT !== "undefined") ? CARGOS_FIT.filter(c => c.re.test(item.title)) : [];
+  if(!cg.length){
+    return `
     <div class="fact-grid">
       ${factFull("Situação", item.situacao)}
       ${fact("Vagas", item.vagas)}
       ${factFull("Cargos / áreas", item.cargos)}
       ${factBanca(item.banca, item)}
     </div>
+  `;
+  }
+  const grupos = [["Superior","Nível superior"],["Médio","Nível médio"],["Médio e Superior","Médio e superior"]];
+  const blocos = grupos.map(([k,t]) => {
+    const l = cg.filter(c => c.nivel === k);
+    return l.length ? `<div class="subhead" style="margin:18px 0 8px">${t} (${l.length})</div>${l.map(c => cargoCardHtml(c, item)).join("")}` : "";
+  }).join("");
+  return `
+    <div class="fact-grid">
+      ${factFull("Situação", item.situacao)}
+      ${fact("Vagas", item.vagas)}
+      ${factBanca(item.banca, item)}
+    </div>
+    ${blocos}
+    <details class="cg-outros"><summary>Todos os cargos do edital, em texto</summary><p>${escHtml(item.cargos || "")}</p></details>
   `;
 }
 
@@ -9522,18 +9551,18 @@ function focoCardHtml(){
 // ---------- Cargos que servem para ela: salário e data da prova lado a lado ----------
 // Valores copiados dos cartões do próprio app (edital quando há, senão "último edital").
 const CARGOS_FIT = [
-  { re:/Cremerj/i, cargo:"Analista de Operações", nivel:"Superior", sal:"R$ 6.084,46", vagas:"11 vagas + CR", nota:"Perfil mais próximo de Administração" },
-  { re:/Cremerj/i, cargo:"Assistente de Operações", nivel:"Médio", sal:"R$ 3.010,00", vagas:"Só cadastro de reserva" },
-  { re:/INB/i, cargo:"Administrador", nivel:"Superior", sal:"R$ 7.221", vagas:"Cadastro de reserva" },
-  { re:/INB/i, cargo:"Assistente Administrativo", nivel:"Médio", sal:"A partir de R$ 3.452", vagas:"Cadastro de reserva", nota:"Valor exato do cargo no edital" },
+  { re:/Cremerj/i, cargo:"Analista de Operações", nivel:"Superior", sal:"R$ 6.084,46", vagas:"11 vagas + CR", taxa:"R$ 47,50", serve:true, nota:"Perfil mais próximo de Administração" },
+  { re:/Cremerj/i, cargo:"Assistente de Operações", nivel:"Médio", sal:"R$ 3.010,00", vagas:"Só cadastro de reserva", taxa:"R$ 47,00", serve:true },
+  { re:/INB/i, cargo:"Administrador", nivel:"Superior", sal:"R$ 7.221", vagas:"Cadastro de reserva", taxa:"R$ 125", serve:true },
+  { re:/INB/i, cargo:"Assistente Administrativo", nivel:"Médio", sal:"A partir de R$ 3.452", vagas:"Cadastro de reserva", taxa:"R$ 100", serve:true, nota:"Valor exato do cargo no edital" },
   { re:/UNIRIO/i, cargo:"Cargos dos editais 221 a 229/2026", nivel:"Superior", sal:"R$ 6.157 a R$ 8.340", vagas:"1 vaga em cada edital", nota:"Confira qual edital é de Administração" },
-  { re:/CRF-RJ/i, cargo:"Administrador Júnior", nivel:"Superior", sal:"R$ 4.076,13", vagas:"Edital novo ainda não saiu", nota:"Valor do último edital" },
-  { re:/CRF-RJ/i, cargo:"Agente Administrativo", nivel:"Médio", sal:"R$ 3.144,52", vagas:"Edital novo ainda não saiu", nota:"Valor do último edital" },
+  { re:/CRF-RJ/i, cargo:"Administrador Júnior", nivel:"Superior", sal:"R$ 4.076,13", vagas:"Edital novo ainda não saiu", serve:true, nota:"Valor do último edital" },
+  { re:/CRF-RJ/i, cargo:"Agente Administrativo", nivel:"Médio", serve:true, sal:"R$ 3.144,52", vagas:"Edital novo ainda não saiu", nota:"Valor do último edital" },
   { re:/CRO-RJ/i, cargo:"Analista técnico executivo", nivel:"Superior", sal:"Até R$ 5.450", vagas:"5 imediatas + CR (total)", nota:"Mais vale alimentação e plano de saúde" },
   { re:/CRO-RJ/i, cargo:"Auxiliar administrativo", nivel:"Médio", sal:"A partir de R$ 2.750", vagas:"5 imediatas + CR (total)" },
   { re:/Theatro/i, cargo:"Técnico de Nível Superior", nivel:"Superior", sal:"Faixa R$ 1.077,73 a R$ 3.790,43", vagas:"110 (total)" },
   { re:/Theatro/i, cargo:"Assistente Administrativo", nivel:"Médio", sal:"Faixa R$ 1.077,73 a R$ 3.790,43", vagas:"110 (total)" },
-  { re:/UFRJ/i, cargo:"Administrador", nivel:"Superior", sal:"R$ 4.967,04", vagas:"6 no edital anterior", nota:"Valor do último edital" },
+  { re:/UFRJ/i, cargo:"Administrador", nivel:"Superior", serve:true, sal:"R$ 4.967,04", vagas:"6 no edital anterior", nota:"Valor do último edital" },
   { re:/UFRJ/i, cargo:"Técnico administrativo", nivel:"Médio", sal:"R$ 3.029,90", vagas:"Edital a conferir", nota:"Valor do último edital" },
   { re:/Pedro II/i, cargo:"Assistente em Administração", nivel:"Médio", sal:"R$ 3 mil a R$ 5 mil", vagas:"Em estudo", nota:"Valor de 2023" },
   { re:/IBGE/i, cargo:"Analista de planejamento, gestão e infraestrutura", nivel:"Superior", sal:"R$ 8.558,13", vagas:"Solicitado" },
