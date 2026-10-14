@@ -4794,8 +4794,12 @@ function computeAlerts(){
         sub: "Fora do painel · " + formatDatePt(w.data, false) });
     }
   });
+  // Só entra na situação o que faz sentido para ela: o que ela guardou ou se inscreveu,
+  // ou o que combina com o perfil e já tem cargos conhecidos.
+  const meu = id => inscritoIds.includes(id) || favIds.includes(id);
   filteredAbertos().forEach(item=>{
     const itemId = slugify(item.title);
+    if(!meu(itemId) && /^\s*a definir/i.test(item.cargos||"")) return;
     const shortTitle = item.title.replace(/^Concurso\s*/i, "");
     if(item.inscricaoFim){
       const end = new Date(item.inscricaoFim + "T23:59:59");
@@ -4827,6 +4831,7 @@ function computeAlerts(){
   });
   filteredEmAndamento().forEach(item=>{
     const itemId = slugify(item.title);
+    if(!meu(itemId)) return; // prova só importa para quem se inscreveu ou guardou
     const shortTitle = item.title.replace(/^Concurso\s*/i, "");
     if(item.provaData){
       const p = new Date(item.provaData + "T00:00:00");
@@ -4838,7 +4843,8 @@ function computeAlerts(){
       }
     }
   });
-  return alerts;
+  const ordem = {rose:0, sand:1, mint:2};
+  return alerts.map((a,i)=>[a,i]).sort((x,y)=>(ordem[x[0].tone]-ordem[y[0].tone])||(x[1]-y[1])).map(x=>x[0]).slice(0,5);
 }
 
 // Frase motivacional do dia: fixa por data (não muda a cada render), roda num banco
