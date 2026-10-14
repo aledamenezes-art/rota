@@ -1782,6 +1782,7 @@
   .cg-nota{margin-top:6px;font-size:11.5px;color:var(--ink-soft)}
   .cg-in{cursor:default}.cg-in.serve{border-color:#D9B4C8}.cg-serve{margin-top:6px;font-size:11.5px;font-weight:700;color:#702A55}
   .cg-outros{margin-top:16px;font-size:12.5px;color:var(--ink-soft)}.cg-outros summary{font-weight:700;color:#702A55;padding:6px 0}
+  .cg-hora{margin-top:6px;font-size:12px;color:var(--ink)}
 </style>
 </head>
 <body data-tab="inicio">
@@ -4621,6 +4622,25 @@ function renderDetailContent(item, itemId, catClass){
 }
 
 // ---------- Sub-telas do detalhe: cada bloco de informação isolado na sua própria tela ----------
+
+// Horário da prova: só o que as fontes trazem. Sem dado, diz que ainda não saiu (nada inventado).
+const PROVA_HORA = [
+  { re:/Cremerj/i, txt:"Dois turnos, manhã e tarde. O horário exato vem no edital ou no cartão de confirmação. Duração de 5h (5h30 para Advogado, Analista Jurídico e Auditor). Dá para se inscrever em 2 cargos se as provas forem em turnos diferentes." },
+  { re:/INB/i, txt:"Horário ainda não divulgado nas fontes. Confira no edital da FGV." }
+];
+function provaHoraTxt(item){
+  const m = PROVA_HORA.find(x => x.re.test(item.title));
+  if(m) return m.txt;
+  if(item.provaHora) return item.provaHora;
+  const t = String(item.prova || "");
+  const h = t.match(/das \d{1,2}h(?:\d{2})? às \d{1,2}h(?:\d{2})?/i);
+  if(h) return h[0].charAt(0).toUpperCase() + h[0].slice(1);
+  const turnos = [];
+  if(/manh[ãa]/i.test(t)) turnos.push("manhã");
+  if(/tarde/i.test(t)) turnos.push("tarde");
+  if(turnos.length) return "Turno: " + turnos.join(" e ") + ". " + (t.match(/\(([^)]*(manh[ãa]|tarde)[^)]*)\)/i) ? "Detalhe: " + t.match(/\(([^)]*)\)/)[1] + ". " : "") + "Horário exato no edital.";
+  return "Horário ainda não divulgado nas fontes";
+}
 function cargoCardHtml(c, item){
   const aberto = item.badgeType === "aberto";
   const prova = item.provaData ? formatDatePt(item.provaData, false) : "A definir";
@@ -4629,6 +4649,7 @@ function cargoCardHtml(c, item){
     <div class="cg-top"><b>${escHtml(c.cargo)}</b><span class="cg-sal">${escHtml(c.sal)}</span></div>
     <div class="cg-org">${escHtml(c.vagas || "")}${c.taxa ? " · Taxa " + escHtml(c.taxa) : ""}</div>
     <div class="cg-dates"><span class="${aberto ? "ok" : ""}">${insc}</span><span>Prova: ${prova}</span></div>
+    <div class="cg-hora">🕘 Horário: ${escHtml(provaHoraTxt(item).split(". ")[0].replace(/\.$/,""))}. Detalhes na aba Prova.</div>
     ${c.serve ? `<div class="cg-serve">Combina com Administração</div>` : ""}
     ${c.nota ? `<div class="cg-nota">${escHtml(c.nota)}</div>` : ""}
   </div>`;
@@ -4679,6 +4700,7 @@ function renderSubProva(item, itemId){
   return `
     <div class="fact-grid">
       ${fact("Prova objetiva", item.prova)}
+      ${factFull("Horário da prova", provaHoraTxt(item))}
     </div>
     ${materiasHtml ? `<div class="subhead" style="margin-top:20px;">O que cai na prova</div>${materiasHtml}` : `<div class="hist-empty" style="margin-top:14px;">Ainda não há informações sobre o conteúdo da prova nas fontes consultadas.</div>`}
     ${renderExamChecklist(itemId)}
