@@ -2428,12 +2428,13 @@ const abertos = [
     salario: "R$ 3.010,00 (médio) a R$ 18.000,00 (Auditor, teto superior); Analista de Operações ganha R$ 6.084,46",
     vagas: "26 vagas imediatas + cadastro de reserva (edital retificado)",
     banca: "Instituto Consulplan",
-    situacao: "Edital publicado, inscrições abertas",
-    inscricoes: "23/09/2026 (10h) a 22/10/2026 (16h)",
+    situacao: "Edital publicado, inscrições abertas e prorrogadas pela retificação",
+    inscricoes: "23/09/2026 (10h) a 29/10/2026 (16h), prorrogadas",
     inscricaoInicio: "2026-09-23",
-    inscricaoFim: "2026-10-22",
+    inscricaoFim: "2026-10-29",
+    boletoVence: "2026-10-30",
     provaData: "2026-12-13",
-    isencaoInicio: "2026-09-23", isencaoFim: "2026-09-25",
+    isencaoInicio: "2026-09-23", isencaoFim: "2026-10-07",
     prova: "13/12/2026, na cidade do Rio de Janeiro, Campos dos Goytacazes e Volta Redonda",
     taxa: "R$ 47,00 (médio/técnico) · R$ 47,50 (superior)",
     editalUrl: "https://www.institutoconsulplan.org.br/cremerj2026",
@@ -2441,7 +2442,7 @@ const abertos = [
     fonteUrl: "https://blog.grancursosonline.com.br/concurso-cremerj-edital-publicado-2026/",
     fonteLabel: "Gran Cursos Online",
     hist: { ano:"2021", banca:"Idib: Instituto de Desenvolvimento Institucional Brasileiro", salario:"R$ 2.889,00 inicial", concorrencia:"Não localizada. Foram 31 vagas (5 imediatas + 26 CR) para Assistente Jurídico e Técnico de Contabilidade" },
-    isencao: { texto: ": o edital confirma isenção pra doadoras de medula óssea e pra inscritas no CadÚnico, com pedido apenas entre 23 e 25/09/2026 (janela curta, logo na abertura das inscrições)." },
+    isencao: { texto: ": o edital confirma isenção pra doadoras de medula óssea e pra inscritas no CadÚnico. O pedido foi de 23 a 25/09/2026, e a retificação reabriu de 05 a 07/10/2026 só para os cargos de TI, Operações e Web Designer. Os dois prazos já encerraram." },
     note: "Sede na capital. Foi o mais rápido dessa lista a sair depois de fechar banca: contrato assinado em 16/07/2026 e edital publicado pouco mais de dois meses depois. As fontes consultadas não detalham a distribuição exata das matérias/questões por cargo. Confira a tabela completa no edital antes de estudar por peso."
   }
 ];
@@ -2511,7 +2512,7 @@ const emAndamento = [
     salario: "R$ 2.437,00 (nível médio) a R$ 6.369,00 (nível superior)",
     vagas: "84 (4 imediatas + 80 cadastro de reserva), sendo 1 imediata + 20 CR para Administrador",
     banca: "IADES: Instituto Americano de Desenvolvimento",
-    situacao: "Inscrições encerradas em 27/09/2026, após prorrogação (Edital de Retificação nº 4). Próxima etapa é a prova",
+    situacao: "Inscrições encerradas em 27/09/2026, após prorrogação (Edital de Retificação nº 4). Prova mantida em 18/10. Os locais saem em 13/10 e a confirmação de inscrição fica disponível desde 13/10, segundo a Folha Dirigida",
     inscricoes: "Encerradas (foram de 20/08/2026 a 27/09/2026, com prazo prorrogado do dia 15/09 original)",
     provaData: "2026-10-18",
     isencaoInicio: "2026-08-20", isencaoFim: "2026-08-24",
@@ -2984,8 +2985,8 @@ anunciados.push(
 );
 banca.push(
   _novo({ org:"🛡️ Polícia Militar do RJ", title:"Concurso PMERJ: Oficial", badge:"BANCA DEFINIDA", badgeType:"banca", area:"Segurança pública",
-    nivel:"Superior", cargos:"Oficial da Polícia Militar (e Oficial Capelão, 7 vagas, banca IBDO)", salario:"Até R$ 10.348,18", vagas:"100 (Oficial)", banca:"FGV (Gran Cursos); a Estratégia cita Cesgranrio",
-    situacao:"Banca definida, sem edital. As fontes divergem na banca: a Gran Cursos (03/10/2026) diz FGV e a Estratégia (23/09/2026) diz Cesgranrio", fonteUrl:_urlGran, fonteLabel:_GRAN,
+    nivel:"Superior", cargos:"Oficial da Polícia Militar (e Oficial Capelão, 7 vagas, banca IBDO)", salario:"Até R$ 10.348,18", vagas:"100 (Oficial)", banca:"Cesgranrio (Estratégia e Folha Dirigida); a Gran Cursos cita FGV",
+    situacao:"Banca definida, sem edital. A Estratégia (08/10) e a Folha Dirigida (13/10) dizem Cesgranrio. A Gran Cursos (03/10) dizia FGV", fonteUrl:_urlGran, fonteLabel:_GRAN,
     note:"Fora do perfil de Administração. Confirme a banca quando o edital sair." }),
   _novo({ org:"🛡️ Polícia Civil do RJ", title:"Concurso PC RJ: peritos e piloto", badge:"BANCA DEFINIDA", badgeType:"banca", area:"Segurança pública",
     nivel:"Superior", cargos:"Perito Criminal, Perito Legista e Piloto Policial (a Gran Cursos soma também Delegado, 85 vagas)", salario:"Até R$ 26,9 mil (delegado); demais cargos cerca de R$ 13,8 mil", vagas:"329 (Estratégia) ou 414 com delegados (Gran Cursos)", banca:"FGV (peritos e piloto)",
@@ -2993,7 +2994,7 @@ banca.push(
     note:"Fora do perfil de Administração. Entra para quem escolher Segurança pública." }),
   _novo({ org:"🚒 Bombeiros RJ: contratação temporária", title:"Concurso Bombeiros RJ: temporários", badge:"BANCA DEFINIDA", badgeType:"banca", area:"Segurança pública",
     nivel:"Médio", cargos:"Soldado e Oficial (processo seletivo simplificado)", salario:"A definir", vagas:"1.500 (Estratégia e Gran Cursos)", banca:"AOCP",
-    situacao:"Banca definida, segundo a Estratégia e a Gran Cursos. Em 07/10 achei notícia de 192 vagas só de saúde para o CBMERJ: confirme qual vale", fonteUrl:_urlGran, fonteLabel:_GRAN,
+    situacao:"Banca definida, segundo a Estratégia e a Gran Cursos (1.500 vagas). A Folha Dirigida (13/10) traz o edital do CBMERJ SMTV: 192 vagas de 1º tenente BM temporário especialista (saúde), AOCP, inscrições de 19/10 a 09/11 e sem prova. Confirme qual vale", fonteUrl:_urlGran, fonteLabel:_GRAN,
     note:"Fora do perfil de Administração. Entra para quem escolher Segurança pública." })
 );
 
@@ -3041,6 +3042,13 @@ window.__FED_ESFERA = {};
   // Aberto / em andamento: dados da Gran
   add("ab","🧪 AgSUS","AgSUS","S","A definir","R$ 8.800,00","Cadastro de reserva","A definir","Inscrições até 16/10/2026. Prova em 22/11/2026",
     { inscricoes:"Até 16/10/2026", inscricaoFim:"2026-10-16", provaData:"2026-11-22", prova:"22/11/2026", fonteUrl:_urlFedG, fonteLabel:_FEDG, area:"Saúde" });
+  add("ab","🏫 Colégio Pedro II","Colégio Pedro II: Professor substituto","S","Professor substituto. Para Administração: 9 vagas (bacharelado em Administração). Outras áreas: Anos Iniciais (81), Português (23), Inglês (20), História (9), Informática Educativa (9), Espanhol (7), Física (5)","R$ 3.198,59 (20h, graduado) a R$ 8.340,32 (40h, doutor), mais auxílio alimentação de R$ 1.152","Cadastro de reserva, ciclo estimado de 163 contratações (9 em Administração)","Banca própria do Colégio Pedro II","Edital 23/2026 publicado em 07/10/2026. Inscrições de 06 a 22/10. Etapas: redação (12 a 16/11), entrevista de desempenho didático (30/11 a 11/12) e análise de títulos",
+    { estado:"RJ", cidade:"Rio de Janeiro (Capital)", area:"Administração", inscricoes:"06/10/2026 a 22/10/2026", inscricaoInicio:"2026-10-06", inscricaoFim:"2026-10-22",
+      isencaoInicio:"2026-10-06", isencaoFim:"2026-10-15", boletoVence:"2026-10-23", provaData:"2026-11-12", prova:"Redação de 12 a 16/11/2026. Entrevista por webconferência de 30/11 a 11/12/2026", taxa:"R$ 110,00 (pagamento até 23/10, 22h, no Banco do Brasil)",
+      editalUrl:"https://arquivos.qconcursos.com/regulamento/arquivo/102365/colegio-pedro-ii-2026-edital-n-23-edital.pdf", editalLabel:"Edital 23/2026 (PDF)",
+      fonteUrl:"https://folha.qconcursos.com/n/colegio-pedro-ii-2026-edital-professor-substituto", fonteLabel:"Folha Dirigida / QConcursos",
+      isencao:{ texto:": o edital aceita isenção para doadores de medula óssea em entidade reconhecida pelo Ministério da Saúde e para inscritos no CadÚnico (renda per capita até meio salário mínimo). O pedido vai só até 15/10/2026." },
+      note:"É contrato temporário de professor, não cargo efetivo: duração mínima de 60 dias, prorrogável até 2 anos, e validade de 1 ano. A vaga de Administração pede bacharelado em Administração. Homologação prevista para janeiro de 2027. Uma fonte resumiu 136 vagas, mas a soma por área dá 163." });
   add("en","⚖️ TRF 5","TRF 5: Juiz Federal","S","Juiz Federal Substituto","R$ 37.765,55","11 + cadastro de reserva","A definir","Inscrições foram de 28/08 a 28/09/2026. Prova em 20/12/2026",
     { inscricoes:"Encerradas em 28/09/2026", inscricaoFim:"2026-09-28", provaData:"2026-12-20", prova:"20/12/2026", fonteUrl:_urlFedG, fonteLabel:_FEDG, area:"Direito" });
   // Banca definida
@@ -8486,7 +8494,7 @@ function dayTimelineBlocks(dow, dateObj){
 // mais confiáveis, e copia o pedido pronto pra colar no Claude, que confere e devolve
 // o painel atualizado. ----------
 const DATA_CHECKED = "14/10/2026";
-const DATA_CHECKED_HORA = "07:45";
+const DATA_CHECKED_HORA = "10:25";
 const UPDATE_SOURCES = [
   { name:"JC Concursos: abertos no RJ", url:"https://jcconcursos.com.br/concursos/inscricoes-abertas/rj" },
   { name:"PCI Concursos: Rio de Janeiro", url:"https://www.pciconcursos.com.br/concursos/rj/rio-de-janeiro" },
@@ -9916,7 +9924,7 @@ function focoCardHtml(){
 // ---------- Cargos que servem para ela: salário e data da prova lado a lado ----------
 // Valores copiados dos cartões do próprio app (edital quando há, senão "último edital").
 const CARGOS_FIT = [
-  { re:/Cremerj/i, cargo:"Analista de Operações", nivel:"Superior", sal:"R$ 6.084,46", vagas:"11 vagas + CR", taxa:"R$ 47,50", serve:true, nota:"Perfil mais próximo de Administração" },
+  { re:/Cremerj/i, cargo:"Analista de Operações", nivel:"Superior", sal:"R$ 6.084,46", vagas:"11 vagas + CR", taxa:"R$ 47,50", serve:true, nota:"Perfil mais próximo de Administração. Após a retificação, aceita graduação em qualquer área" },
   { re:/Cremerj/i, cargo:"Assistente de Operações", nivel:"Médio", sal:"R$ 3.010,00", vagas:"Só cadastro de reserva", taxa:"R$ 47,00", serve:true },
   { re:/INB/i, cargo:"Administrador", nivel:"Superior", sal:"R$ 7.221", vagas:"Cadastro de reserva", taxa:"R$ 125", serve:true },
   { re:/INB/i, cargo:"Assistente Administrativo", nivel:"Médio", sal:"A partir de R$ 3.452", vagas:"Cadastro de reserva", taxa:"R$ 100", serve:true, nota:"Valor exato do cargo no edital" },
@@ -9929,7 +9937,8 @@ const CARGOS_FIT = [
   { re:/Theatro/i, cargo:"Assistente Administrativo", nivel:"Médio", sal:"Faixa R$ 1.077,73 a R$ 3.790,43", vagas:"110 (total)" },
   { re:/UFRJ/i, cargo:"Administrador", nivel:"Superior", serve:true, sal:"R$ 4.967,04", vagas:"6 no edital anterior", nota:"Valor do último edital" },
   { re:/UFRJ/i, cargo:"Técnico administrativo", nivel:"Médio", sal:"R$ 3.029,90", vagas:"Edital a conferir", nota:"Valor do último edital" },
-  { re:/Pedro II/i, cargo:"Assistente em Administração", nivel:"Médio", sal:"R$ 3 mil a R$ 5 mil", vagas:"Em estudo", nota:"Valor de 2023" },
+  { re:/Pedro II: T[eé]cnico/i, cargo:"Assistente em Administração", nivel:"Médio", sal:"R$ 3 mil a R$ 5 mil", vagas:"Em estudo", nota:"Valor de 2023" },
+  { re:/Pedro II: Professor substituto/i, cargo:"Professor substituto de Administração", nivel:"Superior", sal:"R$ 3.198,59 (20h) a R$ 8.340,32 (40h, doutor)", vagas:"9, cadastro de reserva", taxa:"R$ 110,00", serve:true, nota:"Pede bacharelado em Administração. Contrato temporário" },
   { re:/IBGE/i, cargo:"Analista de planejamento, gestão e infraestrutura", nivel:"Superior", sal:"R$ 8.558,13", vagas:"Solicitado" },
   { re:/IBGE/i, cargo:"Técnico", nivel:"Médio", sal:"R$ 3.752,92", vagas:"Solicitado" },
   { re:/PGE RJ/i, cargo:"Analista (Sistemas e Métodos)", nivel:"Superior", sal:"Até R$ 6.824,04", vagas:"Autorizado" },
