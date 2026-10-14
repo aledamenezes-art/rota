@@ -1798,6 +1798,14 @@
   .rd-days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
   .rd-days button{padding:11px 0;border-radius:12px;border:1.5px solid var(--line,#e6ddd2);background:#fff;color:#702A55;font-weight:700;font-size:12.5px}
   .rd-days button.on{background:#702A55;color:#fff;border-color:#702A55}
+  .rg-card{display:flex;align-items:flex-start;gap:10px;padding:12px 12px 12px 14px;border-radius:14px;border-left:5px solid #9A4A73;margin-bottom:10px}
+  .rg-main{flex:1;min-width:0}
+  .rg-title{font-size:15px;font-weight:800;color:var(--ink)}
+  .rg-hora{font-size:13px;color:var(--ink-soft);margin-top:2px;font-variant-numeric:tabular-nums}
+  .rg-dias{display:flex;gap:5px;margin-top:8px}
+  .rg-dias span{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:rgba(255,255,255,.7);color:var(--ink-soft)}
+  .rg-dias span.on{color:#fff}
+  .rg-rep{font-size:11.5px;color:var(--ink-soft);margin-top:7px}
   .rd-presets{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
   .rd-presets button.on{background:#702A55;color:#fff;border-color:#702A55}
   .rd-presets button{padding:7px 11px;border-radius:999px;border:1.5px solid #D9B4C8;background:#F3E4EC;color:#702A55;font-weight:700;font-size:12px}
@@ -8702,15 +8710,40 @@ function renderRotinaList(){
     return;
   }
   empty.classList.add("hidden");
-  const ordered = [...routine].sort((a,b)=> a.dia - b.dia || minutesOf(a.inicio) - minutesOf(b.inicio));
-  container.innerHTML = ordered.map(r=>`
-    <div class="rotina-item">
-      <div class="rotina-item-main">
-        <div class="rotina-item-dia">${["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"][r.dia]}${r.label ? " · " + r.label : ""}</div>
-        <div class="rotina-item-hora">${r.inicio} – ${r.fim} · ${rotinaRepTxt(r)}</div>
+  const groups = {};
+  routine.forEach(r=>{
+    const k = [r.label || "", r.inicio, r.fim, r.rep || "sem", r.ini || ""].join("|");
+    (groups[k] = groups[k] || { r, dias: [], ids: [] });
+    groups[k].dias.push(r.dia); groups[k].ids.push(r.id);
+  });
+  const list = Object.values(groups).sort((a,b)=> minutesOf(a.r.inicio) - minutesOf(b.r.inicio) || (a.r.label||"").localeCompare(b.r.label||""));
+  const tints = ["#F3E4EC","#E3F1EC","#E6EAF5","#FBEBDD","#EEE9F6"];
+  const bars = ["#9A4A73","#3F9C77","#5B6FB0","#D08A4E","#7E62A8"];
+  const nomes = [["S",1],["T",2],["Q",3],["Q",4],["S",5],["S",6],["D",0]];
+  const hashOf = s => { let h = 0; for(const c of s) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h % tints.length; };
+  container.innerHTML = list.map(g=>{
+    const r = g.r, i = hashOf(r.label || "");
+    const mensal = r.rep === "m";
+    const dots = mensal ? "" : `<div class="rg-dias">${nomes.map(([n,d])=>`<span class="${g.dias.indexOf(d) >= 0 ? "on" : ""}" style="${g.dias.indexOf(d) >= 0 ? "background:" + bars[i] : ""}">${n}</span>`).join("")}</div>`;
+    return `
+    <div class="rg-card" style="background:${tints[i]};border-left-color:${bars[i]}">
+      <div class="rg-main">
+        <div class="rg-title">${escHtml(r.label || "Compromisso fixo")}</div>
+        <div class="rg-hora">${r.inicio} às ${r.fim}</div>
+        ${dots}
+        <div class="rg-rep">${mensal ? "Todo mês, dia " + new Date(r.ini + "T00:00:00").getDate() : (r.rep === "q" ? "A cada 15 dias" : "Toda semana")}</div>
       </div>
-      <button class="rotina-del-btn" onmousedown="event.preventDefault()" onclick="removeRotina('${r.id}')" aria-label="Remover">✕</button>
-    </div>`).join("");
+      <button class="rotina-del-btn" onmousedown="event.preventDefault()" onclick="removeRotinaGrupo('${g.ids.join(",")}')" aria-label="Remover">✕</button>
+    </div>`;
+  }).join("");
+}
+
+function removeRotinaGrupo(ids){
+  const set = ids.split(",");
+  routine = routine.filter(r=>set.indexOf(String(r.id)) < 0);
+  saveState("concursos-rj-rotina", routine);
+  renderRotinaList();
+  renderFreeSlots();
 }
 
 function removeRotina(id){
