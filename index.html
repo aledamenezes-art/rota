@@ -1799,6 +1799,7 @@
   .rd-days button{padding:11px 0;border-radius:12px;border:1.5px solid var(--line,#e6ddd2);background:#fff;color:#702A55;font-weight:700;font-size:12.5px}
   .rd-days button.on{background:#702A55;color:#fff;border-color:#702A55}
   .rd-presets{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .rd-presets button.on{background:#702A55;color:#fff;border-color:#702A55}
   .rd-presets button{padding:7px 11px;border-radius:999px;border:1.5px solid #D9B4C8;background:#F3E4EC;color:#702A55;font-weight:700;font-size:12px}
 </style>
 </head>
@@ -2173,12 +2174,19 @@
           <input class="field-input" id="rotina-inicio" type="time" value="09:00">
           <input class="field-input" id="rotina-fim" type="time" value="18:00">
         </div>
-        <div class="rd-label">Quais dias? Marque quantos precisar.</div>
-        <div class="rd-days" id="rotina-dias">
-          <button type="button" data-d="1">Seg</button><button type="button" data-d="2">Ter</button><button type="button" data-d="3">Qua</button><button type="button" data-d="4">Qui</button><button type="button" data-d="5">Sex</button><button type="button" data-d="6">Sáb</button><button type="button" data-d="0">Dom</button>
+        <div class="rd-label">Repetir</div>
+        <div class="rd-presets" id="rotina-rep">
+          <button type="button" data-r="sem" class="on">Toda semana</button><button type="button" data-r="q">A cada 15 dias</button><button type="button" data-r="m">Todo mês</button>
         </div>
-        <div class="rd-presets">
-          <button type="button" data-p="1,4">Seg e Qui</button><button type="button" data-p="1,2,3,4">Seg a Qui</button><button type="button" data-p="1,2,3,4,5">Seg a Sex</button><button type="button" data-p="1,2,3">Seg a Qua</button><button type="button" data-p="0,1,2,3,4,5,6">Todos</button>
+        <div id="rotina-dias-wrap">
+          <div class="rd-label">Em quais dias da semana? Marque quantos precisar.</div>
+          <div class="rd-days" id="rotina-dias">
+            <button type="button" data-d="1">Seg</button><button type="button" data-d="2">Ter</button><button type="button" data-d="3">Qua</button><button type="button" data-d="4">Qui</button><button type="button" data-d="5">Sex</button><button type="button" data-d="6">Sáb</button><button type="button" data-d="0">Dom</button>
+          </div>
+        </div>
+        <div id="rotina-ini-wrap" class="hidden">
+          <div class="rd-label" id="rotina-ini-label">Começa em</div>
+          <input class="field-input" id="rotina-ini" type="date">
         </div>
         <input class="field-input" id="rotina-label" type="text" placeholder="Ex.: Trabalho, Inglês" style="margin-top:10px;">
         <button class="btn primary" id="rotina-add" style="margin-top:12px; width:100%; text-align:center;">Adicionar horário</button>
@@ -5802,11 +5810,27 @@ function hhmmOf(mins){
   return `${h}:${m}`;
 }
 
+function rotinaOcorre(r, d){
+  const rep = r.rep || "sem";
+  if(rep === "sem") return r.dia === d.getDay();
+  if(!r.ini) return r.dia === d.getDay();
+  const st = new Date(r.ini + "T00:00:00"), x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  if(x < st) return false;
+  if(rep === "m") return x.getDate() === st.getDate();
+  if(x.getDay() !== r.dia) return false;
+  const wk = dt => { const c = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate() - dt.getDay()); return Math.round(c.getTime() / 604800000); };
+  return (wk(x) - wk(st)) % 2 === 0;
+}
+function rotinaRepTxt(r){
+  if(r.rep === "q") return "a cada 15 dias";
+  if(r.rep === "m") return "todo mês, dia " + (r.ini ? new Date(r.ini + "T00:00:00").getDate() : "");
+  return "toda semana";
+}
 function freeSlotsToday(){
   const DAY_START = minutesOf("07:00");
   const DAY_END = minutesOf("22:00");
   const dow = new Date().getDay();
-  const busy = routine.filter(r=>r.dia === dow).map(r=>({ ini:minutesOf(r.inicio), fim:minutesOf(r.fim) })).sort((a,b)=>a.ini-b.ini);
+  const busy = routine.filter(r=>rotinaOcorre(r, new Date())).map(r=>({ ini:minutesOf(r.inicio), fim:minutesOf(r.fim) })).sort((a,b)=>a.ini-b.ini);
   const slots = [];
   let cursor = DAY_START;
   busy.forEach(b=>{
@@ -8379,10 +8403,10 @@ function prepZerar(itemId){
 
 // Monta a linha do tempo do dia inteiro (07:00–22:00), alternando blocos ocupados
 // (da rotina fixa) com blocos livres — usado na tela de detalhe de um dia da agenda.
-function dayTimelineBlocks(dow){
+function dayTimelineBlocks(dow, dateObj){
   const DAY_START = minutesOf("07:00");
   const DAY_END = minutesOf("22:00");
-  const busy = routine.filter(r=>r.dia === dow)
+  const busy = routine.filter(r=>rotinaOcorre(r, dateObj || new Date()))
     .map(r=>({ ini:minutesOf(r.inicio), fim:minutesOf(r.fim), label: r.label || "Compromisso fixo" }))
     .sort((a,b)=>a.ini-b.ini);
   const blocks = [];
@@ -8622,7 +8646,7 @@ function openDayScreen(dow, dateObj){
     </div>` : "";
 
   // Horários da rotina fixa cadastrada pra esse dia da semana
-  const blocks = dayTimelineBlocks(dow);
+  const blocks = dayTimelineBlocks(dow, dateObj);
   const materias = uniqueMaterias();
   let freeIdx = 0;
   const rows = blocks.map(b=>{
@@ -8683,7 +8707,7 @@ function renderRotinaList(){
     <div class="rotina-item">
       <div class="rotina-item-main">
         <div class="rotina-item-dia">${["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"][r.dia]}${r.label ? " · " + r.label : ""}</div>
-        <div class="rotina-item-hora">${r.inicio} – ${r.fim}</div>
+        <div class="rotina-item-hora">${r.inicio} – ${r.fim} · ${rotinaRepTxt(r)}</div>
       </div>
       <button class="rotina-del-btn" onmousedown="event.preventDefault()" onclick="removeRotina('${r.id}')" aria-label="Remover">✕</button>
     </div>`).join("");
@@ -8697,19 +8721,27 @@ function removeRotina(id){
 }
 
 document.querySelectorAll("#rotina-dias button").forEach(b => { b.addEventListener("mousedown", e => e.preventDefault()); b.addEventListener("click", () => b.classList.toggle("on")); });
-document.querySelectorAll(".rd-presets button").forEach(b => { b.addEventListener("mousedown", e => e.preventDefault()); b.addEventListener("click", () => {
-  const set = b.dataset.p.split(",");
-  document.querySelectorAll("#rotina-dias button").forEach(x => x.classList.toggle("on", set.indexOf(x.dataset.d) >= 0));
+let rotinaRep = "sem";
+document.querySelectorAll("#rotina-rep button").forEach(b => { b.addEventListener("mousedown", e => e.preventDefault()); b.addEventListener("click", () => {
+  rotinaRep = b.dataset.r;
+  document.querySelectorAll("#rotina-rep button").forEach(x => x.classList.toggle("on", x === b));
+  document.getElementById("rotina-dias-wrap").classList.toggle("hidden", rotinaRep === "m");
+  document.getElementById("rotina-ini-wrap").classList.toggle("hidden", rotinaRep === "sem");
+  document.getElementById("rotina-ini-label").textContent = rotinaRep === "m" ? "Dia do mês (escolha uma data, repete todo mês nesse dia)" : "Primeira vez (a partir dela, repete a cada 15 dias)";
+  const ini = document.getElementById("rotina-ini"); if(!ini.value) ini.value = isoOfDate(new Date());
 }); });
 document.getElementById("rotina-add").addEventListener("mousedown", (e)=>e.preventDefault());
 document.getElementById("rotina-add").addEventListener("click", ()=>{
-  const dias = [...document.querySelectorAll("#rotina-dias button.on")].map(b => parseInt(b.dataset.d, 10));
+  let dias = [...document.querySelectorAll("#rotina-dias button.on")].map(b => parseInt(b.dataset.d, 10));
+  const iniDate = document.getElementById("rotina-ini").value;
+  if(rotinaRep !== "sem" && !iniDate){ if(typeof toast === "function") toast("Escolha a data"); return; }
+  if(rotinaRep === "m") dias = [new Date(iniDate + "T00:00:00").getDay()];
   if(!dias.length){ if(typeof toast === "function") toast("Marque pelo menos um dia"); return; }
   const inicio = document.getElementById("rotina-inicio").value;
   const fim = document.getElementById("rotina-fim").value;
   const label = document.getElementById("rotina-label").value.trim();
   if(!inicio || !fim || minutesOf(fim) <= minutesOf(inicio)) return;
-  dias.forEach(dia => routine.push({ id: Date.now() + "-" + dia + "-" + Math.random().toString(36).slice(2,7), dia, inicio, fim, label }));
+  dias.forEach(dia => routine.push(Object.assign({ id: Date.now() + "-" + dia + "-" + Math.random().toString(36).slice(2,7), dia, inicio, fim, label }, rotinaRep === "sem" ? {} : { rep: rotinaRep, ini: iniDate })));
   document.querySelectorAll("#rotina-dias button.on").forEach(b => b.classList.remove("on"));
   saveState("concursos-rj-rotina", routine);
   document.getElementById("rotina-label").value = "";
@@ -9114,15 +9146,17 @@ function exportAgendaICS(){
   // próxima ocorrência daquele dia (hoje, se hoje já for esse dia da semana).
   routine.forEach(r=>{
     const diff = (r.dia - new Date().getDay() + 7) % 7;
-    const start = new Date();
+    let start = new Date();
     start.setDate(start.getDate() + diff);
+    if(r.ini && r.rep){ const st = new Date(r.ini + "T00:00:00"); if(st > start || r.rep === "m") start = st; }
+    const rrule = r.rep === "m" ? "FREQ=MONTHLY" : (r.rep === "q" ? "FREQ=WEEKLY;INTERVAL=2;BYDAY=" + BYDAY[r.dia] : "FREQ=WEEKLY;BYDAY=" + BYDAY[r.dia]);
     events.push([
       "BEGIN:VEVENT",
       `UID:rotina-${r.id}@concursos-rj-capital`,
       `DTSTAMP:${dtstampUTC}`,
       `DTSTART:${icsDateTime(start, r.inicio)}`,
       `DTEND:${icsDateTime(start, r.fim)}`,
-      `RRULE:FREQ=WEEKLY;BYDAY=${BYDAY[r.dia]}`,
+      `RRULE:${rrule}`,
       `SUMMARY:${escapeText(r.label || "Compromisso fixo")}`,
       "END:VEVENT"
     ].join("\r\n"));
