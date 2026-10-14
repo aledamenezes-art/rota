@@ -1681,6 +1681,40 @@
   .wz-cta.wrap{ flex-wrap:wrap; gap:8px; }
   .pico{ display:inline-flex; vertical-align:-0.16em; width:1.1em; height:1.1em; }
   .pico svg{ width:100%; height:100%; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+
+  /* ====== Suavização (13/10): Estudos mais leve, sem bordas e botões pesados ====== */
+  .hj-card.main{ border:1px solid var(--blue); border-left:4px solid var(--blue); background:var(--card); background:linear-gradient(180deg,color-mix(in srgb,var(--blue-bg) 45%,var(--card)),var(--card) 70%); box-shadow:var(--shadow-sm); }
+  .hj-card.ok{ border-color:var(--mint); border-left-color:var(--mint); }
+  #panel-estudos .btn.primary, .hj-card .btn.primary{ background:var(--blue-bg); color:var(--blue-deep); border:1px solid var(--blue); box-shadow:none; }
+  #panel-estudos .btn.primary:active{ transform:scale(.98); }
+  #panel-estudos .btn.ghost, .hj-card .btn.ghost{ border:1px solid var(--line); background:var(--card); color:var(--ink); box-shadow:none; }
+  .hj-bar i{ background:linear-gradient(90deg,var(--blue),var(--mint)); }
+  .timer-mode-chip{ border:1px solid var(--line); }
+  .timer-mode-chip.active{ border-color:var(--blue); background:var(--blue-bg); color:var(--blue-deep); }
+  #panel-estudos .timer-card, #panel-estudos .card{ border-color:var(--line); }
+
+  /* ====== Bancas dos favoritos e roteiro por banca ====== */
+  .fb-card{ background:var(--card); border:1px solid var(--line); border-left:4px solid var(--vinho); border-radius:16px; padding:15px 16px; margin:0 0 14px; box-shadow:var(--shadow-sm); }
+  .fb-eyebrow{ font-size:10.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--vinho); }
+  .fb-row{ display:flex; align-items:center; gap:12px; margin-top:10px; }
+  .fb-pos{ flex:none; width:34px; height:34px; border-radius:50%; background:var(--vinho-bg); color:var(--vinho); font-weight:900; font-size:13px; display:flex; align-items:center; justify-content:center; }
+  .fb-row.seg .fb-pos{ background:var(--blue-bg); color:var(--blue-deep); }
+  .fb-row b{ display:block; font-family:var(--serif); font-size:21px; font-weight:800; line-height:1.15; }
+  .fb-row.seg b{ font-size:17px; }
+  .fb-row small{ display:block; font-size:12px; color:var(--ink-soft); margin-top:2px; }
+  .fb-note{ font-size:12px; color:var(--ink-soft); line-height:1.5; margin:10px 0 0; }
+  .fb-card .btn{ width:100%; margin-top:12px; text-align:center; background:var(--vinho-bg); color:var(--vinho); border:1px solid transparent; }
+  .fbr-sec{ background:var(--card); border:1px solid var(--line); border-radius:16px; padding:15px 16px; margin:0 0 12px; }
+  .fbr-sec h3{ font-family:var(--serif); font-size:20px; margin:0 0 4px; }
+  .fbr-sec .fb-eyebrow{ display:block; margin-bottom:4px; }
+  .fbr-sec p{ font-size:13px; line-height:1.55; color:var(--ink-soft); margin:6px 0; }
+  .fbr-sec ol{ margin:8px 0 6px; padding-left:20px; font-size:13px; line-height:1.55; }
+  .fbr-sec ol li{ margin:4px 0; }
+  .fbr-row{ display:flex; justify-content:space-between; gap:10px; padding:9px 0; border-top:1px solid var(--line); font-size:13px; }
+  .fbr-row:first-of-type{ border-top:0; }
+  .fbr-row b{ font-weight:800; } .fbr-row span{ color:var(--ink-soft); text-align:right; }
+  .fbr-links{ display:flex; flex-wrap:wrap; gap:14px; margin-top:8px; font-size:13px; font-weight:800; }
+  .fbr-links a{ color:var(--blue-deep); text-decoration:none; }
 </style>
 </head>
 <body data-tab="inicio">
@@ -1962,6 +1996,7 @@
   </section>
 
   <section class="panel" id="panel-favoritos">
+    <div id="fav-bancas"></div>
     <div id="fav-cron"></div>
     <p class="section-note">Toque na ⭐ de um card para guardar aqui. Os favoritos entram no seu cronograma de estudos e no calendário.</p>
     <button class="btn ghost" id="compare-open-btn" onmousedown="event.preventDefault()" onclick="openCompareScreen()" style="width:100%; text-align:center; margin-bottom:14px;">⚖️ Comparar concursos</button>
@@ -5113,6 +5148,7 @@ function renderFavoritesPanel(){
     fc.innerHTML = g ? `<div class="nav-list" style="margin-bottom:14px">${renderNavRow("🗓️", "Cronograma de estudos", g.ids.length + " concurso" + (g.ids.length>1?"s":"") + " juntos, sem matéria repetida", "goCronograma()")}</div>` : "";
   }
   document.getElementById("empty-favoritos").classList.toggle("hidden", matches.length > 0);
+  try{ renderFavBancas(); }catch(e){}
 }
 
 // ---------- Aba Início: resumo geral + lista de inscritos com status do boleto ----------
@@ -6990,7 +7026,7 @@ const ROTEIRO_FASES = [
     { k:"sessao", t:"Fazer a primeira sessão de estudo", d:"Comece com 25 minutos. O tempo entra sozinho na sua meta da semana.", auto:()=>study.logs.length>0, acao:["Iniciar sessão","openTimerPicker()"] },
     { k:"agenda", t:"Reservar os horários na agenda", d:"Na Início, use o botão do Google Agenda nos seus horários livres.", acao:["Ver horários","roteiroIr('inicio')"] }
   ]},
-  { nome:"Treinar e revisar", cor:"vinho", passos:[ _old("questoes"), _old("flash"), _old("revisao"), _old("simulado"), _old("retro") ]}
+  { nome:"Treinar e revisar", cor:"vinho", passos:[ _old("questoes"), { k:"bancaTreino", t:"Treinar no estilo das suas bancas", dd:()=>{ const r = bancasDosFavoritos().lista; return r.length ? "Suas bancas: " + r.slice(0,2).map(o => o.label).join(" e ") + ". Veja como treinar o formato de cada uma." : "Favorite concursos para descobrir quais bancas aparecem mais."; }, acao:["Ver roteiro das bancas","abrirRoteiroBanca()"] }, _old("flash"), _old("revisao"), _old("simulado"), _old("retro") ]}
 ];
 ROTEIRO_FASES_ING.forEach(f => { f.passos = f.passos.filter(p => p.k !== "i_blocos"); });
 function roteiroPassos(t){ return roteiroFases(t).flatMap(f=>f.passos); }
@@ -8941,6 +8977,133 @@ document.getElementById("today-stamp").textContent = "Atualizado em " + DATA_CHE
   function start(){ try{ conv(document.body); }catch(e){} obs.observe(document.body, { childList:true, subtree:true, characterData:true }); }
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();
 })();
+
+// ---------- Bancas mais selecionadas nos favoritos + roteiro por banca ----------
+function bancaChaveInfo(item){
+  const t = bancaTagInfo(item);
+  const nome = String(t.nome || "").trim();
+  if(!nome || /^comiss/i.test(nome)) return null;
+  const low = nome.toLowerCase();
+  const f = BANCAS_FAMA.find(b => low.includes(b.id.toLowerCase()));
+  const label = f ? f.nome : nome.replace(/^instituto\s+/i, "");
+  return { chave:(f ? f.id : label).toLowerCase(), label, ultima:!!t.ultima, fama:f || null };
+}
+function bancasDosFavoritos(){
+  const m = {};
+  favIds.forEach(id => {
+    const rec = allItemsById[id]; if(!rec) return;
+    const b = bancaChaveInfo(rec.item); if(!b) return;
+    const o = m[b.chave] || (m[b.chave] = { chave:b.chave, label:b.label, fama:b.fama, n:0, confirmadas:0, ids:[] });
+    o.n++; if(!b.ultima) o.confirmadas++; o.ids.push(id);
+  });
+  const lista = Object.values(m).sort((a, b) => b.n - a.n || b.confirmadas - a.confirmadas || a.label.localeCompare(b.label, "pt-BR"));
+  const semBanca = favIds.filter(id => allItemsById[id] && !bancaChaveInfo(allItemsById[id].item)).length;
+  return { lista, semBanca, empate: lista.length > 1 && lista[0].n === lista[1].n };
+}
+function renderFavBancas(){
+  const box = document.getElementById("fav-bancas"); if(!box) return;
+  const favs = favIds.filter(id => allItemsById[id]).length;
+  if(!favs){ box.innerHTML = ""; return; }
+  const r = bancasDosFavoritos();
+  if(!r.lista.length){
+    box.innerHTML = `<div class="fb-card"><div class="fb-eyebrow">Suas bancas</div><p class="fb-note">Os concursos favoritados ainda não têm banca conhecida. Quando o edital sair, a banca aparece aqui.</p></div>`;
+    return;
+  }
+  const lin = (o, i) => `<div class="fb-row ${i ? "seg" : ""}"><span class="fb-pos">${i + 1}ª</span><div><b>${escHtml(o.label)}</b><small>${o.n} de ${favs} favorito${favs > 1 ? "s" : ""}${o.fama ? " · " + escHtml(o.fama.fama) : ""}</small></div></div>`;
+  const usaUltima = r.lista.slice(0, 2).some(o => o.confirmadas < o.n);
+  const notas = [];
+  if(r.empate) notas.push("Empate no primeiro lugar. Desempatei pela banca já confirmada em edital.");
+  if(usaUltima) notas.push("Alguns favoritos ainda sem edital entram pela última banca conhecida.");
+  if(r.semBanca) notas.push(r.semBanca + " favorito" + (r.semBanca > 1 ? "s" : "") + " sem banca conhecida não entra" + (r.semBanca > 1 ? "m" : "") + " na conta.");
+  box.innerHTML = `<div class="fb-card">
+    <div class="fb-eyebrow">Banca que mais selecionei</div>
+    ${r.lista.slice(0, 2).map(lin).join("")}
+    ${notas.length ? `<p class="fb-note">${notas.join(" ")}</p>` : ""}
+    <button class="btn" onmousedown="event.preventDefault()" onclick="abrirRoteiroBanca()">Ver roteiro dessas bancas ›</button>
+  </div>`;
+}
+const BANCA_METODO = {
+  cebraspe:{ formato:"Certo ou Errado. Cada item errado anula um certo.", passos:[
+    "Resolva questões de Certo ou Errado e marque, em cada uma, se foi certeza ou chute.",
+    "Quando errar, reescreva o item de forma correta, com a regra da lei ou da teoria.",
+    "Treine deixar em branco quando estiver em dúvida de verdade, porque o erro derruba a nota.",
+    "Leia a lei seca da matéria antes de resolver as questões dela."] },
+  fgv:{ formato:"Múltipla escolha com enunciados longos e questões interpretativas.", passos:[
+    "Treine com enunciados longos: leia a pergunta primeiro e depois o texto.",
+    "Faça uma prova completa por semana, cronometrada.",
+    "Anote o tempo médio por questão e corte o que passar muito disso.",
+    "Pratique eliminar as alternativas erradas antes de escolher a certa."] },
+  cesgranrio:{ formato:"Múltipla escolha com enunciados objetivos.", passos:[
+    "Resolva questões com cronômetro, porque rapidez pesa nessa banca.",
+    "Reforce cálculos e raciocínio lógico, que pedem agilidade.",
+    "Refaça toda semana as questões de cálculo que você errou."] },
+  ibfc:{ formato:"Múltipla escolha de estilo direto.", passos:[
+    "Comece pelas matérias de base e resolva bastante questão, para ganhar confiança.",
+    "Como a prova é mais acessível, a nota de corte tende a subir. Revise os erros por distração.",
+    "Registre no caderno de erros os detalhes que você deixou escapar."] },
+  consulplan:{ formato:"Múltipla escolha tradicional.", passos:[
+    "Treine com provas do mesmo órgão, porque o estilo muda de um concurso para outro.",
+    "Resolva questões por matéria e depois uma prova completa por semana.",
+    "Revise no caderno de erros os assuntos que se repetem."] },
+  iades:{ formato:"Múltipla escolha, em alguns editais com discursiva.", passos:[
+    "Confira no edital se há discursiva e, se houver, treine textos curtos e objetivos.",
+    "Resolva questões de provas anteriores do órgão.",
+    "Revise o caderno de erros semanalmente."] }
+};
+function bancaMetodo(b){
+  const m = BANCA_METODO[b.chave];
+  const f = b.fama;
+  return {
+    formato: m ? m.formato : (f ? f.estilo : "Veja o edital de cada concurso."),
+    passos: (m ? m.passos : [
+      "Baixe as últimas 3 provas dessa banca para o seu cargo.",
+      "Resolva uma por semana, cronometrada.",
+      "Anote os assuntos que mais caem e use como lista de revisão."]),
+    atencao: f ? f.atencao : "Ainda não tenho o estilo verificado dessa banca. Use as últimas provas dela como guia."
+  };
+}
+function abrirRoteiroBanca(){
+  const r = bancasDosFavoritos();
+  const top = r.lista.slice(0, 2);
+  document.getElementById("sub-topbar-title").textContent = "Roteiro das suas bancas";
+  let html = "";
+  if(!top.length){
+    html = `<div class="fbr-sec"><span class="fb-eyebrow">Roteiro por banca</span><h3>Ainda não há banca nos favoritos</h3><p>Favorite concursos com banca conhecida. A banca que mais aparece vira a base do roteiro, e a segunda entra como reforço.</p></div>`;
+  } else {
+    const h = study.goalHours || 0, tot = h * 60;
+    const dois = top.length > 1;
+    const blocos = dois
+      ? [["Teoria e base das matérias", 40], ["Questões " + top[0].label, 25], ["Questões " + top[1].label, 15], ["Revisão do caderno de erros", 20]]
+      : [["Teoria e base das matérias", 40], ["Questões " + top[0].label, 40], ["Revisão do caderno de erros", 20]];
+    const dias = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
+    const wk = Math.floor(Date.now() / 604800000);
+    const simB = top[dois ? wk % 2 : 0];
+    const plano = dias.map((d, i) => {
+      const b = dois ? top[(i % 2 === 0 ? 0 : 1)] : top[0];
+      return [d, "Teoria da matéria do dia e 10 a 15 questões no estilo " + b.label];
+    });
+    plano.push(["Sábado", "Prova completa cronometrada no estilo " + simB.label]);
+    plano.push(["Domingo", "Revisão do caderno de erros e dos cartões"]);
+    html += `<div class="fbr-sec"><span class="fb-eyebrow">Sua semana</span><h3>${dois ? escHtml(top[0].label) + " como base, " + escHtml(top[1].label) + " como reforço" : escHtml(top[0].label) + " como base"}</h3>
+      <p>${h ? "Contando a sua meta de " + String(h).replace(".", ",") + "h por semana." : "Defina a meta de horas em Estudos para ver o tempo de cada bloco."}</p>
+      ${blocos.map(([n, p]) => `<div class="fbr-row"><b>${escHtml(n)}</b><span>${p}%${tot ? " · " + hjFmt(Math.round(tot * p / 100)) : ""}</span></div>`).join("")}</div>`;
+    html += top.map((o, i) => {
+      const m = bancaMetodo(o);
+      const nos = o.ids.map(id => allItemsById[id].item.title.replace(/^Concurso\s*/i, ""));
+      return `<div class="fbr-sec"><span class="fb-eyebrow">${i + 1}ª banca · ${o.n} favorito${o.n > 1 ? "s" : ""}</span><h3>${escHtml(o.label)}</h3>
+        <p><b>Formato.</b> ${escHtml(m.formato)}</p>
+        <p><b>Como treinar</b></p><ol>${m.passos.map(p => "<li>" + escHtml(p) + "</li>").join("")}</ol>
+        <p><b>Atenção.</b> ${escHtml(m.atencao)}</p>
+        <p><b>Nos seus favoritos.</b> ${escHtml(nos.join(", "))}</p>
+        <div class="fbr-links"><a href="${crGg("provas anteriores " + o.label + " administração")}" target="_blank" rel="noopener">Buscar provas anteriores</a><a href="${crYt(o.label + " como estudar para a banca")}" target="_blank" rel="noopener">Buscar aula sobre a banca</a></div></div>`;
+    }).join("");
+    html += `<div class="fbr-sec"><span class="fb-eyebrow">Modelo de semana</span>${plano.map(([d, t]) => `<div class="fbr-row"><b>${d}</b><span>${escHtml(t)}</span></div>`).join("")}
+      <p>Os percentuais são uma divisão sugerida por mim, não uma regra das bancas. Ajuste conforme o que o seu caderno de erros mostrar.</p></div>`;
+  }
+  document.getElementById("sub-content").innerHTML = html;
+  document.getElementById("sub-screen").classList.add("active");
+  document.getElementById("sub-scroll").scrollTop = 0;
+}
 </script>
 </body>
 </html>
