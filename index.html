@@ -2775,7 +2775,7 @@ window.__FED_ESFERA = {};
   const N = {M:"Médio", S:"Superior", MS:"Médio e Superior", D:"A definir"};
   const T = {
     ab:["INSCRIÇÕES ABERTAS","aberto"], bd:["BANCA DEFINIDA","banca"], au:["AUTORIZADO","anunciado"],
-    so:["SOLICITADO","anunciado"], pv:["PREVISTO","anunciado"], es:["EM ESTUDO","anunciado"], cf:["COMISSÃO FORMADA","anunciado"]
+    so:["SOLICITADO","anunciado"], en:["INSCRIÇÃO ENCERRADA","encerrado"], pv:["PREVISTO","anunciado"], es:["EM ESTUDO","anunciado"], cf:["COMISSÃO FORMADA","anunciado"]
   };
   function add(t, org, nome, nv, cargos, sal, vagas, bancaN, sit, ex){
     const it = { org:org, title:"Concurso "+nome, badge:T[t][0], badgeType:T[t][1], nivel:N[nv]||nv, cargos:cargos, salario:sal, vagas:vagas,
@@ -2783,7 +2783,7 @@ window.__FED_ESFERA = {};
       editalUrl:"", inscricoes:"Ainda não abertas", prova:"A definir", taxa:"A definir",
       note:"Concurso federal: a vaga pode ser em qualquer cidade. Confira o edital quando sair." };
     Object.assign(it, ex||{});
-    (T[t][1]==="aberto" ? abertos : T[t][1]==="banca" ? banca : anunciados).push(it);
+    (T[t][1]==="aberto" ? abertos : T[t][1]==="encerrado" ? emAndamento : T[t][1]==="banca" ? banca : anunciados).push(it);
     window.__FED_ESFERA[sl(it.title)] = "federal";
   }
   // Prioridade: pedidos dela
@@ -2797,8 +2797,8 @@ window.__FED_ESFERA = {};
   // Aberto / em andamento: dados da Gran
   add("ab","🧪 AgSUS","AgSUS","S","A definir","R$ 8.800,00","Cadastro de reserva","A definir","Inscrições até 16/10/2026. Prova em 22/11/2026",
     { inscricoes:"Até 16/10/2026", inscricaoFim:"2026-10-16", provaData:"2026-11-22", prova:"22/11/2026", fonteUrl:_urlFedG, fonteLabel:_FEDG, area:"Saúde" });
-  add("ab","⚖️ TRF 5","TRF 5: Juiz Federal","S","Juiz Federal Substituto","R$ 37.765,55","11 + cadastro de reserva","A definir","Inscrições de 28/08 a 28/09/2026. Prova em 20/12/2026. Confira se ainda há prazo no edital",
-    { inscricoes:"28/08 a 28/09/2026", provaData:"2026-12-20", prova:"20/12/2026", fonteUrl:_urlFedG, fonteLabel:_FEDG, area:"Direito" });
+  add("en","⚖️ TRF 5","TRF 5: Juiz Federal","S","Juiz Federal Substituto","R$ 37.765,55","11 + cadastro de reserva","A definir","Inscrições foram de 28/08 a 28/09/2026. Prova em 20/12/2026",
+    { inscricoes:"Encerradas em 28/09/2026", inscricaoFim:"2026-09-28", provaData:"2026-12-20", prova:"20/12/2026", fonteUrl:_urlFedG, fonteLabel:_FEDG, area:"Direito" });
   // Banca definida
   add("bd","⛽ Petrobras","Petrobras","MS","Vários cargos (médio, técnico e superior)","R$ 5.878,82 (Gran) a R$ 15.200,52 (Estratégia)","1.000 a 1.400 (as fontes divergem)","Cesgranrio","Banca definida. Confirme vagas e salário no edital");
   add("bd","📊 IBGE","IBGE: Recenseador","M","Recenseador (temporário)","Até R$ 4,2 mil","27.279","Cesgranrio","Banca definida (a Gran ainda marca em definição)");
@@ -2885,7 +2885,7 @@ window.__FED_ESFERA = {};
 })();
 
 [...abertos, ...emAndamento, ...banca, ...anunciados].forEach(it => {
-  if(/TCU:|TSE:|TCE RJ|TCM RJ|Receita Federal|CGU|BACEN|Dataprev|Petrobras/.test(it.title)) it.destaque = true;
+  if(/TCU:|TSE:|TCE RJ|TCM RJ|Receita Federal|CGU|BACEN|Dataprev/.test(it.title)) it.destaque = true;
 });
 
 // Tags genéricas de área/estado/cidade em cada concurso, usadas pelo filtro de perfil.
@@ -6439,7 +6439,17 @@ let roteiroTri = "concurso";
 function roteiroTrilhasAtivas(){ const o = objAtual() || "concurso"; return o === "ambos" ? ["concurso","ingles"] : [o]; }
 function roteiroFases(t){ return (t || roteiroTri) === "ingles" ? ROTEIRO_FASES_ING : ROTEIRO_FASES; }
 function saveRoteiro(){ saveState('concursos-rj-roteiro', roteiro); }
-function roteiroAlvo(){ return [].concat(inscritoIds, favIds).find(i => allItemsById[i]) || null; }
+function roteiroAlvo(){
+  if(profile.alvoId && allItemsById[profile.alvoId]) return profile.alvoId;
+  return [].concat(inscritoIds, favIds).find(i => allItemsById[i]) || null;
+}
+function roteiroTrocarAlvo(){
+  const l = [].concat(inscritoIds, favIds).filter((x, k, a) => allItemsById[x] && a.indexOf(x) === k);
+  if(l.length < 2) return;
+  const i = l.indexOf(roteiroAlvo());
+  profile.alvoId = l[(i + 1) % l.length]; saveState("concursos-rj-perfil", profile);
+  try{ renderRoteiroCard(); if(document.getElementById("sub-screen").classList.contains("active")) abrirRoteiro(false, roteiroTri); }catch(e){}
+}
 function roteiroAbrir(tipo){
   const id = roteiroAlvo();
   if(!id){ roteiroIr("concursos"); return; }
@@ -6987,7 +6997,7 @@ function abrirRoteiro(manter, t){
         <div class="rt-body">
           <div class="rt-title"><span class="rt-n">${n}</span>${escHtml(p.t)}</div>
           <div class="rt-desc">${escHtml(p.dd ? p.dd() : p.d)}</div>
-          ${p.alvo ? (roteiroAlvo() ? `<div class="rt-alvo">Seu concurso: <b>${escHtml(prepNomeCurto(roteiroAlvo()))}</b></div>` : `<div class="rt-alvo">Favorite um concurso para eu abrir direto aqui.</div>`) : ""}
+          ${p.alvo ? (roteiroAlvo() ? `<div class="rt-alvo">Seu concurso: <b>${escHtml(prepNomeCurto(roteiroAlvo()))}</b> <a href="#" style="color:var(--blue-deep);font-weight:800;margin-left:6px" onmousedown="event.preventDefault()" onclick="roteiroTrocarAlvo();return false">Trocar</a></div>` : `<div class="rt-alvo">Favorite um concurso para eu abrir direto aqui.</div>`) : ""}
           ${p.acao ? `<button class="rt-go" onmousedown="event.preventDefault()" onclick="${p.acao[1]}">${escHtml(p.acao[0])} ›</button>` : ""}
           ${calc}
         </div>
@@ -7550,7 +7560,10 @@ function wizConcursos(todos){
 }
 function wizAutoSel(){
   const T = wizTodos();
-  wiz.sel = wizConcursos().filter(id => prepDisponivel(T[id])).slice(0, 6);
+  const fim = it => it.inscricaoFim || "9999";
+  const rank = it => it.badgeType === "aberto" ? 0 : (it.destaque ? 1 : (it.badgeType === "banca" ? 2 : 3));
+  wiz.sel = wizConcursos().filter(id => prepDisponivel(T[id])).sort((a, b) => (rank(T[a]) - rank(T[b])) || (fim(T[a]) < fim(T[b]) ? -1 : fim(T[a]) > fim(T[b]) ? 1 : 0)).slice(0, 6);
+  profile.alvoId = wiz.sel[0] || ""; saveState("concursos-rj-perfil", profile);
   saveWiz();
   wiz.sel.forEach(id => { if(!favIds.includes(id)) favIds.push(id); });
   saveFavorites(); rebuildLists();
