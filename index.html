@@ -3350,6 +3350,67 @@ window.__FED_ESFERA = {};
     situacao:"A RioSaúde publica editais avulsos o ano todo. O último com Técnico Administrativo (edital 035/2026) foi de 25 a 30/09, e os de 51 vagas fecharam em 13/10. Não achei edital aberto hoje",
     fonteUrl:"https://folha.qconcursos.com/n/riosaude-processos-seletivos-2026", fonteLabel:"Folha Dirigida / QConcursos: RioSaúde",
     note:"Contrato temporário de até 1 ano, sem taxa de inscrição, feito pelo site da RioSaúde. Vale acompanhar o site e o Diário Oficial do Município." }); window.__FED_ESFERA[slugify(it.title)] = "municipal"; delete it.__esf; return it; })());
+  (function(){
+    const F = "https://folha.qconcursos.com/n/";
+    const add2 = (lista, esf, o) => { const it = _novo(Object.assign({ estado:"RJ", area:"Administração" }, o)); lista.push(it); window.__FED_ESFERA[slugify(it.title)] = esf; delete it.__esf; };
+    add2(banca, "municipal", { org:"🏙️ Prefeitura de Resende", title:"Concurso Resende RJ 2026", badge:"BANCA DEFINIDA", badgeType:"banca", cidade:"Resende (RJ)",
+      nivel:"Fundamental, Médio, Técnico e Superior", cargos:"Assistente Administrativo (43 vagas), Auxiliar de Secretaria Escolar (12), Analista de Sistemas, Analista de RH, Assistente Contábil, Administrador, Contador, Técnico em Administração e outros (76 vagas administrativas), além de guarda municipal (30)", salario:"Até R$ 3.600",
+      vagas:"Mais de 300 vagas no total", banca:"IGECS",
+      situacao:"Banca definida e contrato assinado com o IGECS, segundo Nova Concursos e JC. Edital ainda sem data (Folha Dirigida, termo de referência de maio)",
+      fonteUrl:F+"concurso-resende-rj-2026-preparativos-novo-edital", fonteLabel:"Folha Dirigida / QConcursos: Resende",
+      note:"Boa chance para Administração: tem Administrador, Assistente Administrativo e Técnico em Administração. Resende fica no sul fluminense." });
+    add2(banca, "municipal", { org:"🏙️ Prefeitura de Teresópolis", title:"Concurso Teresópolis RJ 2026", badge:"BANCA DEFINIDA", badgeType:"banca", cidade:"Teresópolis (RJ)",
+      nivel:"Fundamental, Médio e Superior", cargos:"Áreas de Administração, Educação, Saúde e Segurança (cargos ainda não divulgados)", salario:"A definir", vagas:"A definir", banca:"ISAT: Instituto de Seleção e Tecnologia",
+      situacao:"Banca contratada, levantamento de vagas em fase final, edital iminente e sem data oficial (Folha Dirigida). Taxas previstas: R$ 40, R$ 50 e R$ 58",
+      fonteUrl:F+"concurso-teresopolis-rj-2026-fase-final-vagas", fonteLabel:"Folha Dirigida / QConcursos: Teresópolis",
+      note:"Fica na Região Serrana. Acompanhe a data do edital." });
+    add2(banca, "municipal", { org:"🌆 Emusa Niterói", title:"Concurso Emusa Niterói", badge:"BANCA DEFINIDA", badgeType:"banca", cidade:"Niterói (RJ)",
+      nivel:"Médio, Técnico e Superior", cargos:"A definir", salario:"A definir", vagas:"56 imediatas + cadastro de reserva", banca:"Instituto Selecon",
+      situacao:"Banca Selecon definida, edital em breve segundo o JC. A informação da banca é de nov/2024, então confirme se já saiu edital",
+      fonteUrl:"https://direcaoconcursos.com.br/noticias/concurso-emusa-niteroi-banca-definida", fonteLabel:"Direção Concursos: Emusa",
+      note:"Empresa municipal de Niterói. Cargos ainda não divulgados." });
+    add2(banca, "conselho", { org:"🧠 CRP-05: Conselho Regional de Psicologia do RJ", title:"Concurso CRP-05 RJ", badge:"BANCA DEFINIDA", badgeType:"banca", cidade:"Rio de Janeiro (Capital)",
+      nivel:"Médio e Superior", cargos:"A definir (cargos administrativos e de apoio)", salario:"Até R$ 7.313", vagas:"39", banca:"Definida, não nomeada nas fontes",
+      situacao:"Banca definida, segundo o JC Concursos. Sem edital nem datas",
+      fonteUrl:"https://jcconcursos.com.br/concursos/previstos/rj", fonteLabel:"JC Concursos: previstos RJ",
+      note:"Sede na capital. Conselhos costumam ter vagas de assistente e analista administrativo." });
+    add2(banca, "municipal", { org:"🏛️ Câmara de São Pedro da Aldeia", title:"Concurso Câmara São Pedro da Aldeia", badge:"BANCA DEFINIDA", badgeType:"banca", cidade:"São Pedro da Aldeia (RJ)",
+      nivel:"Médio e Superior", cargos:"Auxiliar Administrativo, Auxiliar Legislativo, Analista Jurídico, Analista de RH e outros", salario:"A definir", vagas:"12", banca:"IBAM",
+      situacao:"Banca IBAM definida, edital sem data (Folha Dirigida, jul/2026)",
+      fonteUrl:F+"concursos-prefeituras-rj", fonteLabel:"Folha Dirigida / QConcursos: prefeituras RJ",
+      note:"Cargos administrativos na Região dos Lagos." });
+    add2(banca, "municipal", { org:"🏛️ Câmara de Angra dos Reis", title:"Concurso Câmara Angra dos Reis", badge:"BANCA DEFINIDA", badgeType:"banca", cidade:"Angra dos Reis (RJ)",
+      nivel:"Médio e Superior", cargos:"Auxiliar Legislativo, Designer e Procurador", salario:"Até R$ 9.676,81", vagas:"10", banca:"Instituto Seletiva",
+      situacao:"Banca definida, contrato pendente (Folha Dirigida, jul/2026)",
+      fonteUrl:F+"concursos-prefeituras-rj", fonteLabel:"Folha Dirigida / QConcursos: prefeituras RJ",
+      note:"Poucas vagas, no sul fluminense." });
+    add2(anunciados, "municipal", { org:"🏙️ Prefeitura de Cordeiro", title:"Concurso Cordeiro RJ", badge:"EM ESTUDO", badgeType:"anunciado", cidade:"Cordeiro (RJ)",
+      nivel:"Fundamental, Médio e Superior", cargos:"Assistente Administrativo, Fiscal Tributário, Guarda Municipal, Professor, Enfermeiro e outros", salario:"A definir", vagas:"48 imediatas", banca:"A definir",
+      situacao:"Escolha da banca em andamento (Folha Dirigida). Sem edital",
+      fonteUrl:F+"concursos-regiao-serrana-rj", fonteLabel:"Folha Dirigida / QConcursos: Região Serrana",
+      note:"Tem Assistente Administrativo. Região Serrana." });
+    add2(anunciados, "municipal", { org:"🏛️ Câmara Municipal de Petrópolis", title:"Concurso Câmara de Petrópolis", badge:"EM ESTUDO", badgeType:"anunciado", cidade:"Petrópolis (RJ)",
+      nivel:"A definir", cargos:"Funções administrativas e técnicas (expectativa)", salario:"A definir", vagas:"A definir", banca:"A definir",
+      situacao:"Anunciado, em estudo técnico (Folha Dirigida e JC)",
+      fonteUrl:F+"concursos-regiao-serrana-rj", fonteLabel:"Folha Dirigida / QConcursos: Região Serrana" });
+    add2(anunciados, "municipal", { org:"🏛️ Câmara Municipal de Niterói", title:"Concurso Câmara de Niterói", badge:"EM ESTUDO", badgeType:"anunciado", cidade:"Niterói (RJ)",
+      nivel:"A definir", cargos:"A definir", salario:"A definir", vagas:"A definir", banca:"A definir",
+      situacao:"Primeira seleção anunciada, sem banca nem edital (JC Concursos)",
+      fonteUrl:"https://jcconcursos.com.br/concursos/previstos/rj", fonteLabel:"JC Concursos: previstos RJ" });
+    add2(anunciados, "estadual", { org:"🔧 Faetec RJ", title:"Concurso Faetec RJ", badge:"EM ESTUDO", badgeType:"anunciado", cidade:"Rio de Janeiro (RJ)",
+      nivel:"Médio e Superior", cargos:"A definir (técnicos e professores)", salario:"A definir", vagas:"829 (nova seleção em pauta)", banca:"A definir",
+      situacao:"Nova seleção em pauta, segundo o JC Concursos. Sem banca nem edital",
+      fonteUrl:"https://jcconcursos.com.br/concursos/previstos/rj", fonteLabel:"JC Concursos: previstos RJ" });
+    add2(anunciados, "estadual", { org:"💳 AgeRio: Agência de Fomento do RJ", title:"Concurso AgeRio", badge:"EM ESTUDO", badgeType:"anunciado", cidade:"Rio de Janeiro (Capital)",
+      nivel:"A definir", cargos:"A definir", salario:"A definir", vagas:"A definir", banca:"Contratada, não nomeada",
+      situacao:"Banca contratada, edital pode sair (JC Concursos)",
+      fonteUrl:"https://jcconcursos.com.br/concursos/previstos/rj", fonteLabel:"JC Concursos: previstos RJ",
+      note:"Agência de fomento na capital. Costuma ter cargos de Administração e Finanças." });
+    add2(anunciados, "municipal", { org:"🏙️ Prefeitura de Cantagalo", title:"Concurso Cantagalo RJ", badge:"EM ESTUDO", badgeType:"anunciado", cidade:"Cantagalo (RJ)",
+      nivel:"Fundamental, Médio e Superior", cargos:"Áreas de Saúde, Educação, Segurança, Fiscal e Administrativa", salario:"Até R$ 18.558,50", vagas:"28 + cadastro de reserva", banca:"A definir",
+      situacao:"Banca em definição (Folha Dirigida, jul/2026)",
+      fonteUrl:F+"concursos-prefeituras-rj", fonteLabel:"Folha Dirigida / QConcursos: prefeituras RJ" });
+  })();
 })();
 
 // Tags genéricas de área/estado/cidade em cada concurso, usadas pelo filtro de perfil.
