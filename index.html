@@ -2300,7 +2300,7 @@
 <div class="divider"></div>
 
 <footer class="foot">
-  Fontes públicas (Folha Dirigida/QConcursos, JC Concursos, Estratégia Concursos, Gran Cursos Online, Direção Concursos, Nova Concursos, sites oficiais). Checagem cruzada em 18/10/2026. Dados mudam: o edital oficial é sempre a fonte que vale.
+  Fontes públicas (Folha Dirigida/QConcursos, JC Concursos, Estratégia Concursos, Gran Cursos Online, Direção Concursos, Nova Concursos, sites oficiais). Checagem cruzada em 19/10/2026. Dados mudam: o edital oficial é sempre a fonte que vale.
 </footer>
 
 <div class="detail-screen" id="detail-screen" role="dialog" aria-modal="true">
@@ -3363,6 +3363,33 @@ window.__FED_ESFERA = {};
     situacao:"A RioSaúde publica editais avulsos o ano todo. O último com Técnico Administrativo (edital 035/2026) foi de 25 a 30/09, e os de 51 vagas fecharam em 13/10. Não achei edital aberto hoje",
     fonteUrl:"https://folha.qconcursos.com/n/riosaude-processos-seletivos-2026", fonteLabel:"Folha Dirigida / QConcursos: RioSaúde",
     note:"Contrato temporário de até 1 ano, sem taxa de inscrição, feito pelo site da RioSaúde. Vale acompanhar o site e o Diário Oficial do Município." }); window.__FED_ESFERA[slugify(it.title)] = "municipal"; delete it.__esf; return it; })());
+  (function(){
+    const F = "https://folha.qconcursos.com/n/concursos-rio-de-janeiro";
+    const add2 = (lista, esf, o) => { const it = _novo(Object.assign({ estado:"RJ", area:"Administração", fonteUrl:F, fonteLabel:"Folha Dirigida / QConcursos: concursos RJ" }, o)); lista.push(it); window.__FED_ESFERA[slugify(it.title)] = esf; delete it.__esf; };
+    add2(anunciados, "municipal", { org:"🏙️ Prefeitura de Volta Redonda", title:"Concurso Volta Redonda RJ", badge:"EM ESTUDO", badgeType:"anunciado", cidade:"Volta Redonda (RJ)",
+      nivel:"Superior", cargos:"A definir", salario:"A definir", vagas:"400 (nível superior)", banca:"A definir",
+      situacao:"Anunciado, realização prevista para 2026. Sem banca nem edital (Folha Dirigida, 18/10)" });
+    add2(banca, "municipal", { org:"🏙️ Prefeitura de Maricá", title:"Concurso Maricá RJ: Sanemar e saúde", badge:"BANCA DEFINIDA", badgeType:"banca", cidade:"Maricá (RJ)",
+      nivel:"Médio, Técnico e Superior", cargos:"Sanemar (50 vagas, cargos diversos) e agentes de endemias e comunitários de saúde (836 vagas, R$ 2.640)", salario:"A definir (Sanemar); R$ 2.640 (agentes)", vagas:"50 (Sanemar) e 836 (agentes)", banca:"Coseac UFF",
+      situacao:"Banca Coseac UFF definida. O edital do Sanemar estava previsto para abril e ainda não saiu (Folha Dirigida, 18/10)",
+      note:"O Sanemar (empresa de saneamento) pode ter cargos administrativos. Os agentes de saúde não combinam com Administração." });
+    add2(banca, "municipal", { org:"🩺 Clin: Niterói", title:"Concurso Clin Niterói", badge:"BANCA DEFINIDA", badgeType:"banca", cidade:"Niterói (RJ)", area:"Saúde",
+      nivel:"Fundamental e Médio/Técnico", cargos:"A definir", salario:"A definir", vagas:"26", banca:"Instituto Selecon", situacao:"Banca definida, sem edital (Folha Dirigida, 18/10)" });
+    add2(banca, "municipal", { org:"🏙️ Prefeitura de Paracambi", title:"Concurso Paracambi RJ", badge:"BANCA DEFINIDA", badgeType:"banca", cidade:"Paracambi (RJ)",
+      nivel:"A definir", cargos:"A definir", salario:"A definir", vagas:"A definir", banca:"IBAM", situacao:"Banca IBAM definida, aguardando contrato (Folha Dirigida, 18/10)" });
+    add2(anunciados, "municipal", { org:"🏙️ Prefeitura de Niterói: FME e Procon", title:"Concurso Niterói: FME e Procon", badge:"EM ESTUDO", badgeType:"anunciado", cidade:"Niterói (RJ)",
+      nivel:"Médio e Superior (Direito)", cargos:"Agente de apoio escolar (FME, 300 vagas, R$ 2.217,07) e Fiscal do Consumidor (Procon, 10 vagas, R$ 6.500, Direito)", salario:"R$ 2.217,07 a R$ 6.500", vagas:"300 (FME) e 10 (Procon)", banca:"A definir",
+      situacao:"Vagas criadas por lei (FME) e concurso anunciado (Procon). Sem banca nem edital (Folha Dirigida, 18/10)" });
+    add2(anunciados, "municipal", { org:"🏙️ Prefeitura de Miguel Pereira", title:"Concurso Miguel Pereira RJ", badge:"EM ESTUDO", badgeType:"anunciado", cidade:"Miguel Pereira (RJ)",
+      nivel:"Médio, Técnico e Superior", cargos:"A definir", salario:"A confirmar", vagas:"91 + cadastro de reserva", banca:"Em escolha", situacao:"Anunciado, banca em escolha (Folha Dirigida, 18/10)" });
+    add2(anunciados, "municipal", { org:"🏙️ Prefeituras: Araruama, Barra do Piraí, Rio das Ostras e Itaguaí", title:"Concursos RJ: Araruama, Barra do Piraí, Rio das Ostras, Itaguaí", badge:"EM ESTUDO", badgeType:"anunciado", cidade:"Interior e Região dos Lagos (RJ)",
+      nivel:"A definir", cargos:"Araruama (comissão formada), Barra do Piraí (estudos), Rio das Ostras (guarda e educação) e Itaguaí (professores e carreiras administrativas, banca IAN cotada)", salario:"A definir", vagas:"A definir", banca:"A definir",
+      situacao:"Todos em fase inicial, sem edital (Folha Dirigida, 18/10)", note:"Itaguaí prevê carreiras administrativas." });
+    add2(anunciados, "estadual", { org:"🏥 Fundação Saúde RJ", title:"Concurso Fundação Saúde RJ", badge:"EM ESTUDO", badgeType:"anunciado", cidade:"Rio de Janeiro (RJ)", area:"Saúde",
+      nivel:"Médio, Técnico e Superior", cargos:"A definir", salario:"A definir", vagas:"14 mil solicitadas", banca:"A definir", situacao:"Vagas solicitadas ao governo, sem autorização (Folha Dirigida, 10/09)" });
+    add2(anunciados, "estadual", { org:"🎓 UENF", title:"Concurso UENF: professores", badge:"EM ESTUDO", badgeType:"anunciado", cidade:"Campos dos Goytacazes (RJ)", area:"Educação",
+      nivel:"Superior", cargos:"Professores", salario:"A definir", vagas:"A definir", banca:"A definir", situacao:"Comissão formada (Folha Dirigida, 18/10)" });
+  })();
   (function(){
     const F = "https://folha.qconcursos.com/n/";
     const add2 = (lista, esf, o) => { const it = _novo(Object.assign({ estado:"RJ", area:"Administração" }, o)); lista.push(it); window.__FED_ESFERA[slugify(it.title)] = esf; delete it.__esf; };
@@ -8712,8 +8739,8 @@ function dayTimelineBlocks(dow, dateObj){
 // sozinho (e não vai inventar dado). O botão leva pras listas de concursos abertos
 // mais confiáveis, e copia o pedido pronto pra colar no Claude, que confere e devolve
 // o painel atualizado. ----------
-const DATA_CHECKED = "18/10/2026";
-const DATA_CHECKED_HORA = "21:31";
+const DATA_CHECKED = "19/10/2026";
+const DATA_CHECKED_HORA = "09:57";
 const UPDATE_SOURCES = [
   { name:"JC Concursos: abertos no RJ", url:"https://jcconcursos.com.br/concursos/inscricoes-abertas/rj" },
   { name:"PCI Concursos: Rio de Janeiro", url:"https://www.pciconcursos.com.br/concursos/rj/rio-de-janeiro" },
