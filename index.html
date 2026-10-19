@@ -5844,8 +5844,20 @@ function renderOlho(){
 
 function renderFavoritesPanel(){
   const matches = [];
+  const vistosFav = new Set();
   allTrackedCards().forEach(card=>{
-    if(favIds.includes(card.getAttribute("data-id"))) matches.push(stripEntranceAnimation(card.outerHTML));
+    const cid = card.getAttribute("data-id");
+    if(favIds.includes(cid) && !vistosFav.has(cid)){ vistosFav.add(cid); matches.push(stripEntranceAnimation(card.outerHTML)); }
+  });
+  // Favorito nunca some: se o concurso saiu da lista por causa de filtro (encerrado, perfil),
+  // o cartão é montado direto da base.
+  favIds.forEach(cid=>{
+    if(vistosFav.has(cid)) return;
+    const cats = [[abertos,"cat-aberto"],[emAndamento,"cat-encerrado"],[banca,"cat-banca"],[anunciados,"cat-anunciado"]];
+    for(const [lista,cc] of cats){
+      const it = lista.find(x => slugify(x.title) === cid);
+      if(it){ if(!allItemsById[cid]) allItemsById[cid] = { item: it, catClass: cc }; vistosFav.add(cid); matches.push(stripEntranceAnimation(renderCardCompact(it, cc, cid))); break; }
+    }
   });
   document.getElementById("list-favoritos").innerHTML = matches.join("");
   const fc = document.getElementById("fav-cron");
