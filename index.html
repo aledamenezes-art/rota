@@ -3391,6 +3391,129 @@ window.__FED_ESFERA = {};
       nivel:"Superior", cargos:"Professores", salario:"A definir", vagas:"A definir", banca:"A definir", situacao:"Comissão formada (Folha Dirigida, 18/10)" });
   })();
   (function(){
+    // Perfil Direito (19/10/2026): jurídicos e carreiras abertas a Direito, em RJ, federais e outros estados.
+    const EST = "https://cj.estrategia.com/portal/concursos-abertos-carreiras-juridicas/";
+    const EST2 = "https://cj.estrategia.com/portal/concursos-juridicos-2026/";
+    const jur = (lista, esf, o) => { const it = _novo(Object.assign({ estado:"RJ", area:"Direito", fonteUrl:EST, fonteLabel:"Estratégia Carreiras Jurídicas: concursos abertos" }, o)); lista.push(it); window.__FED_ESFERA = window.__FED_ESFERA || {}; window.__FED_ESFERA[slugify(it.title)] = esf; delete it.__esf; return it; };
+    const RIO = "Nacional (há unidade no Rio de Janeiro)";
+    // ABERTOS
+    jur(abertos, "estadual", { org:"⚖️ Tribunal de Justiça de Santa Catarina", title:"Concurso TJSC 2026: Juiz Substituto", badge:"INSCRIÇÕES ABERTAS", badgeType:"aberto", estado:"SC", cidade:"Florianópolis (SC)",
+      nivel:"Superior", cargos:"Juiz Substituto (bacharel em Direito, com atividade jurídica)", salario:"R$ 35.874,14", vagas:"15 + cadastro de reserva", banca:"FGV",
+      situacao:"Inscrições de 19/10 a 26/11/2026. Prova objetiva em 31/01/2027",
+      inscricoes:"19/10 a 26/11/2026", inscricaoInicio:"2026-10-19", inscricaoFim:"2026-11-26", provaData:"2027-01-31", prova:"31/01/2027",
+      note:"Carreira da magistratura: pede Direito e experiência jurídica. É em Santa Catarina." });
+    jur(abertos, "estadual", { org:"⚖️ Tribunal de Justiça do Amapá", title:"Concurso TJAP 2026: Juiz Substituto", badge:"INSCRIÇÕES ABERTAS", badgeType:"aberto", estado:"AP", cidade:"Macapá (AP)",
+      nivel:"Superior", cargos:"Juiz Substituto (bacharel em Direito, com atividade jurídica)", salario:"R$ 35.877,27", vagas:"15 + cadastro de reserva", banca:"FGV",
+      situacao:"Inscrições de 13/10 a 13/11/2026. Prova objetiva em 24/01/2027",
+      inscricoes:"13/10 a 13/11/2026", inscricaoInicio:"2026-10-13", inscricaoFim:"2026-11-13", provaData:"2027-01-24", prova:"24/01/2027",
+      note:"Magistratura: exige Direito e atividade jurídica." });
+    jur(abertos, "estadual", { org:"🛡️ Defensoria Pública de São Paulo", title:"Concurso DPE SP 2026: Defensor", badge:"INSCRIÇÕES ABERTAS", badgeType:"aberto", estado:"SP", cidade:"São Paulo (SP)",
+      nivel:"Superior", cargos:"Defensor Público (bacharel em Direito)", salario:"R$ 29.716,00", vagas:"70", banca:"FCC",
+      situacao:"Inscrições de 13/10 a 11/11/2026. Prova objetiva em 10/01/2027",
+      inscricoes:"13/10 a 11/11/2026", inscricaoInicio:"2026-10-13", inscricaoFim:"2026-11-11", provaData:"2027-01-10", prova:"10/01/2027",
+      note:"Carreira jurídica de Defensoria, em São Paulo." });
+    jur(abertos, "estadual", { org:"🏛️ Assembleia Legislativa do Pará (ALEPA)", title:"Concurso ALEPA 2026: Procurador", badge:"INSCRIÇÕES ABERTAS", badgeType:"aberto", estado:"PA", cidade:"Belém (PA)",
+      nivel:"Superior", cargos:"Procurador da Assembleia (bacharel em Direito)", salario:"R$ 3.697,73 mais gratificações", vagas:"5", banca:"Fundação CETAP",
+      situacao:"Inscrições de 01/10 a 04/11/2026. Prova em 13/12/2026",
+      inscricoes:"01/10 a 04/11/2026", inscricaoInicio:"2026-10-01", inscricaoFim:"2026-11-04", provaData:"2026-12-13", prova:"13/12/2026",
+      note:"Faz parte do mesmo concurso da ALEPA, mas é o cargo jurídico." });
+    jur(abertos, "municipal", { org:"🏛️ Procuradoria Geral do Município de Apucarana", title:"Concurso PGM Apucarana: Procurador", badge:"EDITAL PUBLICADO", badgeType:"aberto", estado:"PR", cidade:"Apucarana (PR)",
+      nivel:"Superior", cargos:"Procurador do Município (Direito)", salario:"R$ 16.381,41", vagas:"1", banca:"FAU",
+      situacao:"Inscrições de 21/10 a 09/11/2026. Prova em 06/12/2026",
+      inscricoes:"21/10 a 09/11/2026", inscricaoInicio:"2026-10-21", inscricaoFim:"2026-11-09", provaData:"2026-12-06", prova:"06/12/2026" });
+    jur(abertos, "municipal", { org:"🏛️ Câmara Municipal de Boituva", title:"Concurso Câmara de Boituva: Procurador", badge:"INSCRIÇÕES ABERTAS", badgeType:"aberto", estado:"SP", cidade:"Boituva (SP)",
+      nivel:"Superior", cargos:"Procurador da Câmara (Direito)", salario:"R$ 8.595,15 mais benefícios", vagas:"1 + cadastro de reserva", banca:"Instituto Mais",
+      situacao:"Inscrições de 21/09 a 09/11/2026. Prova em 06/12/2026",
+      inscricoes:"21/09 a 09/11/2026", inscricaoInicio:"2026-09-21", inscricaoFim:"2026-11-09", provaData:"2026-12-06", prova:"06/12/2026" });
+    jur(abertos, "municipal", { org:"🏛️ Prefeitura de Campinas: SETEC", title:"Concurso PGM SETEC Campinas: Procurador", badge:"INSCRIÇÕES ABERTAS", badgeType:"aberto", estado:"SP", cidade:"Campinas (SP)",
+      nivel:"Superior", cargos:"Procurador (Direito)", salario:"R$ 11.427,98", vagas:"1 + cadastro de reserva", banca:"INDEPAC",
+      situacao:"Inscrições de 08/09 a 04/12/2026. Prova em 17/01/2027",
+      inscricoes:"08/09 a 04/12/2026", inscricaoInicio:"2026-09-08", inscricaoFim:"2026-12-04", provaData:"2027-01-17", prova:"17/01/2027" });
+    jur(abertos, "conselho", { org:"🏛️ CREF ES: Conselho Regional de Educação Física", title:"Concurso CREF ES: Advogado", badge:"ÚLTIMOS DIAS", badgeType:"aberto", estado:"ES", cidade:"Vitória (ES)",
+      nivel:"Superior", cargos:"Advogado (Direito, com OAB)", salario:"R$ 5.500,00", vagas:"1", banca:"IBADE",
+      situacao:"Inscrições até 20/10/2026. Prova em 13/12/2026",
+      inscricoes:"Até 20/10/2026", inscricaoFim:"2026-10-20", provaData:"2026-12-13", prova:"13/12/2026" });
+    jur(abertos, "estadual", { org:"🚓 Polícia Civil do Amapá", title:"Concurso PC AP 2026: Delegado", badge:"ÚLTIMO DIA", badgeType:"aberto", estado:"AP", cidade:"Macapá (AP)",
+      nivel:"Superior", cargos:"Delegado de Polícia (bacharel em Direito)", salario:"R$ 31.439,00", vagas:"102 em cadastro de reserva", banca:"Cesgranrio",
+      situacao:"Inscrições até 19/10/2026 (hoje). Prova em 06/12/2026",
+      inscricoes:"Até 19/10/2026", inscricaoFim:"2026-10-19", provaData:"2026-12-06", prova:"06/12/2026" });
+    jur(abertos, "estadual", { org:"🚓 Polícia Civil de Pernambuco", title:"Concurso PC PE 2026: Delegado", badge:"INSCRIÇÕES ABERTAS", badgeType:"aberto", estado:"PE", cidade:"Recife (PE)",
+      nivel:"Superior", cargos:"Delegado de Polícia (bacharel em Direito)", salario:"R$ 13.560,00", vagas:"45", banca:"Cebraspe",
+      situacao:"Inscrições de 15/10 a 16/12/2026. Prova em 14/03/2027",
+      inscricoes:"15/10 a 16/12/2026", inscricaoInicio:"2026-10-15", inscricaoFim:"2026-12-16", provaData:"2027-03-14", prova:"14/03/2027" });
+    jur(abertos, "federal", { org:"🔎 CGU: Controladoria Geral da União", title:"Concurso CGU 2026: Auditor Federal", badge:"INSCRIÇÕES ABERTAS", badgeType:"aberto", estado:"DF", cidade:"Brasília (DF) e regionais AC, AP, MT, RO e RR",
+      nivel:"Superior", cargos:"Auditor Federal de Finanças e Controle (qualquer graduação, serve para Direito), nas áreas de Auditoria e TI", salario:"R$ 20.000,00", vagas:"105 imediatas + cadastro de reserva", banca:"Cebraspe",
+      situacao:"Inscrições de 10/10 a 04/11/2026. Prova objetiva e discursiva em 13/12/2026 nas capitais",
+      inscricoes:"10/10 a 04/11/2026", inscricaoInicio:"2026-10-10", inscricaoFim:"2026-11-04", provaData:"2026-12-13", prova:"13/12/2026", taxa:"R$ 170",
+      fonteUrl:"https://valorfinal.com.br/concursos/edital/controladoria-geral-da-uniao__1-2026", fonteLabel:"Valor Final: CGU edital 1/2026",
+      note:"Aceita qualquer graduação, então serve para quem fez Direito. A lotação não inclui o Rio de Janeiro neste edital." });
+    jur(abertos, "federal", { org:"⚖️ TRT 8: Tribunal Regional do Trabalho do Pará e Amapá", title:"Concurso TRT 8 2026: Analista e Técnico", badge:"INSCRIÇÕES ABERTAS", badgeType:"aberto", estado:"PA", cidade:"Belém (PA) e Macapá (AP)",
+      nivel:"Superior", cargos:"Analista Judiciário (área Judiciária, jurídica, exige Direito; também áreas administrativa e de apoio) e Técnico Judiciário (administrativa, TI, enfermagem e agente de polícia judicial)", salario:"R$ 16.040,88 (analista) e R$ 9.776,71 (técnico)", vagas:"Cadastro de reserva", banca:"FCC",
+      situacao:"Inscrições de 05/10 a 05/11/2026 (23h59). Boleto até 06/11",
+      inscricoes:"05/10 a 05/11/2026", inscricaoInicio:"2026-10-05", inscricaoFim:"2026-11-05", taxa:"R$ 110 (analista) e R$ 90 (técnico)",
+      fonteUrl:"https://valorfinal.com.br/concursos/edital/tribunal-regional-do-trabalho-da-8-regiao__1-2026", fonteLabel:"Valor Final: TRT 8 edital 1/2026",
+      note:"O edital pede nível superior para os dois cargos. Fica no Pará e Amapá, fora do Rio." });
+    jur(abertos, "federal", { org:"🏛️ Câmara dos Deputados", title:"Concurso Câmara dos Deputados 2026", badge:"EDITAL PUBLICADO", badgeType:"aberto", estado:"DF", cidade:"Brasília (DF)",
+      nivel:"Superior", cargos:"Analista e Técnico Legislativo (há áreas jurídicas; confira as áreas no edital)", salario:"A confirmar no edital", vagas:"A confirmar no edital", banca:"A confirmar",
+      situacao:"Inscrições até 17/11/2026, segundo minha pesquisa anterior. Não consegui abrir a página com os cargos, então confirme no edital",
+      inscricoes:"Até 17/11/2026", inscricaoFim:"2026-11-17",
+      note:"Só uma fonte indicou o prazo. Confira cargos e datas no site da Câmara." });
+    // BANCA / PREVISTOS
+    jur(banca, "estadual", { org:"🚓 Polícia Civil do Rio de Janeiro", title:"Concurso PC RJ: Delegado", badge:"BANCA DEFINIDA", badgeType:"banca", cidade:"Rio de Janeiro (Capital)",
+      nivel:"Superior", cargos:"Delegado de Polícia (bacharel em Direito e 3 anos de atividade jurídica ou policial)", salario:"A definir", vagas:"85", banca:"Fundação Cesgranrio",
+      situacao:"Banca definida, edital sem data (Estratégia Carreiras Jurídicas)", fonteUrl:EST2, fonteLabel:"Estratégia Carreiras Jurídicas: previstos",
+      note:"Exige Direito e experiência. Os outros cargos da PC RJ (peritos e piloto) estão em outro item." });
+    jur(banca, "municipal", { org:"🌊 Prefeitura de Arraial do Cabo", title:"Concurso Arraial do Cabo: Advogado", badge:"BANCA DEFINIDA", badgeType:"banca", cidade:"Arraial do Cabo (RJ)",
+      nivel:"Superior", cargos:"Advogado (Direito)", salario:"R$ 7.765,00", vagas:"1", banca:"IBAM",
+      situacao:"Banca IBAM definida, edital sem data", fonteUrl:EST2, fonteLabel:"Estratégia Carreiras Jurídicas: previstos" });
+    jur(banca, "federal", { org:"🏛️ AGU: Advocacia Geral da União", title:"Concurso AGU Unificado", badge:"AUTORIZADO", badgeType:"banca", estado:"NACIONAL", cidade:RIO,
+      nivel:"Superior", cargos:"Advogado da União, Procurador Federal, Procurador da Fazenda Nacional e Procurador do Banco Central (Direito)", salario:"Até R$ 24.967,00", vagas:"170", banca:"A confirmar (as fontes divergem)",
+      situacao:"Concurso autorizado, sem edital", fonteUrl:EST2, fonteLabel:"Estratégia Carreiras Jurídicas: previstos" });
+    jur(banca, "federal", { org:"💼 COFEN: Conselho Federal de Enfermagem", title:"Concurso COFEN: Advogado", badge:"BANCA DEFINIDA", badgeType:"banca", estado:"DF", cidade:"Brasília (DF)",
+      nivel:"Superior", cargos:"Advogado (Direito)", salario:"A definir", vagas:"4 + cadastro de reserva", banca:"Instituto Quadrix",
+      situacao:"Termo de referência publicado, banca Quadrix", fonteUrl:EST2, fonteLabel:"Estratégia Carreiras Jurídicas: previstos" });
+    jur(banca, "estadual", { org:"🏛️ PGE Bahia", title:"Concurso PGE BA: Procurador", badge:"BANCA DEFINIDA", badgeType:"banca", estado:"BA", cidade:"Salvador (BA)",
+      nivel:"Superior", cargos:"Procurador do Estado (Direito)", salario:"A definir", vagas:"20", banca:"FCC", situacao:"Banca definida, sem edital", fonteUrl:EST2, fonteLabel:"Estratégia Carreiras Jurídicas: previstos" });
+    jur(banca, "estadual", { org:"⚖️ TJDFT", title:"Concurso TJDFT: Juiz", badge:"BANCA DEFINIDA", badgeType:"banca", estado:"DF", cidade:"Brasília (DF)",
+      nivel:"Superior", cargos:"Juiz Substituto (Direito)", salario:"A definir", vagas:"24", banca:"Cebraspe", situacao:"Banca definida, sem edital", fonteUrl:EST2, fonteLabel:"Estratégia Carreiras Jurídicas: previstos" });
+    jur(banca, "estadual", { org:"🛡️ Defensoria Pública do Rio Grande do Norte", title:"Concurso DPE RN: Defensor", badge:"BANCA DEFINIDA", badgeType:"banca", estado:"RN", cidade:"Natal (RN)",
+      nivel:"Superior", cargos:"Defensor Público (Direito)", salario:"A definir", vagas:"10 + cadastro de reserva", banca:"Cebraspe", situacao:"Banca definida, sem edital", fonteUrl:EST2, fonteLabel:"Estratégia Carreiras Jurídicas: previstos" });
+    jur(banca, "estadual", { org:"⚖️ Ministério Público do Amapá", title:"Concurso MP AP: Promotor", badge:"BANCA DEFINIDA", badgeType:"banca", estado:"AP", cidade:"Macapá (AP)",
+      nivel:"Superior", cargos:"Promotor de Justiça (Direito)", salario:"A definir", vagas:"5 + cadastro de reserva", banca:"FCC", situacao:"Banca definida, sem edital", fonteUrl:EST2, fonteLabel:"Estratégia Carreiras Jurídicas: previstos" });
+    jur(anunciados, "estadual", { org:"⚖️ Cartórios do Rio: TJ RJ", title:"Concurso Cartórios TJ RJ", badge:"EM ESTUDO", badgeType:"anunciado", cidade:"Rio de Janeiro (RJ)",
+      nivel:"Superior", cargos:"Outorga de serviços notariais e de registro (bacharel em Direito ou 10 anos de atividade notarial)", salario:"A definir", vagas:"A definir", banca:"A definir",
+      situacao:"Comissão formada e regulamento publicado para nova seleção", fonteUrl:EST2, fonteLabel:"Estratégia Carreiras Jurídicas: previstos" });
+    jur(anunciados, "federal", { org:"⚖️ Tribunais Regionais Federais", title:"Tribunais federais previstos: TRF 2, TRF 5 e TRF 6", badge:"EM ESTUDO", badgeType:"anunciado", estado:"NACIONAL", cidade:"TRF 2 tem sede no Rio de Janeiro (Capital)",
+      nivel:"Superior", cargos:"Juiz Federal (Direito). TRF 2 cobre RJ e ES, com comissão sofrendo alterações; TRF 5 com contrato de banca assinado; TRF 6 com 28 vagas e contrato assinado", salario:"Até R$ 33.924 (TRF 2), R$ 33.000 (TRF 5) e R$ 37.765 (TRF 6)", vagas:"28 no TRF 6", banca:"Contrato assinado (TRF 5 e 6)",
+      situacao:"Previstos, sem edital. Para analista e técnico do TRF 2, o concurso de 2024 segue válido até 2028 e nova seleção só é projetada para 2028", fonteUrl:"https://jcconcursos.com.br/concursos/por-area/judiciaria-juridica", fonteLabel:"JC Concursos: judiciária e jurídica" });
+    jur(anunciados, "estadual", { org:"🏛️ Procuradorias e defensorias de outros estados", title:"Procuradorias e defensorias previstas em outros estados", badge:"EM ESTUDO", badgeType:"anunciado", estado:"NACIONAL", cidade:"Vários estados (nenhum no Rio de Janeiro)",
+      nivel:"Superior", cargos:"Procurador e Defensor (Direito): DPE RO (6 vagas), DPE PR, DPE PB, DPDF (40), DPE AL, DPE GO, PGE RS, PGE RN, PGDF, PGE PE, PGE AP, PGE MA (10), PGE AM, PGM Belo Horizonte, Curitiba, Fortaleza (5), Palmas (5), Joinville e Maceió, entre outras", salario:"A definir", vagas:"Varia", banca:"Varia: FAFIPA (Curitiba), Instituto AOCP (Joinville) e outras ainda a definir",
+      situacao:"Comissões formadas, regulamentos publicados ou bancas definidas, sem edital aberto", fonteUrl:EST2, fonteLabel:"Estratégia Carreiras Jurídicas: previstos",
+      note:"Lista resumida. O app mostra o que está previsto na Estratégia em 19/10/2026." });
+    // EM ANDAMENTO (inscrição encerrada)
+    jur(emAndamento, "estadual", { org:"🏛️ PGE RJ: Procuradoria Geral do Estado", title:"Concurso PGE RJ 2026: Procurador", badge:"INSCRIÇÃO ENCERRADA", badgeType:"encerrado", cidade:"Rio de Janeiro (Capital)",
+      nivel:"Superior", cargos:"Procurador do Estado (bacharel em Direito)", salario:"A definir", vagas:"5 imediatas + cadastro de reserva", banca:"Comissão própria da PGE RJ",
+      situacao:"Inscrições de 18/05 a 17/06/2026 já encerradas. Data da prova objetiva ainda a divulgar. Fases: prova geral, provas específicas, oral e títulos",
+      inscricoes:"18/05 a 17/06/2026 (encerradas)", inscricaoInicio:"2026-05-18", inscricaoFim:"2026-06-17", taxa:"R$ 300",
+      fonteUrl:"https://blog.grancursosonline.com.br/concurso-pge-rj-procurador-edital-publicado-2026/", fonteLabel:"Gran Cursos: PGE RJ Procurador",
+      note:"Já passou o prazo, mas a prova ainda vem. Acompanhe a data no site da PGE." });
+    jur(emAndamento, "estadual", { org:"🛡️ DPE RJ: Defensoria Pública do Rio", title:"Concurso DPE RJ 2026: Defensor", badge:"INSCRIÇÃO ENCERRADA", badgeType:"encerrado", cidade:"Rio de Janeiro (Capital)",
+      nivel:"Superior", cargos:"Defensor Público Substituto (bacharel em Direito)", salario:"R$ 34.279,28", vagas:"35 imediatas + cadastro de reserva", banca:"FGV",
+      situacao:"Inscrições de 08/06 a 07/07/2026 encerradas. Prova objetiva estava marcada para 30/08/2026 (confira o resultado no site da FGV)",
+      inscricoes:"08/06 a 07/07/2026 (encerradas)", inscricaoInicio:"2026-06-08", inscricaoFim:"2026-07-07", provaData:"2026-08-30", prova:"30/08/2026, 90 questões", taxa:"R$ 300",
+      fonteUrl:"https://blog.grancursosonline.com.br/concurso-dpe-rj-defensor-edital-publicado-2026/amp/", fonteLabel:"Gran Cursos: DPE RJ Defensor" });
+    jur(emAndamento, "estadual", { org:"⚖️ TJ RJ: Tribunal de Justiça do Rio", title:"Concurso TJ RJ 2025/2026: Analista e Técnico", badge:"HOMOLOGADO", badgeType:"encerrado", cidade:"Rio de Janeiro (Capital)", area:"Direito",
+      nivel:"Médio e Superior", cargos:"Técnico de Atividade Judiciária (médio, jurídica) e Analista Judiciário (superior, com cerca de 20 especialidades, inclusive Judiciária e Execução de Mandados)", salario:"R$ 5.685,54 (técnico) e R$ 9.363,84 (analista)", vagas:"Sem vagas imediatas, cadastro de reserva com mais de 28 mil aprovados",
+      banca:"Não informada na fonte", situacao:"Resultado final e homologação em 12/06/2026. Validade de 2 anos, até junho de 2028. Estimativa de mais de mil nomeações, ligadas ao programa de incentivo à aposentadoria",
+      fonteUrl:"https://folha.qconcursos.com/n/concurso-tj-rj-2026-homologado", fonteLabel:"Folha Dirigida / QConcursos: TJ RJ homologado",
+      note:"Não há inscrição aberta. Quem passou espera convocação." });
+    jur(emAndamento, "estadual", { org:"⚖️ MPRJ: Ministério Público do Rio", title:"Concurso MPRJ: XXXIX Promotor de Justiça", badge:"INSCRIÇÃO ENCERRADA", badgeType:"encerrado", cidade:"Rio de Janeiro (Capital)",
+      nivel:"Superior", cargos:"Promotor de Justiça substituto (bacharel em Direito)", salario:"A confirmar", vagas:"10 iniciais", banca:"FGV",
+      situacao:"Inscrições previstas de 18/03 a 16/04/2026, segundo a fonte. Confirme no site do MPRJ e da FGV em que fase está",
+      fonteUrl:"https://blog.damasio.com.br/concursos-juridicos-previstos", fonteLabel:"Damásio: concursos jurídicos",
+      note:"Só uma fonte cita este concurso. Outra fonte (Estratégia) trata o MPRJ como previsto." });
+  })();
+  (function(){
     const F = "https://folha.qconcursos.com/n/";
     const add2 = (lista, esf, o) => { const it = _novo(Object.assign({ estado:"RJ", area:"Administração" }, o)); lista.push(it); window.__FED_ESFERA[slugify(it.title)] = esf; delete it.__esf; };
     add2(banca, "municipal", { org:"🏙️ Prefeitura de Resende", title:"Concurso Resende RJ 2026", badge:"BANCA DEFINIDA", badgeType:"banca", cidade:"Resende (RJ)",
@@ -3474,7 +3597,7 @@ let profile = { area: "Administração", estados: ["RJ"], niveis: ["Médio","Té
 // quando o cargo não deixa claro se aceita a formação, o concurso fica de fora e aparece como "não confirmado". ----------
 const FIT_FORMACAO = {
   adm: /administra|gest[ãa]o|planejament|governan|pol[ií]ticas p[úu]blicas|sistemas e m[ée]todos/i,
-  direito: /advogad|jur[ií]dic|processual|procurador|direito/i,
+  direito: /advogad|jur[ií]dic|processual|procurador|direito|defensor|promotor|delegad|magistrad|juiz|notarial/i,
   contabil: /cont[áa]bil|ci[êe]ncias cont|auditor|controle externo|tribut|fiscal|financ|or[çc]ament/i,
   ti: /\bTI\b|tecnologia|sistemas|processamento|inform[áa]tica/i,
   saude: /sa[úu]de|enferm|m[ée]dic|farm/i,
@@ -3493,7 +3616,7 @@ Object.assign(ESFERA_ITEM, window.__FED_ESFERA||{});
 function soRioCapital(){ return (profile.estados||[]).length===1 && profile.estados[0]==="RJ"; }
 function itemTemRio(it){
   if((it.estado||"RJ").toUpperCase()!=="NACIONAL") return true;
-  return /Rio de Janeiro|\(Capital\)|Sede no Rio/i.test(it.cidade||"") || /IBGE|BACEN|Banco Central|TCU:|EBSERH/i.test(it.title||"");
+  return /Rio de Janeiro|\(Capital\)|Sede no Rio/i.test(it.cidade||"") || /IBGE|BACEN|Banco Central|TCU:|EBSERH|DPU|AGU/i.test(it.title||"");
 }
 function itemFechado(it){ return it.badgeType === "encerrado"; }
 function itemServeFormacao(it, formacao){
@@ -8752,7 +8875,7 @@ function dayTimelineBlocks(dow, dateObj){
 // mais confiáveis, e copia o pedido pronto pra colar no Claude, que confere e devolve
 // o painel atualizado. ----------
 const DATA_CHECKED = "19/10/2026";
-const DATA_CHECKED_HORA = "09:57";
+const DATA_CHECKED_HORA = "22:43";
 const UPDATE_SOURCES = [
   { name:"JC Concursos: abertos no RJ", url:"https://jcconcursos.com.br/concursos/inscricoes-abertas/rj" },
   { name:"PCI Concursos: Rio de Janeiro", url:"https://www.pciconcursos.com.br/concursos/rj/rio-de-janeiro" },
