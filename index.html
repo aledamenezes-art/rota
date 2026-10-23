@@ -5427,9 +5427,32 @@ function dispensarAlerta(i){
   alertasOff.push(alertaChave(a)); saveState("concursos-rj-alertas-off", alertasOff); renderAlertBox();
 }
 function restaurarAlertas(){ alertasOff = []; saveState("concursos-rj-alertas-off", alertasOff); renderAlertBox(); }
+// Novidades dos concursos que ela guardou ou em que se inscreveu. Eu atualizo esta lista a cada pesquisa.
+// Aparece em "Sua situação agora" por 14 dias, só para favoritos e inscritas, e dá para dispensar.
+const NOVIDADES = [
+  { titulo:"Concurso MPRJ: XXXIX Promotor de Justiça", data:"2026-10-22", texto:"Prova oral de 26 a 28/10 e classificação final prevista para 18/11" },
+  { titulo:"Concurso AGU Unificado", data:"2026-10-22", texto:"Bancas examinadoras constituídas por portaria. Ainda sem edital" },
+  { titulo:"Concurso Cremerj 2026", data:"2026-10-22", texto:"Inscrições seguem até 29/10 (prorrogadas). Prova em 13/12" },
+  { titulo:"Concurso Queimados RJ 2026", data:"2026-10-22", texto:"Inscrições prorrogadas até 03/11. Provas em 20 e 22/11" },
+  { titulo:"Concurso Seplag RJ: EPPGG e APO", data:"2026-10-22", texto:"Inscrições encerradas. Prova em 29/11 (FGV)" },
+  { titulo:"Concurso TJ PB 2026: Analista Judiciário", data:"2026-10-20", texto:"Edital publicado. Inscrições de 20/10 a 18/11, banca FGV" },
+  { titulo:"Concurso Câmara dos Deputados", data:"2026-10-22", texto:"Não tem vaga jurídica. Inscrições até 17/11 (Cebraspe)" },
+  { titulo:"Concurso TJ RJ 2025/2026: Analista e Técnico", data:"2026-10-19", texto:"Homologado, validade até junho de 2028. Sem vagas imediatas" },
+  { titulo:"Concurso PGE RJ 2026: Procurador", data:"2026-10-19", texto:"Inscrições encerradas. Data da prova ainda não divulgada" },
+  { titulo:"Concurso DPE RJ 2026: Defensor", data:"2026-10-19", texto:"Prova foi em 30/08. Acompanhe o resultado no site da FGV" }
+];
 function computeAlerts(){
   const now = new Date();
   const alerts = [];
+  NOVIDADES.forEach(n=>{
+    const id = slugify(n.titulo);
+    if(!(favIds.includes(id) || inscritoIds.includes(id))) return;
+    const idade = Math.floor((now - new Date(n.data + "T00:00:00")) / 86400000);
+    if(idade < 0 || idade > 14) return;
+    alerts.push({ itemId: id, tone: "mint",
+      title: `${n.titulo.replace(/^Concurso\s*/i, "")}: novidade de ${formatDatePt(n.data, false)}`,
+      sub: n.texto });
+  });
   inscritoIds.forEach(id=>{
     if(boletoStatus[id] === true){ // já pago: falta só a confirmação da inscrição
       const en = allItemsById[id];
@@ -5521,7 +5544,7 @@ function computeAlerts(){
       sub: formatDatePt(e.item.provaData, false) + (cg ? " · " + cg : "") + " · " + provaHoraTxt(e.item).split(". ")[0].replace(/\.$/, "") });
   });
   const ordem = {rose:0, sand:1, mint:2};
-  return alerts.map((a,i)=>[a,i]).sort((x,y)=>(ordem[x[0].tone]-ordem[y[0].tone])||(x[1]-y[1])).map(x=>x[0]).filter(a=>!alertasOff.includes(alertaChave(a))).slice(0,5);
+  return alerts.map((a,i)=>[a,i]).sort((x,y)=>(ordem[x[0].tone]-ordem[y[0].tone])||(x[1]-y[1])).map(x=>x[0]).filter(a=>!alertasOff.includes(alertaChave(a))).slice(0,8);
 }
 
 // Frase motivacional do dia: fixa por data (não muda a cada render), roda num banco
