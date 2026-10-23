@@ -5857,7 +5857,7 @@ function refreshInscritoUI(){
   document.querySelectorAll(".card[data-id]").forEach(c=>c.classList.toggle("is-inscrita", inscritoIds.includes(c.getAttribute("data-id"))));
   renderResumo();
   renderInicioInscritos();
-  try{ const ac = document.querySelector(".sort-chip.active"); if(ac && ac.dataset.filter === "inscritas") applyConcursoFilter("inscritas"); }catch(e){}
+  try{ const ac = document.querySelector(".sort-chip.active"); if(ac && (ac.dataset.filter === "inscritas" || ac.dataset.filter === "all")) applyConcursoFilter(ac.dataset.filter); }catch(e){}
 }
 
 function refreshOlhoUI(){}
@@ -10020,6 +10020,15 @@ function applyConcursoFilter(f){
   Object.keys(concursoSections).forEach(key=>{
     const s = concursoSections[key];
     if(f === "inscritas"){
+      let alguma = false;
+      document.querySelectorAll(`#${s.list} .card`).forEach(c=>{ const ok = c.classList.contains("is-inscrita"); c.style.display = ok ? "" : "none"; if(ok) alguma = true; });
+      document.getElementById(s.heading).style.display = alguma ? "" : "none";
+      if(s.note) document.getElementById(s.note).style.display = alguma ? "" : "none";
+      if(s.fixedEmpty) document.getElementById(s.fixedEmpty).style.display = "none";
+      return;
+    }
+    if(f === "all" && key === "emandamento"){
+      // Inscrição encerrada: só aparece em "Todos" se ela se inscreveu. Para ver o resto, toca em "Em andamento".
       let alguma = false;
       document.querySelectorAll(`#${s.list} .card`).forEach(c=>{ const ok = c.classList.contains("is-inscrita"); c.style.display = ok ? "" : "none"; if(ok) alguma = true; });
       document.getElementById(s.heading).style.display = alguma ? "" : "none";
