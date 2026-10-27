@@ -2300,7 +2300,7 @@
 <div class="divider"></div>
 
 <footer class="foot">
-  Fontes públicas (Folha Dirigida/QConcursos, JC Concursos, Estratégia Concursos, Gran Cursos Online, Direção Concursos, Nova Concursos, sites oficiais). Checagem cruzada em 22/10/2026. Dados mudam: o edital oficial é sempre a fonte que vale.
+  Fontes públicas (Folha Dirigida/QConcursos, JC Concursos, Estratégia Concursos, Gran Cursos Online, Direção Concursos, Nova Concursos, sites oficiais). Checagem cruzada em 27/10/2026. Dados mudam: o edital oficial é sempre a fonte que vale.
 </footer>
 
 <div class="detail-screen" id="detail-screen" role="dialog" aria-modal="true">
@@ -2967,7 +2967,7 @@ abertos.push(
   _novo({ org:"🎓 UNIRIO: Universidade Federal do Estado do Rio de Janeiro", title:"Concurso UNIRIO: editais avulsos", badge:"EDITAL PUBLICADO", badgeType:"aberto",
     nivel:"Superior", cargos:"A definir (a fonte não traz os cargos)", salario:"A definir", vagas:"1 vaga em cada um dos editais 221, 222, 223, 224 e 229/2026", banca:"A definir",
     situacao:"Cinco editais de 1 vaga cada, de nível superior. Inscrições até 20/10 (221), 22/10 (223, 224 e 229) e 30/10 (222, que ainda não começou), segundo o Valor Final. Os cargos não aparecem na fonte: confira cada edital",
-    inscricoes:"Até 20/10, 22/10 ou 30/10/2026, conforme o edital", inscricaoFim:"2026-10-22", fonteUrl:_urlVal, fonteLabel:_VAL,
+    inscricoes:"Até 30/10/2026 (o edital 222; os outros já fecharam)", inscricaoFim:"2026-10-30", fonteUrl:_urlVal, fonteLabel:_VAL,
     note:"Editais de 1 vaga costumam ser de seleção de docentes ou de áreas específicas, por isso nem sempre servem para Administração. Confira o cargo antes." })
 );
 emAndamento.push(
@@ -3492,6 +3492,50 @@ window.__FED_ESFERA = {};
       situacao:"Inscrições de 27/07 a 27/08/2026 encerradas. Prova objetiva e dissertativa estava prevista para 27/09 e resultado final para 17/12 (datas podem mudar)",
       inscricoes:"27/07 a 27/08/2026 (encerradas)", inscricaoInicio:"2026-07-27", inscricaoFim:"2026-08-27", provaData:"2026-09-27", prova:"27/09/2026 (prevista)", taxa:"R$ 90",
       fonteUrl:"https://jcconcursos.com.br/noticia/concursos/concurso-da-prefeitura-de-casimiro-de-abreu-rj-abre-inscricoes-para-procurador-144299", fonteLabel:"JC Concursos: Casimiro de Abreu" });
+    // Atualização 27/10/2026
+    jur(abertos, "federal", { org:"⚖️ TRF 3: Tribunal Regional Federal da 3ª Região", title:"Concurso TRF 3 2026: Analista e Técnico", badge:"EDITAL PUBLICADO", badgeType:"aberto", estado:"SP", cidade:"São Paulo (SP) e Mato Grosso do Sul",
+      nivel:"Superior", cargos:"Analista Judiciário (área Judiciária, jurídica, mais Administrativa, Contadoria e TI) e Técnico Judiciário", salario:"R$ 9.776,73 a R$ 20.013,11", vagas:"11 + cadastro de reserva", banca:"Fundação VUNESP",
+      situacao:"Edital publicado em 26/10. Inscrições de 04/11 a 23/11/2026",
+      inscricoes:"04/11 a 23/11/2026", inscricaoInicio:"2026-11-04", inscricaoFim:"2026-11-23", taxa:"R$ 160 (analista) e R$ 100 (técnico)",
+      fonteUrl:"https://blog.grancursosonline.com.br/concurso-publico-26-outubro-2026/", fonteLabel:"Gran Cursos: editais de 26/10", note:"Vagas em São Paulo e Mato Grosso do Sul, fora do Rio. É da Justiça Federal." });
+    jur(abertos, "estadual", { org:"🛡️ Defensoria Pública do Distrito Federal", title:"Concurso DPDF 2026: servidores", badge:"EDITAL PUBLICADO", badgeType:"aberto", estado:"DF", cidade:"Brasília (DF)",
+      nivel:"Superior", cargos:"Servidores da Defensoria nas áreas Jurídica, TI e Contábil", salario:"R$ 11.514,95", vagas:"7 imediatas + cadastro de reserva (a fonte também cita o número 707)", banca:"Instituto ACCESS",
+      situacao:"Edital publicado em 26/10. Inscrições de 03/12/2026 a 07/01/2027",
+      inscricoes:"03/12/2026 a 07/01/2027", inscricaoInicio:"2026-12-03", inscricaoFim:"2027-01-07", taxa:"R$ 110",
+      fonteUrl:"https://blog.grancursosonline.com.br/concurso-publico-26-outubro-2026/", fonteLabel:"Gran Cursos: editais de 26/10", note:"Não é o concurso de Defensor Público. É para os servidores de apoio." });
+    jur(abertos, "municipal", { org:"🏛️ Prefeitura de Ijuí", title:"Concurso Prefeitura de Ijuí 2026", badge:"INSCRIÇÕES ABERTAS", badgeType:"aberto", estado:"RS", cidade:"Ijuí (RS)",
+      nivel:"Fundamental, Médio, Técnico e Superior", cargos:"Vários cargos, inclusive da área Jurídica (confira os cargos no edital)", salario:"R$ 1.437,25 a R$ 21.312,22", vagas:"154 + cadastro de reserva", banca:"Fundatec",
+      situacao:"Inscrições de 23/10 a 19/11/2026",
+      inscricoes:"23/10 a 19/11/2026", inscricaoInicio:"2026-10-23", inscricaoFim:"2026-11-19", taxa:"R$ 53,45 a R$ 267,23",
+      fonteUrl:"https://blog.grancursosonline.com.br/concurso-publico-26-outubro-2026/", fonteLabel:"Gran Cursos: editais de 26/10" });
+    jur(abertos, "municipal", { org:"🏛️ Prefeitura de Monteiro Lobato", title:"Concurso Monteiro Lobato SP 2026", badge:"INSCRIÇÕES ABERTAS", badgeType:"aberto", estado:"SP", cidade:"Monteiro Lobato (SP)",
+      nivel:"Fundamental, Médio, Técnico e Superior", cargos:"Vários cargos nas áreas Administrativa, Saúde, Educação e Jurídica", salario:"R$ 1.803,38 a R$ 7.408,75", vagas:"64 + cadastro de reserva", banca:"Instituto Aplicativa",
+      situacao:"Inscrições de 23/10 a 23/11/2026",
+      inscricoes:"23/10 a 23/11/2026", inscricaoInicio:"2026-10-23", inscricaoFim:"2026-11-23", taxa:"R$ 40 a R$ 60",
+      fonteUrl:"https://blog.grancursosonline.com.br/concurso-publico-26-outubro-2026/", fonteLabel:"Gran Cursos: editais de 26/10" });
+    jur(abertos, "municipal", { org:"🏛️ Câmara Municipal de Laranjal", title:"Concurso Câmara de Laranjal MG", badge:"EDITAL PUBLICADO", badgeType:"aberto", estado:"MG", cidade:"Laranjal (MG)",
+      nivel:"Médio e Superior", cargos:"Áreas Administrativa, Contabilidade e Jurídica", salario:"R$ 2.000,00 a R$ 5.296,39", vagas:"4", banca:"IBGP",
+      situacao:"Inscrições de 06/01 a 04/02/2027",
+      inscricoes:"06/01 a 04/02/2027", inscricaoInicio:"2027-01-06", inscricaoFim:"2027-02-04", taxa:"R$ 80 a R$ 100",
+      fonteUrl:"https://blog.grancursosonline.com.br/concurso-publico-26-outubro-2026/", fonteLabel:"Gran Cursos: editais de 26/10" });
+    jur(banca, "estadual", { org:"🛡️ Defensoria Pública do Amazonas", title:"Concurso DPE AM: Analista Jurídico", badge:"BANCA DEFINIDA", badgeType:"banca", estado:"AM", cidade:"Manaus (AM)",
+      nivel:"Médio e Superior", cargos:"Analista Jurídico de Defensoria (Direito) e cargos de nível médio", salario:"Até R$ 8.006,38", vagas:"5 imediatas + cadastro de reserva", banca:"FCC",
+      situacao:"Banca definida, sem edital", fonteUrl:"https://magistrarcursos.com.br/blog/concurso-analista-judiciario-melhores-editais-em-outubro-de-2026/", fonteLabel:"Magistrar: analista judiciário em outubro" });
+    jur(banca, "municipal", { org:"🏛️ IPREMB: Previdência de Betim", title:"Concurso IPREMB Betim: Analista Jurídico", badge:"BANCA DEFINIDA", badgeType:"banca", estado:"MG", cidade:"Betim (MG)",
+      nivel:"Superior", cargos:"Analista Jurídico (Direito)", salario:"A definir", vagas:"6 + cadastro de reserva", banca:"Consulplan",
+      situacao:"Banca definida, sem edital", fonteUrl:"https://magistrarcursos.com.br/blog/concurso-analista-judiciario-melhores-editais-em-outubro-de-2026/", fonteLabel:"Magistrar: analista judiciário em outubro" });
+    jur(banca, "municipal", { org:"🏙️ Prefeitura de São João de Meriti", title:"Concurso São João de Meriti RJ 2026", badge:"BANCA DEFINIDA", badgeType:"banca", area:"Educação", cidade:"São João de Meriti (RJ)",
+      nivel:"Superior", cargos:"Magistério (cargos e especialidades ainda não detalhados). Sem cargo jurídico divulgado", salario:"A definir", vagas:"649 efetivos + cadastro de reserva", banca:"IBAM",
+      situacao:"Banca IBAM contratada por dispensa, autorização no Diário Oficial de 16/10/2026. Edital sem data",
+      fonteUrl:"https://folha.qconcursos.com/n/concurso-sao-joao-de-meriti-rj-educacao-banca-definida-2026", fonteLabel:"Folha Dirigida / QConcursos: São João de Meriti",
+      note:"É concurso de professores. Entra para quem escolher Educação." });
+    jur(anunciados, "estadual", { org:"⚖️ MPRJ: Ministério Público do Rio", title:"Concurso MPRJ: XL Promotor de Justiça", badge:"REGULAMENTO APROVADO", badgeType:"anunciado", cidade:"Rio de Janeiro (Capital)",
+      nivel:"Superior", cargos:"Promotor de Justiça substituto (bacharel em Direito e 3 anos de atividade jurídica)", salario:"R$ 37.765,53 (último edital)", vagas:"A definir", banca:"A definir",
+      situacao:"Regulamento aprovado, sem edital nem data. O XXXIX concurso ainda está na fase final",
+      fonteUrl:"https://folha.qconcursos.com/n/concursos-rio-de-janeiro", fonteLabel:"Folha Dirigida / QConcursos: concursos RJ" });
+    jur(anunciados, "municipal", { org:"🏙️ Prefeitura de Araruama", title:"Concurso Araruama RJ: 1.978 vagas", badge:"AUTORIZADO", badgeType:"anunciado", area:"Administração", cidade:"Araruama (RJ)",
+      nivel:"Fundamental, Médio e Superior", cargos:"A definir", salario:"R$ 1.621 a R$ 12.608", vagas:"1.978", banca:"A definir",
+      situacao:"Lei autoriza as vagas. Sem banca nem edital", fonteUrl:"https://folha.qconcursos.com/n/concursos-rio-de-janeiro", fonteLabel:"Folha Dirigida / QConcursos: concursos RJ" });
     // BANCA / PREVISTOS
     jur(banca, "estadual", { org:"🚓 Polícia Civil do Rio de Janeiro", title:"Concurso PC RJ: Delegado", badge:"BANCA DEFINIDA", badgeType:"banca", cidade:"Rio de Janeiro (Capital)",
       nivel:"Superior", cargos:"Delegado de Polícia (bacharel em Direito e 3 anos de atividade jurídica ou policial)", salario:"A definir", vagas:"85", banca:"Fundação Cesgranrio",
@@ -3568,8 +3612,8 @@ window.__FED_ESFERA = {};
       fonteUrl:"https://direcaoconcursos.com.br/noticias/concurso-emusa-niteroi-banca-definida", fonteLabel:"Direção Concursos: Emusa",
       note:"Empresa municipal de Niterói. Cargos ainda não divulgados." });
     add2(banca, "conselho", { org:"🧠 CRP-05: Conselho Regional de Psicologia do RJ", title:"Concurso CRP-05 RJ", badge:"BANCA DEFINIDA", badgeType:"banca", cidade:"Rio de Janeiro (Capital)",
-      nivel:"Médio e Superior", cargos:"A definir (cargos administrativos e de apoio)", salario:"Até R$ 7.313", vagas:"39", banca:"Definida, não nomeada nas fontes",
-      situacao:"Banca definida, segundo o JC Concursos. Sem edital nem datas",
+      nivel:"Médio e Superior", cargos:"A definir (cargos administrativos e de apoio)", salario:"R$ 3.077,42 a R$ 7.313,35", vagas:"37 + cadastro de reserva", banca:"FGV",
+      situacao:"Banca FGV definida (Folha Dirigida, 26/10). Sem edital nem datas",
       fonteUrl:"https://jcconcursos.com.br/concursos/previstos/rj", fonteLabel:"JC Concursos: previstos RJ",
       note:"Sede na capital. Conselhos costumam ter vagas de assistente e analista administrativo." });
     add2(banca, "municipal", { org:"🏛️ Câmara de São Pedro da Aldeia", title:"Concurso Câmara São Pedro da Aldeia", badge:"BANCA DEFINIDA", badgeType:"banca", cidade:"São Pedro da Aldeia (RJ)",
@@ -3630,6 +3674,17 @@ let profile = { area: "Administração", estados: ["RJ"], niveis: ["Médio","Té
 // ---------- Filtro "combina comigo": só concursos abertos, previstos ou em análise (nunca os encerrados) e que
 // servem para a formação e para as respostas do passo a passo. Regras simples sobre o texto dos cargos:
 // quando o cargo não deixa claro se aceita a formação, o concurso fica de fora e aparece como "não confirmado". ----------
+// Fecha sozinho o que passou do prazo de inscrição (o app não depende de eu republicar na data certa).
+(function(){
+  const hoje = new Date();
+  abertos.forEach(it=>{
+    if(it.badgeType === "encerrado" || !it.inscricaoFim) return;
+    if(new Date(it.inscricaoFim + "T23:59:59") < hoje){
+      it.badgeType = "encerrado"; it.badge = "INSCRIÇÃO ENCERRADA";
+      it.situacao = "Inscrições encerradas em " + it.inscricaoFim.split("-").reverse().join("/") + ". " + (it.situacao || "");
+    }
+  });
+})();
 const FIT_FORMACAO = {
   adm: /administra|gest[ãa]o|planejament|governan|pol[ií]ticas p[úu]blicas|sistemas e m[ée]todos/i,
   direito: /advogad|jur[ií]dic|processual|procurador|direito|defensor|promotor|delegad|magistrad|juiz|notarial/i,
@@ -5430,9 +5485,11 @@ function restaurarAlertas(){ alertasOff = []; saveState("concursos-rj-alertas-of
 // Novidades dos concursos que ela guardou ou em que se inscreveu. Eu atualizo esta lista a cada pesquisa.
 // Aparece em "Sua situação agora" por 14 dias, só para favoritos e inscritas, e dá para dispensar.
 const NOVIDADES = [
-  { titulo:"Concurso MPRJ: XXXIX Promotor de Justiça", data:"2026-10-22", texto:"Prova oral de 26 a 28/10 e classificação final prevista para 18/11" },
+  { titulo:"Concurso MPRJ: XXXIX Promotor de Justiça", data:"2026-10-27", texto:"Prova oral em andamento (26 a 28/10). Classificação final prevista para 18/11. O regulamento do XL concurso já foi aprovado" },
+  { titulo:"Concurso TRT 8 2026: Analista e Técnico", data:"2026-10-27", texto:"Inscrições até 05/11 (FCC). Prova prevista para 17/01/2027" },
+  { titulo:"Concurso TRF 3 2026: Analista e Técnico", data:"2026-10-27", texto:"Edital publicado em 26/10. Inscrições de 04 a 23/11 (Vunesp)" },
   { titulo:"Concurso AGU Unificado", data:"2026-10-22", texto:"Bancas examinadoras constituídas por portaria. Ainda sem edital" },
-  { titulo:"Concurso Cremerj 2026", data:"2026-10-22", texto:"Inscrições seguem até 29/10 (prorrogadas). Prova em 13/12" },
+  { titulo:"Concurso Cremerj 2026", data:"2026-10-22", texto:"Prazo retificado: inscrições até 29/10 (algumas páginas ainda mostram 22/10). Prova em 13/12" },
   { titulo:"Concurso Queimados RJ 2026", data:"2026-10-22", texto:"Inscrições prorrogadas até 03/11. Provas em 20 e 22/11" },
   { titulo:"Concurso Seplag RJ: EPPGG e APO", data:"2026-10-22", texto:"Inscrições encerradas. Prova em 29/11 (FGV)" },
   { titulo:"Concurso TJ PB 2026: Analista Judiciário", data:"2026-10-20", texto:"Edital publicado. Inscrições de 20/10 a 18/11, banca FGV" },
@@ -8933,8 +8990,8 @@ function dayTimelineBlocks(dow, dateObj){
 // sozinho (e não vai inventar dado). O botão leva pras listas de concursos abertos
 // mais confiáveis, e copia o pedido pronto pra colar no Claude, que confere e devolve
 // o painel atualizado. ----------
-const DATA_CHECKED = "22/10/2026";
-const DATA_CHECKED_HORA = "21:51";
+const DATA_CHECKED = "27/10/2026";
+const DATA_CHECKED_HORA = "09:04";
 const UPDATE_SOURCES = [
   { name:"JC Concursos: abertos no RJ", url:"https://jcconcursos.com.br/concursos/inscricoes-abertas/rj" },
   { name:"PCI Concursos: Rio de Janeiro", url:"https://www.pciconcursos.com.br/concursos/rj/rio-de-janeiro" },
