@@ -1336,6 +1336,22 @@
   .hj-actions .btn.primary{ flex:2 1 150px; }
   .hj-links{ display:flex; flex-wrap:wrap; gap:14px; margin-top:10px; font-size:12.5px; font-weight:800; }
   .hj-links a{ color:var(--blue-deep); text-decoration:none; }
+  /* Minhas inscrições (lista no topo de Concursos) */
+  .mi-box{ background:var(--card); border:1px solid var(--line); border-left:4px solid var(--mint-deep); border-radius:16px; padding:12px 14px; margin:0 0 14px; }
+  .mi-h{ font-size:12px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--mint-deep); margin:0 0 6px; }
+  .mi-row{ display:flex; align-items:center; gap:10px; padding:9px 0; border-top:1px solid var(--line); cursor:pointer; }
+  .mi-row:first-of-type{ border-top:0; }
+  .mi-n{ flex:0 0 22px; height:22px; border-radius:50%; background:var(--mint-bg); color:var(--mint-deep); font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; }
+  .mi-t{ flex:1; min-width:0; font-size:14px; font-weight:800; line-height:1.25; }
+  .mi-s{ display:block; font-size:12px; font-weight:600; color:var(--ink-soft); margin-top:2px; }
+  .mi-d{ flex:0 0 auto; font-size:12px; font-weight:800; color:var(--mint-deep); text-align:right; }
+  /* Estudos: progresso do edital e atalhos de foco */
+  .ed-card{ display:flex; align-items:center; gap:14px; }
+  .ed-ring{ flex:0 0 58px; height:58px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:800; }
+  .ed-ring i{ font-style:normal; width:44px; height:44px; border-radius:50%; background:var(--card); display:flex; align-items:center; justify-content:center; }
+  .foco-quick{ display:flex; gap:8px; margin:8px 0 2px; }
+  .foco-quick span{ flex:1; text-align:center; font-size:12px; font-weight:800; padding:6px 0; border-radius:10px; border:1.5px solid var(--line); background:var(--bg); color:var(--ink-soft); cursor:pointer; }
+  .foco-quick span.on{ background:var(--blue-bg); border-color:var(--blue-deep); color:var(--blue-deep); }
   .hj-qform{ display:grid; grid-template-columns:1fr 70px 88px; gap:8px; margin-top:12px; }
   .hj-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:11px 0; border-top:1px solid var(--line); margin-top:8px; }
   .hj-row b{ display:block; font-size:14px; }
@@ -1945,6 +1961,7 @@
       <span class="sort-chip" data-filter="encerrados">Encerrados</span>
     </div>
 
+    <div id="minhas-insc"></div>
     <div id="fit-resumo" class="fit-resumo"></div>
     <div id="perfil-busca"></div>
 
@@ -1991,6 +2008,7 @@
       </div>
       <div id="timer-idle">
         <div class="timer-config hidden" id="timer-config-pomodoro">
+          <div class="foco-quick" id="foco-quick"><span data-m="15">15</span><span data-m="25" class="on">25</span><span data-m="50">50</span></div>
           <div class="timer-config-row">
             <div><label class="field-label" for="pomodoro-foco">Foco (min)</label><input class="field-input" id="pomodoro-foco" type="number" min="5" step="5" value="25"></div>
             <div><label class="field-label" for="pomodoro-pausa">Pausa (min)</label><input class="field-input" id="pomodoro-pausa" type="number" min="1" step="1" value="5"></div>
@@ -3742,6 +3760,7 @@ function itemServeEsfera(id, esferas){
 }
 
 function passesProfile(item, soEncerrados){
+  soEncerrados = soEncerrados === true;
   if(itemFechado(item) && !soEncerrados && !inscritoIds.includes(slugify(item.title))) return false;
   if(profile.filtrar){
     const id = slugify(item.title);
@@ -3970,13 +3989,20 @@ function addTopicoTime(subjectId, topicoId, minutes){
   renderStudyStats();
 }
 
+const TOPICO_INTERVALOS = [1, 7, 21];
 function toggleTopicoConcluido(subjectId, topicoId){
   const subj = study.subjects.find(s => s.id === subjectId);
   if(!subj) return;
   const top = subj.topicos.find(t => t.id === topicoId);
   if(!top) return;
   top.concluido = !top.concluido;
+  const rk = subjectId + ":" + topicoId;
+  study.reviews = study.reviews.filter(r => r.topicoKey !== rk);
+  if(top.concluido){
+    study.reviews.push({ id: Date.now() + "-" + Math.random().toString(36).slice(2,7), materia: subj.materiaNome, method: "topico", topicoKey: rk, topico: top.nome, stage: 0, dueDate: addDaysIso(TOPICO_INTERVALOS[0]) });
+  }
   saveState("concursos-rj-estudos", study);
+  if(typeof renderReviews === "function") renderReviews();
   renderStudySubjects();
   renderInicioStudyWidgets();
 }
@@ -4343,6 +4369,7 @@ function methodLabel(r){
   if(r.method === "diaFixo") return `Toda ${DOW_NOMES[r.dia]}`;
   if(r.method === "personalizada") return `A cada ${r.customDias} dias`;
   if(r.method === "desempenho") return "Por desempenho";
+  if(r.method === "topico") return `Tópico: ${r.topico} · revisão ${Math.min(r.stage+1, TOPICO_INTERVALOS.length)} de ${TOPICO_INTERVALOS.length}`;
   return "";
 }
 
@@ -4375,7 +4402,11 @@ function renderReviews(){
 function completeReview(id){
   const r = study.reviews.find(x=>x.id === id);
   if(!r) return;
-  if(r.method === "curva"){
+  if(r.method === "topico"){
+    r.stage += 1;
+    if(r.stage >= TOPICO_INTERVALOS.length){ study.reviews = study.reviews.filter(x => x.id !== id); }
+    else r.dueDate = addDaysIso(TOPICO_INTERVALOS[r.stage]);
+  } else if(r.method === "curva"){
     r.stage = Math.min(r.stage + 1, CURVA_INTERVALOS.length - 1);
     r.dueDate = addDaysIso(CURVA_INTERVALOS[r.stage]);
   } else if(r.method === "semanal"){
@@ -7334,12 +7365,30 @@ function hojeQuestoes(){
   const iso = isoOfDate(new Date());
   for(let i = 0; i < n; i++){
     const certo = i < ac;
-    study.errors.push({ id: Date.now() + "-" + Math.random().toString(36).slice(2,7) + "-" + i, materia: mat, nota: "", tipo: certo ? "certo" : "errado", date: iso, revisado: true, rapido: true });
+    study.errors.push({ id: Date.now() + "-" + Math.random().toString(36).slice(2,7) + "-" + i, materia: mat, assunto: (document.getElementById("hj-q-ass") || {}).value || "", nota: "", tipo: certo ? "certo" : "errado", date: iso, revisado: true, rapido: true });
   }
   saveState("concursos-rj-estudos", study);
   hjAfterChange();
 }
 function hojeIrPara(seg){ setStudySeg(seg); window.scrollTo(0,0); }
+function hjChipsExtra(){
+  const iso = isoOfDate(new Date());
+  const rev = study.reviews.filter(r => r.dueDate <= iso).length;
+  const c = editalProgressCounts();
+  let h = `<span>🔁 ${rev ? rev + " revisõ" + (rev === 1 ? "ão" : "es") + " para hoje" : "revisões em dia"}</span>`;
+  if(c.total) h += `<span>📚 ${c.concluidos} de ${c.total} tópicos</span>`;
+  const n = nearestProvaCountdown();
+  if(n){ const d = Math.max(0, Math.ceil((new Date(n.item.provaData + "T00:00:00") - new Date(iso + "T00:00:00")) / 86400000)); h += `<span>⏳ prova em ${d} d</span>`; }
+  return h;
+}
+function hjAssuntosOpts(mat){
+  const subj = study.subjects.find(s => s.materiaNome === mat);
+  return `<option value="">Vários assuntos da matéria</option>` + (subj ? subj.topicos.map(t => `<option>${escHtml(t.nome)}</option>`).join("") : "");
+}
+function hjTrocaMateria(){
+  const a = document.getElementById("hj-q-ass"), m = document.getElementById("hj-q-mat");
+  if(a && m){ a.innerHTML = hjAssuntosOpts(m.value); }
+}
 function hjHeroHtml(){
   const agora = new Date(), iso = isoOfDate(agora);
   const hh = study.dailyHours || Math.round(((study.goalHours || 10) / 6) * 2) / 2;
@@ -7355,7 +7404,7 @@ function hjHeroHtml(){
       <div class="hj-big">${hjFmt(minHoje)} <small>de ${hjFmt(alvo)} hoje</small></div>
       <div class="hj-meter"><i style="width:${pctDia}%"></i></div>
       <div class="hj-frase">${frase}</div>
-      <div class="hj-chips"><span>🔥 ${streak} dia${streak === 1 ? "" : "s"} seguido${streak === 1 ? "" : "s"}</span><span>📅 ${hjFmt(sem7)}${metaH ? " de " + String(metaH).replace(".", ",") + "h" : ""} na semana</span></div>
+      <div class="hj-chips"><span>🔥 ${streak} dia${streak === 1 ? "" : "s"} seguido${streak === 1 ? "" : "s"}</span><span>📅 ${hjFmt(sem7)}${metaH ? " de " + String(metaH).replace(".", ",") + "h" : ""} na semana</span>${hjChipsExtra()}</div>
     </div>`;
 }
 function renderEstudoHoje(g){
@@ -7439,12 +7488,14 @@ function renderEstudoHoje(g){
       <div class="hj-title">${nq} hoje${metaQ ? ` <small>de ${metaQ} sugeridas</small>` : ""}</div>
       <div class="hj-sub">${nq ? Math.round(nqOk / nq * 100) + "% de acerto hoje." : "Registre rápido o que resolveu. Fica no caderno e conta na sua meta."}</div>
       <div class="hj-qform">
-        <select class="field-input" id="hj-q-mat">${mats.map(m => `<option>${escHtml(m)}</option>`).join("")}</select>
+        <select class="field-input" id="hj-q-mat" onchange="hjTrocaMateria()">${mats.map(m => `<option>${escHtml(m)}</option>`).join("")}</select>
         <input class="field-input" id="hj-q-n" type="number" inputmode="numeric" min="1" placeholder="Feitas">
         <input class="field-input" id="hj-q-ac" type="number" inputmode="numeric" min="0" placeholder="Certas">
       </div>
+      <select class="field-input" id="hj-q-ass" style="margin-top:8px;width:100%">${hjAssuntosOpts(mats[0])}</select>
       <button class="btn primary" style="width:100%;margin-top:8px" onmousedown="event.preventDefault()" onclick="hojeQuestoes()">Registrar questões</button>
     </div>
+    ${(()=>{ const c = editalProgressCounts(); if(!c.total) return ""; const p = Math.round(c.concluidos / c.total * 100); return `<div class="hj-card"><div class="hj-tag">EDITAL</div><div class="ed-card"><div class="ed-ring" style="background:conic-gradient(var(--mint-deep) ${p * 3.6}deg, var(--line) 0)"><i>${p}%</i></div><div style="flex:1"><div class="hj-title" style="margin:0">${c.concluidos} de ${c.total} tópicos vistos</div><div class="hj-sub" style="margin-top:4px">Ao marcar um tópico, a revisão aparece sozinha em 1, 7 e 21 dias.</div></div></div><button class="btn" style="width:100%;margin-top:8px" onmousedown="event.preventDefault()" onclick="setStudySeg('mais'); setTimeout(()=>scrollToEstudos('study-subjects-list'), 80)">Abrir tópicos por matéria</button></div>`; })()}
     <div class="hj-card">
       <div class="hj-tag">PARA REVISAR HOJE</div>
       ${nada ? `<div class="hj-sub" style="margin-top:6px">Nada vencendo hoje. Boa. Quando você agendar revisões, cartões ou errar questões, eles aparecem aqui.</div>` : ""}
@@ -10091,7 +10142,25 @@ const concursoSections = {
   encerrado:   { list:"list-encerrados", heading:"encerrados-heading", note:"encerrados-note", fixedEmpty:null }
 };
 
+function renderMinhasInsc(f){
+  const box = document.getElementById("minhas-insc"); if(!box) return;
+  const lista = (f === "all") ? inscritoIds.filter(id => allItemsById[id]) : [];
+  if(!lista.length){ box.innerHTML = ""; return; }
+  const hoje = isoOfDate(new Date());
+  const chave = id => { const it = allItemsById[id].item; if(it.provaData && it.provaData >= hoje) return "0" + it.provaData; if(it.inscricaoFim && it.inscricaoFim >= hoje) return "1" + it.inscricaoFim; return "2" + (it.inscricaoFim || "9999"); };
+  lista.sort((a,b) => chave(a) < chave(b) ? -1 : 1);
+  const dias = d => Math.ceil((new Date(d + "T00:00:00") - new Date(hoje + "T00:00:00")) / 86400000);
+  const fmt = d => d.split("-").reverse().slice(0,2).join("/");
+  box.innerHTML = '<div class="mi-box"><div class="mi-h">Minhas inscrições (' + lista.length + ')</div>' + lista.map((id,i) => {
+    const it = allItemsById[id].item; let sub, dd = "";
+    if(it.provaData && it.provaData >= hoje){ sub = "Prova em " + fmt(it.provaData); dd = dias(it.provaData) === 0 ? "hoje" : "em " + dias(it.provaData) + " d"; }
+    else if(it.inscricaoFim && it.inscricaoFim >= hoje){ sub = "Inscrição até " + fmt(it.inscricaoFim); dd = dias(it.inscricaoFim) === 0 ? "hoje" : "em " + dias(it.inscricaoFim) + " d"; }
+    else { sub = it.prova && !/definir/i.test(it.prova) ? "Prova: " + it.prova : (it.situacao || "Acompanhe o edital").slice(0, 70); }
+    return '<div class="mi-row" onmousedown="event.preventDefault()" onclick="openDetail(\'' + id + '\')"><span class="mi-n">' + (i+1) + '</span><span class="mi-t">' + escHtml(it.title) + '<span class="mi-s">' + escHtml(sub) + '</span></span><span class="mi-d">' + dd + '</span></div>';
+  }).join("") + '</div>';
+}
 function applyConcursoFilter(f){
+  renderMinhasInsc(f);
   document.querySelectorAll(".sort-chip").forEach(c=>c.classList.toggle("active", c.dataset.filter === f));
   const activeKeys = f === "all" ? ["abertos","emandamento","banca","anunciado"]
     : f === "previstos" ? ["banca","anunciado"]
@@ -10123,6 +10192,16 @@ function applyConcursoFilter(f){
     if(s.note) document.getElementById(s.note).style.display = visible ? "" : "none";
     if(s.fixedEmpty) document.getElementById(s.fixedEmpty).style.display = visible ? "" : "none";
   });
+  if(f === "all"){
+    Object.keys(concursoSections).forEach(key=>{
+      if(key === "encerrado") return;
+      const s = concursoSections[key]; let n = 0;
+      document.querySelectorAll(`#${s.list} .card`).forEach(c=>{ if(c.classList.contains("is-inscrita")) c.style.display = "none"; else if(c.style.display !== "none") n++; });
+      document.getElementById(s.heading).style.display = n ? "" : "none";
+      if(s.note) document.getElementById(s.note).style.display = n ? "" : "none";
+      if(s.fixedEmpty) document.getElementById(s.fixedEmpty).style.display = n ? "none" : "";
+    });
+  }
   applySearch();
   const pb = document.getElementById("perfil-busca"); if(pb) pb.style.display = (f === "all") ? "" : "none";
   { const so = f === "inscritas" || f === "encerrados";
@@ -10136,6 +10215,13 @@ function applyConcursoFilter(f){
 
 document.querySelectorAll(".sort-chip").forEach(chip=>{
   chip.addEventListener("click", ()=> applyConcursoFilter(chip.dataset.filter));
+});
+
+document.querySelectorAll("#foco-quick span").forEach(sp=>{
+  sp.addEventListener("click", ()=>{
+    document.getElementById("pomodoro-foco").value = sp.dataset.m;
+    document.querySelectorAll("#foco-quick span").forEach(x=>x.classList.toggle("on", x === sp));
+  });
 });
 
 const searchInput = document.getElementById("search-input");
