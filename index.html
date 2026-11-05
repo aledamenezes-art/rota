@@ -6465,6 +6465,14 @@ function rotinaRepTxt(r){
 // Agenda do Google lida em 04/11/2026 (próximos 14 dias). Só horário e tipo; nomes de pessoas ficam de fora.
 const GCAL_LIDA_EM = "04/11/2026";
 const GCAL_EVENTOS = [["2026-11-04","05:30","07:00","academia","Academia"],["2026-11-04","13:00","14:00","freela","Freelance"],["2026-11-04","16:00","17:00","ingles","Inglês: conversação"],["2026-11-04","17:00","23:00","estudo","Estudar"],["2026-11-05","05:30","07:00","academia","Academia"],["2026-11-05","13:00","14:00","freela","Freelance"],["2026-11-05","16:00","17:00","ingles","Inglês: Duolingo ou Anki"],["2026-11-05","17:10","20:10","aulas","Aula particular"],["2026-11-05","21:00","23:00","estudo","Estudar"],["2026-11-06","05:30","07:00","academia","Academia"],["2026-11-06","16:00","17:00","ingles","Inglês: conversação"],["2026-11-06","17:00","18:00","aulas","Preparar aulas"],["2026-11-06","17:00","23:00","estudo","Estudar"],["2026-11-09","05:30","07:00","academia","Academia"],["2026-11-09","08:00","09:00","aulas","Aula particular"],["2026-11-09","13:00","14:00","freela","Freelance"],["2026-11-09","16:00","17:00","ingles","Inglês: exercício"],["2026-11-09","17:10","20:10","aulas","Aula particular"],["2026-11-09","21:00","23:00","estudo","Estudar"],["2026-11-10","05:30","07:00","academia","Academia"],["2026-11-10","13:00","14:00","freela","Freelance"],["2026-11-10","16:00","17:00","ingles","Inglês: conversação"],["2026-11-10","17:00","23:00","estudo","Estudar"],["2026-11-11","05:30","07:00","academia","Academia"],["2026-11-11","13:00","14:00","freela","Freelance"],["2026-11-11","16:00","17:00","ingles","Inglês: conversação"],["2026-11-11","17:00","23:00","estudo","Estudar"],["2026-11-12","05:30","07:00","academia","Academia"],["2026-11-12","13:00","14:00","freela","Freelance"],["2026-11-12","16:00","17:00","ingles","Inglês: Duolingo ou Anki"],["2026-11-12","17:10","20:10","aulas","Aula particular"],["2026-11-12","21:00","23:00","estudo","Estudar"],["2026-11-13","05:30","07:00","academia","Academia"],["2026-11-13","16:00","17:00","ingles","Inglês: conversação"],["2026-11-13","17:00","18:00","aulas","Preparar aulas"],["2026-11-13","17:00","23:00","estudo","Estudar"],["2026-11-16","05:30","07:00","academia","Academia"],["2026-11-16","08:00","09:00","aulas","Aula particular"],["2026-11-16","13:00","14:00","freela","Freelance"],["2026-11-16","16:00","17:00","ingles","Inglês: exercício"],["2026-11-16","17:10","20:10","aulas","Aula particular"],["2026-11-16","21:00","23:00","estudo","Estudar"],["2026-11-17","05:30","07:00","academia","Academia"],["2026-11-17","13:00","14:00","freela","Freelance"],["2026-11-17","16:00","17:00","ingles","Inglês: conversação"],["2026-11-17","17:00","23:00","estudo","Estudar"]];
+GCAL_EVENTOS.push(["2026-11-05","21:00","23:00","estudo","Rota: Português"],["2026-11-06","19:00","21:00","estudo","Rota: Direito Constitucional"],["2026-11-07","09:00","11:00","estudo","Rota: Direito Administrativo"],["2026-11-09","21:00","23:00","estudo","Rota: Raciocínio Lógico"],["2026-11-10","19:00","21:00","estudo","Rota: Administração Pública"],["2026-11-11","19:00","21:00","estudo","Rota: Informática e Atualidades"],["2026-11-12","21:00","23:00","estudo","Rota: AFO e Direito Financeiro"],["2026-11-13","19:00","21:00","estudo","Rota: Ética e Controle Externo"],["2026-11-14","09:00","11:00","estudo","Rota: Português"],["2026-11-16","21:00","23:00","estudo","Rota: Direito Constitucional"],["2026-11-17","19:00","21:00","estudo","Rota: Direito Administrativo"],["2026-11-18","19:00","21:00","estudo","Rota: Raciocínio Lógico"]);
+const CICLO_LISTA = ["Português","Direito Constitucional","Direito Administrativo","Raciocínio Lógico","Administração Pública","Informática e Atualidades","AFO e Direito Financeiro","Ética e Controle Externo"];
+function cicloPtr(){ const n = CICLO_LISTA.length; return (((study.cicloPtr || 0) % n) + n) % n; }
+function blocoDeHoje(){
+  const iso = isoOfDate(new Date());
+  const e = GCAL_EVENTOS.find(x => x[0] === iso && x[3] === "estudo" && /^Rota/.test(x[4]));
+  return e ? e[1] + " às " + e[2] : "";
+}
 function gcalDoDia(d){
   const iso = isoOfDate(d);
   return GCAL_EVENTOS.filter(e => e[0] === iso).map(e => ({ inicio:e[1], fim:e[2], tipo:e[3], label:e[4], g:true }));
@@ -6874,7 +6882,7 @@ function prepOf(id){
   if(!Array.isArray(p.dias) || !p.dias.length) p.dias = [1,2,3,4,5,6];
   if(!Array.isArray(p.simulados)) p.simulados = [];
   if(!p.rac || typeof p.rac !== "object") p.rac = {};
-  if(!p.horas) p.horas = Math.max(1, Math.round(((study.goalHours || 10) / 6) * 2) / 2);
+  if(!p.horas) p.horas = Math.max(1, 2);
   return p;
 }
 function prepPrecisaCargo(itemId){
@@ -7322,7 +7330,7 @@ function renderEstudoCronograma(openWeeks){
   }
   const done = prepOf("_geral").done;
   const todayIso = isoLocal(new Date());
-  const h = study.dailyHours || Math.round(((study.goalHours || 10) / 6) * 2) / 2;
+  const h = study.dailyHours || 2;
   const hojeEv = g.days.find(d => d.iso === todayIso);
   renderEstudoHoje(g);
   const sem = [];
@@ -7386,7 +7394,7 @@ function hojeLog(m, min){
   const g = prepGeral();
   const ev = g && g.days.find(d => d.iso === iso);
   if(ev && !ev.rev){
-    const hh = study.dailyHours || Math.round(((study.goalHours || 10) / 6) * 2) / 2;
+    const hh = study.dailyHours || 2;
     const feito = study.logs.filter(l => l.date === iso && l.materia === ev.nome).reduce((a,l) => a + l.minutes, 0);
     const dn = prepOf("_geral").done;
     if(feito >= hh * 60 && !dn[iso]){ dn[iso] = true; savePrep(); renderWeekStrip(); }
@@ -7411,18 +7419,37 @@ function sessaoHoje(){
   if(!study.sessao || study.sessao.date !== iso) study.sessao = { date: iso, done: {} };
   return study.sessao;
 }
+function hjFechaSessao(){
+  const s = sessaoHoje();
+  const todos = ["rev","teo","q","reg"].every(k => s.done[k]);
+  if(todos && !s.fechada){
+    s.fechada = true;
+    study.cicloPtr = cicloPtr() + 1;
+    study.logs.push({ hora: new Date().getHours(), id: Date.now() + "-" + Math.random().toString(36).slice(2,7), date: s.date, minutes: s.alvo || 120, materia: s.mat || "Estudo geral" });
+  } else if(!todos && s.fechada){
+    s.fechada = false;
+    study.cicloPtr = cicloPtr() - 1;
+    const i = study.logs.map(l => l.date === s.date && l.materia === s.mat && l.minutes === (s.alvo || 120)).lastIndexOf(true);
+    if(i >= 0) study.logs.splice(i, 1);
+  }
+}
 function hjToggleSessao(k){
   const s = sessaoHoje(); s.done[k] = !s.done[k];
-  saveState("concursos-rj-estudos", study); renderEstudoHoje();
+  hjFechaSessao();
+  saveState("concursos-rj-estudos", study); hjAfterChange();
 }
 function hjSalvaParou(mat){
   const v = (document.getElementById("ss-parou-in") || {}).value || "";
   study.parou = study.parou || {}; study.parou[mat] = v.trim();
   const s = sessaoHoje(); s.done.reg = !!v.trim();
-  saveState("concursos-rj-estudos", study); renderEstudoHoje();
+  hjFechaSessao();
+  saveState("concursos-rj-estudos", study); hjAfterChange();
 }
 function hjSessaoHtml(mat, alvo, dueRev){
   const s = sessaoHoje();
+  if(!s.fechada){ s.mat = mat; s.alvo = alvo; }
+  const ptr = cicloPtr(), prox3 = [1,2,3].map(i => CICLO_LISTA[(ptr + i) % CICLO_LISTA.length]);
+  const hrs = blocoDeHoje();
   const r5 = n => Math.max(5, Math.round(n / 5) * 5);
   const m = { rev: r5(alvo * .125), reg: r5(alvo * .08), q: r5(alvo * .29) };
   m.teo = Math.max(5, alvo - m.rev - m.reg - m.q);
@@ -7432,9 +7459,9 @@ function hjSessaoHtml(mat, alvo, dueRev){
   const row = (k, min, t, sub) => `<div class="ss-row${s.done[k] ? " ok" : ""}" onmousedown="event.preventDefault()" onclick="hjToggleSessao('${k}')"><div class="ss-min">${min}<small> min</small></div><div class="ss-t">${t}<span>${sub}</span></div><div class="ss-ck">${s.done[k] ? "✓" : ""}</div></div>`;
   const feitos = Object.keys(s.done).filter(k => s.done[k]).length;
   return `<div class="hj-card">
-    <div class="hj-tag">SESSÃO DE HOJE · ${feitos} DE 4</div>
+    <div class="hj-tag">SESSÃO DE HOJE${hrs ? " · " + hrs : ""} · ${feitos} DE 4</div>
     <div class="hj-title" style="margin-bottom:2px">${escHtml(mat)}</div>
-    <div class="ss-tot">${hjFmt(alvo)} no total. Perdeu um dia? Siga para a próxima matéria, sem compensar.</div>
+    <div class="ss-tot">${hjFmt(alvo)} no total. Depois: ${prox3.map(escHtml).join(", ")}. Perdeu um dia? Siga a lista, sem compensar.</div>
     ${row("rev", m.rev, "Revisão", dueRev.length ? dueRev.length + " para hoje" : "Releia o que viu ontem")}
     ${row("teo", m.teo, "Teoria", prox ? "Próximo tópico: " + escHtml(prox.nome) : "Um assunto novo")}
     ${row("q", m.q, "Questões", "15 questões e analise os erros")}
@@ -7462,7 +7489,7 @@ function hjTrocaMateria(){
 }
 function hjHeroHtml(){
   const agora = new Date(), iso = isoOfDate(agora);
-  const hh = study.dailyHours || Math.round(((study.goalHours || 10) / 6) * 2) / 2;
+  const hh = study.dailyHours || 2;
   const alvo = Math.round(hh * 60);
   const minHoje = study.logs.filter(l => l.date === iso).reduce((a,l) => a + l.minutes, 0);
   const pctDia = Math.min(100, Math.round(minHoje / Math.max(1, alvo) * 100));
@@ -7483,7 +7510,7 @@ function renderEstudoHoje(g){
   if(!top || !bot) return;
   if(g === undefined) g = prepGeral();
   const agora = new Date(), iso = isoOfDate(agora);
-  const hh = study.dailyHours || Math.round(((study.goalHours || 10) / 6) * 2) / 2;
+  const hh = study.dailyHours || 2;
   const alvo = Math.round(hh * 60);
   const logsHoje = study.logs.filter(l => l.date === iso);
   const minHoje = logsHoje.reduce((a,l) => a + l.minutes, 0);
@@ -7540,10 +7567,11 @@ function renderEstudoHoje(g){
   const nq = study.errors.filter(e => e.date === iso).length;
   const nqOk = study.errors.filter(e => e.date === iso && e.tipo === "certo").length;
   const metaQ = study.goalQuestoes ? Math.ceil(study.goalQuestoes / 7) : 0;
-  const mats = [];
+  const mats = [CICLO_LISTA[cicloPtr()]];
   if(ev && !ev.rev) mats.push(ev.nome);
   study.cycle.forEach(c => { if(!mats.includes(c.materia)) mats.push(c.materia); });
   if(g) g.lista.slice(0, 8).forEach(m => { if(!mats.includes(m.nome)) mats.push(m.nome); });
+  CICLO_LISTA.forEach(m => { if(!mats.includes(m)) mats.push(m); });
   mats.push("Estudo geral");
   const dueRev = study.reviews.filter(r => r.dueDate <= iso);
   const dueFl = dueFlashcards().length;
@@ -7566,7 +7594,7 @@ function renderEstudoHoje(g){
       <select class="field-input" id="hj-q-ass" style="margin-top:8px;width:100%">${hjAssuntosOpts(mats[0])}</select>
       <button class="btn primary" style="width:100%;margin-top:8px" onmousedown="event.preventDefault()" onclick="hojeQuestoes()">Registrar questões</button>
     </div>
-    ${hjSessaoHtml((ev && !ev.rev) ? ev.nome : ((study.cycle[study.cycleActiveIndex] || study.cycle[0] || {}).materia || mats[0]), alvo, dueRev)}
+    ${hjSessaoHtml(CICLO_LISTA[cicloPtr()], alvo, dueRev)}
     ${(()=>{ const c = editalProgressCounts(); if(!c.total) return ""; const p = Math.round(c.concluidos / c.total * 100); return `<div class="hj-card"><div class="hj-tag">EDITAL</div><div class="ed-card"><div class="ed-ring" style="background:conic-gradient(var(--mint-deep) ${p * 3.6}deg, var(--line) 0)"><i>${p}%</i></div><div style="flex:1"><div class="hj-title" style="margin:0">${c.concluidos} de ${c.total} tópicos vistos</div><div class="hj-sub" style="margin-top:4px">Ao marcar um tópico, a revisão aparece sozinha em 1, 7 e 21 dias.</div></div></div><button class="btn" style="width:100%;margin-top:8px" onmousedown="event.preventDefault()" onclick="setStudySeg('mais'); setTimeout(()=>scrollToEstudos('study-subjects-list'), 80)">Abrir tópicos por matéria</button></div>`; })()}
     <div class="hj-card">
       <div class="hj-tag">PARA REVISAR HOJE</div>
@@ -7602,7 +7630,7 @@ function renderInicioHoje0(g, ev){
   if(g === undefined) g = prepGeral();
   const iso = isoOfDate(new Date());
   if(ev === undefined) ev = g ? g.days.find(d => d.iso === iso) : null;
-  const hh = study.dailyHours || Math.round(((study.goalHours || 10) / 6) * 2) / 2, alvo = Math.round(hh * 60);
+  const hh = study.dailyHours || 2, alvo = Math.round(hh * 60);
   const min = study.logs.filter(l => l.date === iso).reduce((a,l) => a + l.minutes, 0);
   const pct = Math.min(100, Math.round(min / Math.max(1, alvo) * 100));
   const hero = `<div style="margin-top:14px"></div>` + hjHeroHtml();
