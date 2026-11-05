@@ -3718,6 +3718,13 @@ function itemTemRio(it){
   if((it.estado||"RJ").toUpperCase()!=="NACIONAL") return true;
   return /Rio de Janeiro|\(Capital\)|Sede no Rio/i.test(it.cidade||"") || /IBGE|BACEN|Banco Central|TCU:|EBSERH|DPU|AGU/i.test(it.title||"");
 }
+// Filtro Rio capital: concurso de outro município do RJ (Niterói, Queimados, Petrópolis etc.) fica de fora.
+function itemEhOutroMunicipioRJ(it){
+  if((it.estado||"RJ").toUpperCase()!=="RJ") return false;
+  const c = it.cidade||"";
+  if(!c || /Rio de Janeiro|Capital/i.test(c)) return false;
+  return true;
+}
 function itemFechado(it){ return it.badgeType === "encerrado"; }
 function itemServeFormacao(it, formacao){
   if(!formacao || it.destaque) return true;
@@ -3746,6 +3753,7 @@ function passesProfile(item, soEncerrados){
   if(profile.area && profile.area.trim() && item.area && item.area.toLowerCase() !== profile.area.trim().toLowerCase()) return false;
   if(profile.estados.length && item.estado && item.estado.toUpperCase()!=="NACIONAL" && !profile.estados.includes(item.estado.toUpperCase())) return false;
   if(soRioCapital() && !itemTemRio(item) && !inscritoIds.includes(slugify(item.title)) && !favIds.includes(slugify(item.title))) return false;
+  if(soRioCapital() && itemEhOutroMunicipioRJ(item) && !inscritoIds.includes(slugify(item.title)) && !favIds.includes(slugify(item.title))) return false;
   if(profile.niveis.length && item.nivel && !/^a definir/i.test(item.nivel)){
     const ok = profile.niveis.some(n => item.nivel.includes(n));
     if(!ok) return false;
