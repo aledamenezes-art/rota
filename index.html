@@ -1352,6 +1352,29 @@
   .foco-quick{ display:flex; gap:8px; margin:8px 0 2px; }
   .foco-quick span{ flex:1; text-align:center; font-size:12px; font-weight:800; padding:6px 0; border-radius:10px; border:1.5px solid var(--line); background:var(--bg); color:var(--ink-soft); cursor:pointer; }
   .foco-quick span.on{ background:var(--blue-bg); border-color:var(--blue-deep); color:var(--blue-deep); }
+  /* Rotina mais bonita + sessão do dia */
+  .rv-nav button{ box-shadow:var(--shadow-sm); }
+  .rv-tit{ font-family:var(--serif); font-size:16px; }
+  .rw-wrap{ background:var(--card); border:1px solid var(--line); border-radius:18px; padding:10px 8px 8px; box-shadow:var(--shadow-sm); }
+  .rw-col{ border-radius:10px; background-color:var(--bg); }
+  .rw-b{ border-radius:8px; border-left-width:4px; box-shadow:0 1px 2px rgba(36,30,32,.08); }
+  .rw-b span{ font-size:9px; color:var(--ink); }
+  .rw-h.hoje b{ background:var(--vinho); }
+  .rl-leg{ display:flex; flex-wrap:wrap; gap:6px 12px; margin-top:10px; font-size:11px; font-weight:700; color:var(--ink-soft); }
+  .rl-leg i{ display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:5px; }
+  .gcal-nota{ font-size:11.5px; font-weight:700; color:var(--ink-soft); margin:8px 2px 0; }
+  .ss-tot{ font-size:12px; font-weight:700; color:var(--ink-soft); margin:2px 0 10px; }
+  .ss-row{ display:flex; align-items:center; gap:12px; padding:10px 12px; border:1px solid var(--line); border-radius:14px; margin-top:8px; background:var(--card); cursor:pointer; }
+  .ss-row:nth-child(even){ background:var(--blue-bg); border-color:transparent; }
+  .ss-min{ flex:0 0 54px; font-size:20px; font-weight:800; letter-spacing:-.02em; color:var(--ink); }
+  .ss-min small{ font-size:11px; font-weight:700; color:var(--ink-soft); }
+  .ss-t{ flex:1; min-width:0; font-size:13.5px; font-weight:800; line-height:1.25; }
+  .ss-t span{ display:block; font-size:12px; font-weight:600; color:var(--ink-soft); margin-top:2px; }
+  .ss-ck{ flex:0 0 24px; height:24px; border-radius:8px; border:2px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:14px; color:#fff; background:var(--card); }
+  .ss-row.ok .ss-ck{ background:var(--mint-deep); border-color:var(--mint-deep); }
+  .ss-row.ok .ss-t{ text-decoration:line-through; color:var(--ink-soft); }
+  .ss-parou{ display:flex; gap:8px; margin-top:8px; }
+  .ss-parou input{ flex:1; min-width:0; }
   .hj-qform{ display:grid; grid-template-columns:1fr 70px 88px; gap:8px; margin-top:12px; }
   .hj-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:11px 0; border-top:1px solid var(--line); margin-top:8px; }
   .hj-row b{ display:block; font-size:14px; }
@@ -6439,11 +6462,23 @@ function rotinaRepTxt(r){
   if(r.rep === "m") return "todo mês, dia " + (r.ini ? new Date(r.ini + "T00:00:00").getDate() : "");
   return "toda semana";
 }
+// Agenda do Google lida em 04/11/2026 (próximos 14 dias). Só horário e tipo; nomes de pessoas ficam de fora.
+const GCAL_LIDA_EM = "04/11/2026";
+const GCAL_EVENTOS = [["2026-11-04","05:30","07:00","academia","Academia"],["2026-11-04","13:00","14:00","freela","Freelance"],["2026-11-04","16:00","17:00","ingles","Inglês: conversação"],["2026-11-04","17:00","23:00","estudo","Estudar"],["2026-11-05","05:30","07:00","academia","Academia"],["2026-11-05","13:00","14:00","freela","Freelance"],["2026-11-05","16:00","17:00","ingles","Inglês: Duolingo ou Anki"],["2026-11-05","17:10","20:10","aulas","Aula particular"],["2026-11-05","21:00","23:00","estudo","Estudar"],["2026-11-06","05:30","07:00","academia","Academia"],["2026-11-06","16:00","17:00","ingles","Inglês: conversação"],["2026-11-06","17:00","18:00","aulas","Preparar aulas"],["2026-11-06","17:00","23:00","estudo","Estudar"],["2026-11-09","05:30","07:00","academia","Academia"],["2026-11-09","08:00","09:00","aulas","Aula particular"],["2026-11-09","13:00","14:00","freela","Freelance"],["2026-11-09","16:00","17:00","ingles","Inglês: exercício"],["2026-11-09","17:10","20:10","aulas","Aula particular"],["2026-11-09","21:00","23:00","estudo","Estudar"],["2026-11-10","05:30","07:00","academia","Academia"],["2026-11-10","13:00","14:00","freela","Freelance"],["2026-11-10","16:00","17:00","ingles","Inglês: conversação"],["2026-11-10","17:00","23:00","estudo","Estudar"],["2026-11-11","05:30","07:00","academia","Academia"],["2026-11-11","13:00","14:00","freela","Freelance"],["2026-11-11","16:00","17:00","ingles","Inglês: conversação"],["2026-11-11","17:00","23:00","estudo","Estudar"],["2026-11-12","05:30","07:00","academia","Academia"],["2026-11-12","13:00","14:00","freela","Freelance"],["2026-11-12","16:00","17:00","ingles","Inglês: Duolingo ou Anki"],["2026-11-12","17:10","20:10","aulas","Aula particular"],["2026-11-12","21:00","23:00","estudo","Estudar"],["2026-11-13","05:30","07:00","academia","Academia"],["2026-11-13","16:00","17:00","ingles","Inglês: conversação"],["2026-11-13","17:00","18:00","aulas","Preparar aulas"],["2026-11-13","17:00","23:00","estudo","Estudar"],["2026-11-16","05:30","07:00","academia","Academia"],["2026-11-16","08:00","09:00","aulas","Aula particular"],["2026-11-16","13:00","14:00","freela","Freelance"],["2026-11-16","16:00","17:00","ingles","Inglês: exercício"],["2026-11-16","17:10","20:10","aulas","Aula particular"],["2026-11-16","21:00","23:00","estudo","Estudar"],["2026-11-17","05:30","07:00","academia","Academia"],["2026-11-17","13:00","14:00","freela","Freelance"],["2026-11-17","16:00","17:00","ingles","Inglês: conversação"],["2026-11-17","17:00","23:00","estudo","Estudar"]];
+function gcalDoDia(d){
+  const iso = isoOfDate(d);
+  return GCAL_EVENTOS.filter(e => e[0] === iso).map(e => ({ inicio:e[1], fim:e[2], tipo:e[3], label:e[4], g:true }));
+}
+function ocupadosDoDia(d){
+  const r = routine.filter(x => rotinaOcorre(x, d)).map(x => ({ inicio:x.inicio, fim:x.fim, label:x.label || "Compromisso fixo" }));
+  const g = gcalDoDia(d).filter(e => e.tipo !== "estudo").map(e => ({ inicio:e.inicio, fim:e.fim, label:e.label }));
+  return r.concat(g).sort((a,b) => minutesOf(a.inicio) - minutesOf(b.inicio));
+}
 function freeSlotsToday(){
   const DAY_START = minutesOf("07:00");
   const DAY_END = minutesOf("22:00");
   const dow = new Date().getDay();
-  const busy = routine.filter(r=>rotinaOcorre(r, new Date())).map(r=>({ ini:minutesOf(r.inicio), fim:minutesOf(r.fim) })).sort((a,b)=>a.ini-b.ini);
+  const busy = ocupadosDoDia(new Date()).map(r=>({ ini:minutesOf(r.inicio), fim:minutesOf(r.fim) }));
   const slots = [];
   let cursor = DAY_START;
   busy.forEach(b=>{
@@ -7371,6 +7406,42 @@ function hojeQuestoes(){
   hjAfterChange();
 }
 function hojeIrPara(seg){ setStudySeg(seg); window.scrollTo(0,0); }
+function sessaoHoje(){
+  const iso = isoOfDate(new Date());
+  if(!study.sessao || study.sessao.date !== iso) study.sessao = { date: iso, done: {} };
+  return study.sessao;
+}
+function hjToggleSessao(k){
+  const s = sessaoHoje(); s.done[k] = !s.done[k];
+  saveState("concursos-rj-estudos", study); renderEstudoHoje();
+}
+function hjSalvaParou(mat){
+  const v = (document.getElementById("ss-parou-in") || {}).value || "";
+  study.parou = study.parou || {}; study.parou[mat] = v.trim();
+  const s = sessaoHoje(); s.done.reg = !!v.trim();
+  saveState("concursos-rj-estudos", study); renderEstudoHoje();
+}
+function hjSessaoHtml(mat, alvo, dueRev){
+  const s = sessaoHoje();
+  const r5 = n => Math.max(5, Math.round(n / 5) * 5);
+  const m = { rev: r5(alvo * .125), reg: r5(alvo * .08), q: r5(alvo * .29) };
+  m.teo = Math.max(5, alvo - m.rev - m.reg - m.q);
+  const subj = study.subjects.find(x => x.materiaNome === mat);
+  const prox = subj ? subj.topicos.find(t => !t.concluido) : null;
+  const parou = (study.parou || {})[mat] || "";
+  const row = (k, min, t, sub) => `<div class="ss-row${s.done[k] ? " ok" : ""}" onmousedown="event.preventDefault()" onclick="hjToggleSessao('${k}')"><div class="ss-min">${min}<small> min</small></div><div class="ss-t">${t}<span>${sub}</span></div><div class="ss-ck">${s.done[k] ? "✓" : ""}</div></div>`;
+  const feitos = Object.keys(s.done).filter(k => s.done[k]).length;
+  return `<div class="hj-card">
+    <div class="hj-tag">SESSÃO DE HOJE · ${feitos} DE 4</div>
+    <div class="hj-title" style="margin-bottom:2px">${escHtml(mat)}</div>
+    <div class="ss-tot">${hjFmt(alvo)} no total. Perdeu um dia? Siga para a próxima matéria, sem compensar.</div>
+    ${row("rev", m.rev, "Revisão", dueRev.length ? dueRev.length + " para hoje" : "Releia o que viu ontem")}
+    ${row("teo", m.teo, "Teoria", prox ? "Próximo tópico: " + escHtml(prox.nome) : "Um assunto novo")}
+    ${row("q", m.q, "Questões", "15 questões e analise os erros")}
+    ${row("reg", m.reg, "Registro", parou ? "Parei em: " + escHtml(parou) : "Onde parei, acertos, o que revisar")}
+    <div class="ss-parou"><input class="field-input" id="ss-parou-in" placeholder="Onde eu parei?" value="${escHtml(parou)}"><button class="btn" onmousedown="event.preventDefault()" onclick="hjSalvaParou('${mat.replace(/'/g, "\\'")}')">Salvar</button></div>
+  </div>`;
+}
 function hjChipsExtra(){
   const iso = isoOfDate(new Date());
   const rev = study.reviews.filter(r => r.dueDate <= iso).length;
@@ -7495,6 +7566,7 @@ function renderEstudoHoje(g){
       <select class="field-input" id="hj-q-ass" style="margin-top:8px;width:100%">${hjAssuntosOpts(mats[0])}</select>
       <button class="btn primary" style="width:100%;margin-top:8px" onmousedown="event.preventDefault()" onclick="hojeQuestoes()">Registrar questões</button>
     </div>
+    ${hjSessaoHtml((ev && !ev.rev) ? ev.nome : ((study.cycle[study.cycleActiveIndex] || study.cycle[0] || {}).materia || mats[0]), alvo, dueRev)}
     ${(()=>{ const c = editalProgressCounts(); if(!c.total) return ""; const p = Math.round(c.concluidos / c.total * 100); return `<div class="hj-card"><div class="hj-tag">EDITAL</div><div class="ed-card"><div class="ed-ring" style="background:conic-gradient(var(--mint-deep) ${p * 3.6}deg, var(--line) 0)"><i>${p}%</i></div><div style="flex:1"><div class="hj-title" style="margin:0">${c.concluidos} de ${c.total} tópicos vistos</div><div class="hj-sub" style="margin-top:4px">Ao marcar um tópico, a revisão aparece sozinha em 1, 7 e 21 dias.</div></div></div><button class="btn" style="width:100%;margin-top:8px" onmousedown="event.preventDefault()" onclick="setStudySeg('mais'); setTimeout(()=>scrollToEstudos('study-subjects-list'), 80)">Abrir tópicos por matéria</button></div>`; })()}
     <div class="hj-card">
       <div class="hj-tag">PARA REVISAR HOJE</div>
@@ -9039,7 +9111,7 @@ function prepZerar(itemId){
 function dayTimelineBlocks(dow, dateObj){
   const DAY_START = minutesOf("07:00");
   const DAY_END = minutesOf("22:00");
-  const busy = routine.filter(r=>rotinaOcorre(r, dateObj || new Date()))
+  const busy = ocupadosDoDia(dateObj || new Date())
     .map(r=>({ ini:minutesOf(r.inicio), fim:minutesOf(r.fim), label: r.label || "Compromisso fixo" }))
     .sort((a,b)=>a.ini-b.ini);
   const blocks = [];
@@ -9370,11 +9442,11 @@ function renderRotinaCores(){
   }).join("");
 }
 function rotinaLegenda(){
-  const usadas = [...new Set(routine.map(rotinaAreaDe))];
+  const usadas = [...new Set(routine.concat(GCAL_EVENTOS.map(e => ({ label:e[4], area:e[3] === "estudo" ? "concurso" : e[3] }))).map(rotinaAreaDe))];
   return `<div class="rl-leg">${usadas.map(id=>{ const c = rotinaCorDe(id); return `<span><i style="background:${c.bar}"></i>${c.nome}</span>`; }).join("")}</div>`;
 }
 function rotinaBlocosDoDia(d){
-  return routine.filter(r=>rotinaOcorre(r, d)).sort((a,b)=>minutesOf(a.inicio) - minutesOf(b.inicio));
+  return routine.filter(r=>rotinaOcorre(r, d)).concat(gcalDoDia(d)).sort((a,b)=>minutesOf(a.inicio) - minutesOf(b.inicio));
 }
 const RV_MES = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
 const RV_DIA = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
@@ -9402,7 +9474,7 @@ function rotinaSemanaHtml(){
     return `<div class="rw-col" style="height:${altura}px">${blocos}</div>`;
   }).join("");
   const eixo = horas.map(m=>`<div style="height:${H}px">${String(m/60).padStart(2,"0")}h</div>`).join("");
-  return rotinaNavHtml(titulo) + `<div class="rw-wrap"><div class="rw-head"><div></div>${head}</div><div class="rw-body" style="--rwH:${H}px"><div class="rw-eixo">${eixo}</div>${cols}</div></div>` + rotinaLegenda();
+  return rotinaNavHtml(titulo) + `<div class="gcal-nota" style="margin:0 2px 8px">📅 Inclui sua agenda do Google lida em ${GCAL_LIDA_EM}</div><div class="rw-wrap"><div class="rw-head"><div></div>${head}</div><div class="rw-body" style="--rwH:${H}px"><div class="rw-eixo">${eixo}</div>${cols}</div></div>` + rotinaLegenda();
 }
 function rotinaDiaHtml(){
   const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate() + rotinaOff);
