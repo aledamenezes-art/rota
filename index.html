@@ -1898,6 +1898,20 @@
   .rd-presets{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
   .rd-presets button.on{background:#702A55;color:#fff;border-color:#702A55}
   .rd-presets button{padding:7px 11px;border-radius:999px;border:1.5px solid #D9B4C8;background:#F3E4EC;color:#702A55;font-weight:700;font-size:12px}
+
+  /* ====== Menos informação: telas limpas ====== */
+  .mast-title,.mast-sub,.insight-strip{ display:none !important; }
+  #panel-inicio .ps-home,#panel-inicio #como-usar,#inicio-frase,#resumo-row,#inicio-roteiro,#inicio-study-widgets,#list-freeslots,#empty-freeslots,#freeslots-head,#today-label,#inicio-ver-concursos{ display:none !important; }
+  #panel-inicio .section-label:has(+ #inicio-study-widgets){ display:none !important; }
+  #inicio-hoje .hj-card.main{ display:none; }
+  #fit-resumo,#perfil-busca .fit-resumo,#panel-concursos .section-note{ display:none !important; }
+  .inicio-start{ width:100%; margin:0 0 14px; text-align:center; }
+  #panel-estudos:not(.hj-mais-on) .hj-extra,
+  #panel-estudos:not(.hj-mais-on) .study-card[data-seg="hoje"]:not(.timer-card){ display:none; }
+  #panel-estudos .timer-card:has(#timer-idle:not(.hidden)){ display:none; }
+  #panel-estudos .timer-card.show-idle{ display:block !important; }
+  .hj-toggle{ width:100%; text-align:center; margin:0 0 12px; }
+  body[data-tab="inicio"] #stats, body[data-tab="inicio"] .stats-hint{ display:none !important; }
 </style>
 </head>
 <body data-tab="inicio">
@@ -1947,6 +1961,7 @@
     <div class="resumo-row" id="resumo-row"></div>
 
     <div id="inicio-hoje"></div>
+    <button class="btn primary inicio-start" id="inicio-start-btn" onmousedown="event.preventDefault()" onclick="irEstudosHoje()">▶ Estudar hoje</button>
 
     <div id="inicio-roteiro"></div>
 
@@ -6465,13 +6480,17 @@ function rotinaRepTxt(r){
 // Agenda do Google lida em 04/11/2026 (próximos 14 dias). Só horário e tipo; nomes de pessoas ficam de fora.
 const GCAL_LIDA_EM = "04/11/2026";
 const GCAL_EVENTOS = [["2026-11-04","05:30","07:00","academia","Academia"],["2026-11-04","13:00","14:00","freela","Freelance"],["2026-11-04","16:00","17:00","ingles","Inglês: conversação"],["2026-11-04","17:00","23:00","estudo","Estudar"],["2026-11-05","05:30","07:00","academia","Academia"],["2026-11-05","13:00","14:00","freela","Freelance"],["2026-11-05","16:00","17:00","ingles","Inglês: Duolingo ou Anki"],["2026-11-05","17:10","20:10","aulas","Aula particular"],["2026-11-05","21:00","23:00","estudo","Estudar"],["2026-11-06","05:30","07:00","academia","Academia"],["2026-11-06","16:00","17:00","ingles","Inglês: conversação"],["2026-11-06","17:00","18:00","aulas","Preparar aulas"],["2026-11-06","17:00","23:00","estudo","Estudar"],["2026-11-09","05:30","07:00","academia","Academia"],["2026-11-09","08:00","09:00","aulas","Aula particular"],["2026-11-09","13:00","14:00","freela","Freelance"],["2026-11-09","16:00","17:00","ingles","Inglês: exercício"],["2026-11-09","17:10","20:10","aulas","Aula particular"],["2026-11-09","21:00","23:00","estudo","Estudar"],["2026-11-10","05:30","07:00","academia","Academia"],["2026-11-10","13:00","14:00","freela","Freelance"],["2026-11-10","16:00","17:00","ingles","Inglês: conversação"],["2026-11-10","17:00","23:00","estudo","Estudar"],["2026-11-11","05:30","07:00","academia","Academia"],["2026-11-11","13:00","14:00","freela","Freelance"],["2026-11-11","16:00","17:00","ingles","Inglês: conversação"],["2026-11-11","17:00","23:00","estudo","Estudar"],["2026-11-12","05:30","07:00","academia","Academia"],["2026-11-12","13:00","14:00","freela","Freelance"],["2026-11-12","16:00","17:00","ingles","Inglês: Duolingo ou Anki"],["2026-11-12","17:10","20:10","aulas","Aula particular"],["2026-11-12","21:00","23:00","estudo","Estudar"],["2026-11-13","05:30","07:00","academia","Academia"],["2026-11-13","16:00","17:00","ingles","Inglês: conversação"],["2026-11-13","17:00","18:00","aulas","Preparar aulas"],["2026-11-13","17:00","23:00","estudo","Estudar"],["2026-11-16","05:30","07:00","academia","Academia"],["2026-11-16","08:00","09:00","aulas","Aula particular"],["2026-11-16","13:00","14:00","freela","Freelance"],["2026-11-16","16:00","17:00","ingles","Inglês: exercício"],["2026-11-16","17:10","20:10","aulas","Aula particular"],["2026-11-16","21:00","23:00","estudo","Estudar"],["2026-11-17","05:30","07:00","academia","Academia"],["2026-11-17","13:00","14:00","freela","Freelance"],["2026-11-17","16:00","17:00","ingles","Inglês: conversação"],["2026-11-17","17:00","23:00","estudo","Estudar"]];
-GCAL_EVENTOS.push(["2026-11-05","21:00","23:00","estudo","Rota: Português"],["2026-11-06","19:00","21:00","estudo","Rota: Direito Constitucional"],["2026-11-07","09:00","11:00","estudo","Rota: Direito Administrativo"],["2026-11-09","21:00","23:00","estudo","Rota: Raciocínio Lógico"],["2026-11-10","19:00","21:00","estudo","Rota: Administração Pública"],["2026-11-11","19:00","21:00","estudo","Rota: Informática e Atualidades"],["2026-11-12","21:00","23:00","estudo","Rota: AFO e Direito Financeiro"],["2026-11-13","19:00","21:00","estudo","Rota: Ética e Controle Externo"],["2026-11-14","09:00","11:00","estudo","Rota: Português"],["2026-11-16","21:00","23:00","estudo","Rota: Direito Constitucional"],["2026-11-17","19:00","21:00","estudo","Rota: Direito Administrativo"],["2026-11-18","19:00","21:00","estudo","Rota: Raciocínio Lógico"]);
+const MAT_DIA = {"2026-11-05":"Português","2026-11-06":"Direito Constitucional","2026-11-09":"Direito Administrativo","2026-11-10":"Raciocínio Lógico","2026-11-11":"Administração Pública","2026-11-12":"Informática e Atualidades","2026-11-13":"AFO e Direito Financeiro","2026-11-16":"Ética e Controle Externo","2026-11-17":"Português","2026-11-18":"Direito Constitucional"};
+GCAL_EVENTOS.push(["2026-11-18","17:00","23:00","estudo","Estudar"]);
+GCAL_EVENTOS.forEach(e => { if(e[3] === "estudo" && MAT_DIA[e[0]]) e[4] = "Estudar: " + MAT_DIA[e[0]]; });
 const CICLO_LISTA = ["Português","Direito Constitucional","Direito Administrativo","Raciocínio Lógico","Administração Pública","Informática e Atualidades","AFO e Direito Financeiro","Ética e Controle Externo"];
 function cicloPtr(){ const n = CICLO_LISTA.length; return (((study.cicloPtr || 0) % n) + n) % n; }
 function blocoDeHoje(){
   const iso = isoOfDate(new Date());
-  const e = GCAL_EVENTOS.find(x => x[0] === iso && x[3] === "estudo" && /^Rota/.test(x[4]));
-  return e ? e[1] + " às " + e[2] : "";
+  const e = GCAL_EVENTOS.find(x => x[0] === iso && x[3] === "estudo" && /^Estudar:/.test(x[4]));
+  if(!e) return "";
+  const fim = Math.min(minutesOf(e[2]), minutesOf(e[1]) + 120);
+  return e[1] + " às " + hhmmOf(fim);
 }
 function gcalDoDia(d){
   const iso = isoOfDate(d);
@@ -7461,6 +7480,7 @@ function hjSessaoHtml(mat, alvo, dueRev){
   return `<div class="hj-card">
     <div class="hj-tag">SESSÃO DE HOJE${hrs ? " · " + hrs : ""} · ${feitos} DE 4</div>
     <div class="hj-title" style="margin-bottom:2px">${escHtml(mat)}</div>
+    <button class="btn primary" style="width:100%;margin:8px 0 6px;text-align:center" onmousedown="event.preventDefault()" onclick="startTimerHoje(this.dataset.m)" data-m="${escHtml(mat)}">▶ Começar sessão</button>
     <div class="ss-tot">${hjFmt(alvo)} no total. Depois: ${prox3.map(escHtml).join(", ")}. Perdeu um dia? Siga a lista, sem compensar.</div>
     ${row("rev", m.rev, "Revisão", dueRev.length ? dueRev.length + " para hoje" : "Releia o que viu ontem")}
     ${row("teo", m.teo, "Teoria", prox ? "Próximo tópico: " + escHtml(prox.nome) : "Um assunto novo")}
@@ -7478,6 +7498,13 @@ function hjChipsExtra(){
   const n = nearestProvaCountdown();
   if(n){ const d = Math.max(0, Math.ceil((new Date(n.item.provaData + "T00:00:00") - new Date(iso + "T00:00:00")) / 86400000)); h += `<span>⏳ prova em ${d} d</span>`; }
   return h;
+}
+function hjMais(){
+  const p = document.getElementById("panel-estudos"); p.classList.toggle("hj-mais-on");
+  const b = document.getElementById("hj-toggle"); if(b) b.textContent = p.classList.contains("hj-mais-on") ? "Menos ferramentas" : "Mais ferramentas";
+}
+function hjMostraTimer(){
+  const c = document.querySelector("#panel-estudos .timer-card"); if(c){ c.classList.add("show-idle"); c.scrollIntoView({ behavior:"smooth", block:"center" }); }
 }
 function hjAssuntosOpts(mat){
   const subj = study.subjects.find(s => s.materiaNome === mat);
@@ -7559,8 +7586,7 @@ function renderEstudoHoje(g){
     html += `<div class="hj-card main"><div class="hj-tag">COMECE AQUI</div><div class="hj-title">Monte o seu plano</div><div class="hj-sub">Responda o passo a passo no Perfil. Eu sugiro concursos e monto o cronograma, com a matéria de cada dia aparecendo aqui.</div><div class="hj-actions"><button class="btn primary" onmousedown="event.preventDefault()" onclick="abrirWizard()">Responder o passo a passo</button><button class="btn ghost" onmousedown="event.preventDefault()" onclick="goToOlho()">Ver favoritos</button></div></div>`;
   }
   const objH = objAtual();
-  if(objH === "ingles") html = ingHojeHtml();
-  else if(objH === "ambos") html = html + ingHojeHtml();
+  html = (objH === "ingles" || objH === "ambos") ? ingHojeHtml() : "";
   top.innerHTML = html;
 
   // ----- parte de baixo: questões, revisões e semana -----
@@ -7582,6 +7608,9 @@ function renderEstudoHoje(g){
   for(let i = 0; i < 7; i++){ const d = new Date(mon); d.setDate(d.getDate() + i); const k = isoOfDate(d); dias.push({ k, l: letras[i], min: study.logs.filter(x => x.date === k).reduce((a,x) => a + x.minutes, 0), hoje: k === iso }); }
   const maxMin = Math.max(alvo, ...dias.map(d => d.min), 1);
   bot.innerHTML = `
+    ${hjSessaoHtml(CICLO_LISTA[cicloPtr()], alvo, dueRev)}
+    <button class="btn ghost hj-toggle" id="hj-toggle" onmousedown="event.preventDefault()" onclick="hjMais()">${document.getElementById('panel-estudos').classList.contains('hj-mais-on') ? 'Menos ferramentas' : 'Mais ferramentas'}</button>
+    <div class="hj-extra">
     <div class="hj-card">
       <div class="hj-tag">QUESTÕES</div>
       <div class="hj-title">${nq} hoje${metaQ ? ` <small>de ${metaQ} sugeridas</small>` : ""}</div>
@@ -7594,7 +7623,6 @@ function renderEstudoHoje(g){
       <select class="field-input" id="hj-q-ass" style="margin-top:8px;width:100%">${hjAssuntosOpts(mats[0])}</select>
       <button class="btn primary" style="width:100%;margin-top:8px" onmousedown="event.preventDefault()" onclick="hojeQuestoes()">Registrar questões</button>
     </div>
-    ${hjSessaoHtml(CICLO_LISTA[cicloPtr()], alvo, dueRev)}
     ${(()=>{ const c = editalProgressCounts(); if(!c.total) return ""; const p = Math.round(c.concluidos / c.total * 100); return `<div class="hj-card"><div class="hj-tag">EDITAL</div><div class="ed-card"><div class="ed-ring" style="background:conic-gradient(var(--mint-deep) ${p * 3.6}deg, var(--line) 0)"><i>${p}%</i></div><div style="flex:1"><div class="hj-title" style="margin:0">${c.concluidos} de ${c.total} tópicos vistos</div><div class="hj-sub" style="margin-top:4px">Ao marcar um tópico, a revisão aparece sozinha em 1, 7 e 21 dias.</div></div></div><button class="btn" style="width:100%;margin-top:8px" onmousedown="event.preventDefault()" onclick="setStudySeg('mais'); setTimeout(()=>scrollToEstudos('study-subjects-list'), 80)">Abrir tópicos por matéria</button></div>`; })()}
     <div class="hj-card">
       <div class="hj-tag">PARA REVISAR HOJE</div>
@@ -7608,7 +7636,10 @@ function renderEstudoHoje(g){
       <div class="hj-tag">SUA SEMANA</div>
       <div class="hj-week">${dias.map(d => `<div class="${d.hoje ? "hoje" : ""}"><span class="v">${d.min ? hjFmt(d.min) : ""}</span><div class="col"><i style="height:${Math.max(d.min ? 8 : 3, Math.round(d.min / maxMin * 100))}%"></i></div><b>${d.l}</b></div>`).join("")}</div>
     </div>
-    <div class="hj-more"><button class="btn ghost" onmousedown="event.preventDefault()" onclick="setStudySeg('evolucao');window.scrollTo(0,0)">Ver estatísticas</button><button class="btn ghost" onmousedown="event.preventDefault()" onclick="setStudySeg('plano');window.scrollTo(0,0)">Metas e ciclo</button></div>`;
+    <div class="hj-more"><button class="btn ghost" onmousedown="event.preventDefault()" onclick="setStudySeg('evolucao');window.scrollTo(0,0)">Ver estatísticas</button><button class="btn ghost" onmousedown="event.preventDefault()" onclick="setStudySeg('plano');window.scrollTo(0,0)">Metas e ciclo</button></div>
+    <div class="hj-more"><button class="btn ghost" onmousedown="event.preventDefault()" onclick="hjMostraTimer()">Cronômetro livre</button></div>
+    </div>`;
+  const ib = document.getElementById("inicio-start-btn"); if(ib) ib.textContent = "▶ Estudar hoje: " + CICLO_LISTA[cicloPtr()];
 }
 
 function prepServeCurto(serve, n){
